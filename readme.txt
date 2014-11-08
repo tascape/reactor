@@ -3,7 +3,7 @@ Prerequsites:
 
 1. Development machine - Mac OSX, with java 8, and IDE (Netbeans/Eclipse/...).
 2. Deployment server(Linux), with java 8, apache tomcat 8, mysql 5.
-3. Test machine (reuse of deployment server), with java 8, firefox and Xvfb (for web UI testing)
+3. Test machine (reuse of deployment server), with java 8, firefox and Xvfb (for web UI testing), apache httpd (for serving test log)
 
 
 There are 2 sub-directories: th and thr.
