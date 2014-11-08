@@ -10,4 +10,5 @@ There are 2 sub-directories: th and thr.
 
 1. th - all source code, build dependencies and build scripts for test automation framework.
 2. thr - all source code, build/deploy dependencies and build scripts for test reporting
+3. sample - sample useage of this automation framework.
 
