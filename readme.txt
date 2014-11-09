@@ -16,6 +16,11 @@ Install/configure apache httpd on test machine (ubuntu)
 6. ln -s /var/www/logs /qa/logs
 
 
+Install Xvfb on test machine (ubuntu) for web UI testing
+
+1. sudo apt-get install xvfb
+
+
 There are 3 sub-directories: th and thr.
 
 1. th - all source code, build dependencies and build scripts for test automation framework.
