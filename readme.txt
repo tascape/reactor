@@ -1,14 +1,24 @@
 Prerequsites:
-(this is just a sample setup, you can try other configurations)
+(this is just a sample setup, you can try other configurations, assuming your login user is johnd, you will run testharness under this name)
 
 1. Development machine - Mac OSX, with java 8, and IDE (Netbeans/Eclipse/...).
 2. Deployment server(Linux), with java 8, apache tomcat 8, mysql 5.
 3. Test machine (reuse of deployment server), with java 8, firefox and Xvfb (for web UI testing), apache httpd (for serving test log)
 
 
-There are 2 sub-directories: th and thr.
+Install/configure apache httpd on test machine (ubuntu)
+
+1. sudo apt-get install apache2
+2. sudo mkdir /var/www/logs
+3. sudo chown johnd /var/www/logs
+4. sudo mkdir /qa
+5. sudo chown johnd /qa
+6. ln -s /var/www/logs /qa/logs
+
+
+There are 3 sub-directories: th and thr.
 
 1. th - all source code, build dependencies and build scripts for test automation framework.
 2. thr - all source code, build/deploy dependencies and build scripts for test reporting
-3. sample - sample useage of this automation framework.
+3. sample - sample usage of this automation framework.
 
