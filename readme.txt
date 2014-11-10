@@ -21,6 +21,12 @@ Install Xvfb on test machine (ubuntu) for web UI testing
 1. sudo apt-get install xvfb
 
 
+Configure firefox on test machine for page loading performance testing
+
+1. install plugin firebug
+2. install firebug extension netexport
+
+
 There are 3 sub-directories: th and thr.
 
 1. th - all source code, build dependencies and build scripts for test automation framework.
