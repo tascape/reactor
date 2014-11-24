@@ -20,19 +20,25 @@ public class TestIterationData extends AbstractTestData {
     }
 
     public static TestIterationData[] getData(String sysPropIterations) {
-        String iters = config.getProperty(sysPropIterations);
-        if (iters == null) {
-            iters = "1";
+        String n = config.getProperty(sysPropIterations);
+        return useIterations(n);
+    }
+
+    public static TestIterationData[] useIterations(String n) {
+        int iters = 1;
+        try {
+            iters = Integer.parseInt(n);
+        } catch (Exception ex) {
         }
-        TestIterationData[] data = new TestIterationData[Integer.parseInt(iters)];
-        for (int i = 0; i < data.length; i++) {
-            data[i] = new TestIterationData(i, data.length);
+        TestIterationData[] data = new TestIterationData[iters];
+        for (int i = 0; i < iters; i++) {
+            data[i] = new TestIterationData(i, iters);
         }
         return data;
     }
 
     @Override
     public String format() {
-        return this.iteration + "/" + this.iterations;
+        return (this.iteration + 1) + "/" + this.iterations;
     }
 }

@@ -30,7 +30,7 @@ public class TestSuite {
 
     public TestSuite(String suiteClass, Pattern testClassRegex, Pattern testMethodRegex, int priority)
             throws Exception {
-        LOG.info("Find test cases in target test suite(s)");
+        LOG.info("Find test cases in target test suite");
         AbstractSuite suite = AbstractSuite.class.cast(Class.forName(suiteClass).newInstance());
         suite.setUpTestClasses();
         for (Class<? extends AbstractTest> clazz : suite.getTestClasses()) {
@@ -59,8 +59,8 @@ public class TestSuite {
     }
 
     private List<TestCase> filter(Pattern testClassRegex, Pattern testMethodRegex) {
-        LOG.info("Use test class  name fileter {}", testClassRegex);
-        LOG.info("Use test method name fileter {}", testMethodRegex);
+        LOG.info("Use debug class  name fileter {}", testClassRegex);
+        LOG.info("Use debug method name fileter {}", testMethodRegex);
         List<TestCase> tcs = new ArrayList<>();
         this.tests.stream().forEach((tc) -> {
             Matcher mc = testClassRegex.matcher(tc.getTestClass());

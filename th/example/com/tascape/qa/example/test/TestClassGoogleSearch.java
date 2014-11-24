@@ -1,6 +1,7 @@
 package com.tascape.qa.example.test;
 
 import com.tascape.qa.example.driver.GoogleSearchUi;
+import com.tascape.qa.th.Utils;
 import com.tascape.qa.th.data.TestDataProvider;
 import com.tascape.qa.th.data.TestIterationData;
 import com.tascape.qa.th.test.JUnit4Test;
@@ -21,8 +22,10 @@ public class TestClassGoogleSearch extends JUnit4Test {
     }
 
     @Test
-    @TestDataProvider(klass=TestIterationData.class)
+    @TestDataProvider(klass=TestIterationData.class, method = "useIterations", parameter = "4")
     public void testSearch() throws Exception {
-        this.search.search("test automation");
+        TestIterationData data = this.getTestData(TestIterationData.class);
+        this.search.search("test automation " + data.format());
+        Utils.sleep(2000, "wait");
     }
 }
