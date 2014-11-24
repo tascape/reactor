@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<project name="th" default="deploy">
+    <description>Builds, tests, and runs the project th.</description>
+
+    <target name="init">
+        <property file="build.properties" />
+        <property file="${conf.dir}/build_info.properties"/>
+        <property name="build.number" value="${build.major.number}.${build.minor.number}.${build.revision.number}"/>
+        <echo>Current build number: ${build.number}</echo>
+    </target>
+   
+    <target name="compile" depends="init">
+        <mkdir dir="${bin.dir}" />
+        <mkdir dir="${bin.dir}/classes" />
+        <javac includeantruntime="false" debug="true" destdir="${bin.dir}/classes" encoding="UTF-8">
+            <compilerarg value="-Xlint"/>
+            <src path="${src.dir}/main/java" />
+            <classpath>
+                <fileset dir="${lib.dir}" includes="**/*.jar" />
+            </classpath>
+        </javac>
+    </target>
+
+    <target name="jar" depends="compile">
+        <jar destfile="${deploy.dir}/th.jar">
+            <fileset dir="${bin.dir}/classes" />
+            <fileset dir="${conf.dir}" />
+        </jar>
+    </target>
+
+    <target name="deploy" depends="jar">
+        <propertyfile  file="${conf.dir}/build_info.properties">
+            <entry key="build.revision.number" type="int" operation="+" value="1" pattern="00000"/>
+        </propertyfile>
+    </target>
+    
+    <target name="clean" depends="init">
+        <delete dir="${deploy.dir}" />
+        <delete dir="${bin.dir}/classes" />
+        <delete dir="${bin.dir}" />
+    </target>
+</project>
