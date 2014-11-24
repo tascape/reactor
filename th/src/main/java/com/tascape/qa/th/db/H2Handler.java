@@ -120,7 +120,7 @@ public final class H2Handler extends DbHandler {
                 }
 
                 Long time = System.currentTimeMillis();
-                stmt.setString(1, Utils.getUniqueId("r"));
+                stmt.setString(1, Utils.getUniqueId());
                 stmt.setString(2, execId);
                 stmt.setInt(3, tcid);
                 stmt.setString(4, ExecutionResult.QUEUED.name());

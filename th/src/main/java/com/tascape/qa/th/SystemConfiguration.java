@@ -23,7 +23,9 @@ import org.slf4j.LoggerFactory;
 public class SystemConfiguration {
     private static final Logger LOG = LoggerFactory.getLogger(SystemConfiguration.class);
 
-    public static final String CONSTANT_LOG_KEEP_ALIVE_PREFIX = "_thlkah_";
+    public static final String CONSTANT_LOG_KEEP_ALIVE_PREFIX = "thlka_";
+
+    public static final String CONSTANT_EXEC_ID_PREFIX = "th_";
 
     public static final String SYSPROP_CONF_FILE = "qa.th.conf.file";
 
@@ -61,6 +63,10 @@ public class SystemConfiguration {
 
     private final Properties properties = new Properties();
 
+    public static SystemConfiguration getInstance() {
+        return CONFIG;
+    }
+
     private SystemConfiguration() {
         this.listSysProperties();
 
@@ -87,16 +93,12 @@ public class SystemConfiguration {
 
         String execId = this.properties.getProperty(SYSPROP_EXECUTION_ID);
         if (execId == null || execId.trim().isEmpty()) {
-            execId = Utils.getUniqueId("wx" + System.currentTimeMillis());
+            execId = Utils.getUniqueId(CONSTANT_EXEC_ID_PREFIX);
             LOG.warn("There is no execution id specified, using local new UUID: {}", execId);
             this.properties.setProperty(SYSPROP_EXECUTION_ID, execId);
         }
 
         this.listAppProperties();
-    }
-
-    public static SystemConfiguration getInstance() {
-        return CONFIG;
     }
 
     public String getProperty(String name) {

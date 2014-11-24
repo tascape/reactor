@@ -414,8 +414,12 @@ public class Utils {
         t.start();
     }
 
+    public static String getUniqueId() {
+        return getUniqueId("");
+    }
+
     public static String getUniqueId(String prefix) {
-        return new StringBuilder(prefix).append(UUID.randomUUID()).toString().replaceAll("-", "x");
+        return new StringBuilder(prefix).append(UUID.randomUUID()).toString().replaceAll("-", "_");
     }
 
     public static void sleep(long millis, String message) throws InterruptedException {

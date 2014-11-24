@@ -186,7 +186,7 @@ public class MysqlHandler extends DbHandler {
                         tcid = this.getTestCaseId(test);
                     }
 
-                    rs.updateString(Test_Result.TEST_RESULT_ID.name(), Utils.getUniqueId("r"));
+                    rs.updateString(Test_Result.TEST_RESULT_ID.name(), Utils.getUniqueId());
                     rs.updateString(Test_Result.SUITE_RESULT.name(), execId);
                     rs.updateInt(Test_Result.TEST_CASE_ID.name(), tcid);
                     rs.updateString(Test_Result.EXECUTION_RESULT.name(), ExecutionResult.QUEUED.name());
