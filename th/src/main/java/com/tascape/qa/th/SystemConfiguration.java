@@ -107,24 +107,40 @@ public class SystemConfiguration {
         return this.properties.getProperty(name, defaultValue);
     }
 
+    public int getIntProperty(String name, int defaultValue) {
+        String v = this.getProperty(name);
+        if (v == null) {
+            return defaultValue;
+        }
+        return Integer.parseInt(v);
+    }
+
+    public boolean getBooleanProperty(String name, boolean defaultValue) {
+        String v = this.getProperty(name);
+        if (v == null) {
+            return defaultValue;
+        }
+        return Boolean.parseBoolean(v);
+    }
+
     public Path getRootPath() {
-        return Paths.get(this.properties.getProperty(SYSPROP_ROOT_PATH, "/qa"));
+        return Paths.get(this.getProperty(SYSPROP_ROOT_PATH, "/qa"));
     }
 
     public Path getLogPath() {
-        return Paths.get(this.properties.getProperty(SYSPROP_LOG_PATH, "/qa/logs"));
+        return Paths.get(this.getProperty(SYSPROP_LOG_PATH, "/qa/logs"));
     }
 
     public int getTestRetry() {
-        return Integer.parseInt(this.properties.getProperty(SYSPROP_TEST_RETRY, "0"));
+        return Integer.parseInt(this.getProperty(SYSPROP_TEST_RETRY, "0"));
     }
 
     public int getExecutionThreadCount() {
-        return Integer.parseInt(this.properties.getProperty(SYSPROP_EXECUTION_THREAD_COUNT, "1"));
+        return Integer.parseInt(this.getProperty(SYSPROP_EXECUTION_THREAD_COUNT, "1"));
     }
 
     public String getHostName() {
-        String hn = this.properties.getProperty(SYSPROP_TEST_STATION);
+        String hn = this.getProperty(SYSPROP_TEST_STATION);
         if (hn == null || hn.isEmpty()) {
             try {
                 hn = Utils.cmd("hostname").get(0);
@@ -138,7 +154,7 @@ public class SystemConfiguration {
     }
 
     public String getExecId() {
-        return this.properties.getProperty(SYSPROP_EXECUTION_ID);
+        return this.getProperty(SYSPROP_EXECUTION_ID);
     }
 
     /**
@@ -147,7 +163,7 @@ public class SystemConfiguration {
      * @return
      */
     public String getTestSuite() {
-        String suite = this.properties.getProperty(SYSPROP_TEST_SUITE);
+        String suite = this.getProperty(SYSPROP_TEST_SUITE);
         if (suite == null || suite.isEmpty()) {
             throw new RuntimeException("There is no test suite class name specified (system property "
                     + SYSPROP_TEST_SUITE + ")");
@@ -156,17 +172,17 @@ public class SystemConfiguration {
     }
 
     public Pattern getTestClassRegex() {
-        String regex = this.properties.getProperty(SYSPROP_DEBUG_CLASS_REGEX, ".+");
+        String regex = this.getProperty(SYSPROP_DEBUG_CLASS_REGEX, ".+");
         return Pattern.compile(regex);
     }
 
     public Pattern getTestMethodRegex() {
-        String regex = this.properties.getProperty(SYSPROP_DEBUG_METHOD_RESGX, ".+");
+        String regex = this.getProperty(SYSPROP_DEBUG_METHOD_RESGX, ".+");
         return Pattern.compile(regex);
     }
 
     public int getTestPriority() {
-        String v = this.properties.getProperty(SYSPROP_TEST_PRIORITY);
+        String v = this.getProperty(SYSPROP_TEST_PRIORITY);
         if (v == null || v.isEmpty()) {
             return Priority.P3;
         }
@@ -174,15 +190,15 @@ public class SystemConfiguration {
     }
 
     public String getDatabaseType() {
-        return this.properties.getProperty(DbHandler.SYSPROP_DATABASE_TYPE, "mysql");
+        return this.getProperty(DbHandler.SYSPROP_DATABASE_TYPE, "mysql");
     }
 
     public String getDatabaseHost() {
-        return this.properties.getProperty(DbHandler.SYSPROP_DATABASE_HOST, "127.0.0.1:3306");
+        return this.getProperty(DbHandler.SYSPROP_DATABASE_HOST, "127.0.0.1:3306");
     }
 
     public String getDatabaseSchema() {
-        return this.properties.getProperty(DbHandler.SYSPROP_DATABASE_SCHEMA, "testharness");
+        return this.getProperty(DbHandler.SYSPROP_DATABASE_SCHEMA, "testharness");
     }
 
     public String getDatabaseUser() {
@@ -190,11 +206,11 @@ public class SystemConfiguration {
     }
 
     public String getDatabasePass() {
-        return this.properties.getProperty(DbHandler.SYSPROP_DATABASE_PASS, "p@ssword");
+        return this.getProperty(DbHandler.SYSPROP_DATABASE_PASS, "p@ssword");
     }
 
     public String getProdUnderTest() {
-        return this.properties.getProperty(SYSPROP_PRODUCT_UNDER_TEST, SYSPROP_PRODUCT_UNDER_TEST + " was not set");
+        return this.getProperty(SYSPROP_PRODUCT_UNDER_TEST, SYSPROP_PRODUCT_UNDER_TEST + " was not set");
     }
 
     public String getJobName() {
