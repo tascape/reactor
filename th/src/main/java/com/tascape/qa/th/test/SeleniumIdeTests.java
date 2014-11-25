@@ -1,9 +1,8 @@
 package com.tascape.qa.th.test;
 
+import com.tascape.qa.th.suite.SeleniumIdeSuite;
 import java.io.File;
 import org.apache.commons.io.FileUtils;
-import org.junit.After;
-import org.junit.Before;
 import org.openqa.selenium.server.RemoteControlConfiguration;
 import org.openqa.selenium.server.SeleniumServer;
 import org.openqa.selenium.server.htmlrunner.HTMLLauncher;
@@ -22,20 +21,7 @@ public abstract class SeleniumIdeTests extends AbstractTest {
     public SeleniumIdeTests() throws Exception {
         RemoteControlConfiguration rcc = new RemoteControlConfiguration();
         rcc.setTrustAllSSLCertificates(true);
-        this.seleniumServer = new SeleniumServer(false, rcc);
-    }
-
-    @Before
-    public void setUp() throws Exception {
-        this.seleniumServer.start();
-    }
-
-    @After
-    public void tearDown() throws Exception {
-        this.seleniumServer.stop();
-        /*
-         * http://localhost:4444/selenium-server/driver/?cmd=shutDownSeleniumServer
-         */
+        this.seleniumServer = SeleniumIdeSuite.getSeleniumServer();
     }
 
     protected boolean runSeleniumIdeFirefox(File html, String browserURL) throws Exception {
