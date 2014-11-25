@@ -16,6 +16,7 @@
         <javac includeantruntime="false" debug="true" destdir="${bin.dir}/classes" encoding="UTF-8">
             <compilerarg value="-Xlint"/>
             <src path="${src.dir}/main/java" />
+            <src path="${src.dir}/../example" />
             <classpath>
                 <fileset dir="${lib.dir}" includes="**/*.jar" />
             </classpath>
