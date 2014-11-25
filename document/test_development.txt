@@ -1,0 +1,40 @@
+For Mac OS
+(assume Linux username is johnd, with sudo access)
+
+
+Install Java SE bundle of NetBeans IDE
+  http://www.oracle.com/technetwork/java/javase/downloads/jdk-netbeans-jsp-142931.html
+
+
+Install/Update Firefox web browser
+  1. install plugin Firebug - http://getfirebug.com/
+  2. install Firebug extension Netexport - http://getfirebug.com/wiki/index.php/Firebug_Extensions
+
+
+Install/Configure Apache httpd to serve test log
+  1. sudo mkdir /Library/WebServer/Documents/logs
+  2. sudo chown johnd /Library/WebServer/Documents/logs
+  3. sudo mkdir /qa
+  4. sudo chown johnd /qa
+  5. ln -s /Library/WebServer/Documents/logs /qa/logs
+  6. sudo /usr/sbin/apachectl restart
+
+
+Download Selenium Java
+  1. cd /qa
+  2. wget http://selenium-release.storage.googleapis.com/2.44/selenium-java-2.44.0.zip
+  3. unzip selenium-java-2.44.0.zip
+  4. rm selenium-java-2.44.0.zip
+
+
+Install Git
+  https://help.ubuntu.com/lts/serverguide/git.html
+  
+
+Install Apache Ant
+  http://www.vogella.com/tutorials/ApacheAnt/article.html
+
+
+Clone github project tascape/testharness
+  1. cd /qa
+  2. git clone https://github.com/tascape/testharness.git
