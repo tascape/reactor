@@ -12,20 +12,20 @@ import org.junit.Test;
  * @author linsong wang
  */
 public class TestClassGoogleSearch extends JUnit4Test {
-    
+
     public static final String SEARCH_UI = "SEARCH_UI";
 
-    private final GoogleSearchUi search;
-    
+    private final GoogleSearchUi searchUi;
+
     public TestClassGoogleSearch() {
-        this.search = this.getDriver(SEARCH_UI, GoogleSearchUi.class);
+        this.searchUi = this.getEntityDriver(SEARCH_UI, GoogleSearchUi.class);
     }
 
     @Test
-    @TestDataProvider(klass=TestIterationData.class, method = "useIterations", parameter = "4")
+    @TestDataProvider(klass = TestIterationData.class, method = "useIterations", parameter = "4")
     public void testSearch() throws Exception {
         TestIterationData data = this.getTestData(TestIterationData.class);
-        this.search.search("test automation " + data.format());
+        this.searchUi.search("test automation " + data.format());
         Utils.sleep(2000, "wait");
     }
 }

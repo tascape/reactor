@@ -1,17 +1,14 @@
 package com.tascape.qa.example.driver;
 
 import com.tascape.qa.th.driver.EntityDriver;
-import com.tascape.qa.th.driver.WebBrowser;
+import com.tascape.qa.th.comm.WebBrowser;
+import com.tascape.qa.th.driver.WebPage;
 
 /**
  *
  * @author linsong wang
  */
 public class GoogleSearchUi extends EntityDriver {
-
-    private WebBrowser browser;
-
-    private SearchPage queryPage;
 
     @Override
     public String getName() {
@@ -20,20 +17,13 @@ public class GoogleSearchUi extends EntityDriver {
 
     public void search(String term) throws Exception {
         this.reset();
-        this.queryPage.submitSearch(term);
+        SearchPage searchPage = WebPage.getPage(SearchPage.class, this);
+        searchPage.submitSearch(term);
     }
 
     @Override
     public void reset() throws Exception {
-        this.browser.get(SearchPage.URL);
-    }
-
-    public WebBrowser getBrowser() {
-        return browser;
-    }
-
-    public void setBrowser(WebBrowser browser) {
-        this.browser = browser;
-        this.queryPage = this.browser.getPage(SearchPage.class, this);
+        WebBrowser browser = WebBrowser.class.cast(this.getEntityCommunication());
+        browser.get(SearchPage.URL);
     }
 }

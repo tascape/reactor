@@ -37,8 +37,6 @@ public class SystemConfiguration {
 
     public static final String SYSPROP_TEST_RETRY = "qa.th.test.retry";
 
-    public static final String SYSPROP_ROOT_PATH = "qa.th.root.path";
-
     public static final String SYSPROP_LOG_PATH = "qa.th.log.path";
 
     public static final String SYSPROP_TEST_SUITE = "qa.th.test.suite";
@@ -123,10 +121,6 @@ public class SystemConfiguration {
             return defaultValue;
         }
         return Boolean.parseBoolean(v);
-    }
-
-    public Path getRootPath() {
-        return Paths.get(this.getProperty(SYSPROP_ROOT_PATH, "/qa"));
     }
 
     public Path getLogPath() {

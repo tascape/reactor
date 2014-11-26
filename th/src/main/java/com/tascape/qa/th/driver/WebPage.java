@@ -1,10 +1,16 @@
 package com.tascape.qa.th.driver;
 
+import com.google.common.collect.HashBasedTable;
+import com.google.common.collect.Table;
+import com.tascape.qa.th.comm.EntityCommunication;
+import com.tascape.qa.th.comm.WebBrowser;
+import com.tascape.qa.th.exception.EntityCommunicationException;
 import java.io.File;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.CacheLookup;
 import org.openqa.selenium.support.FindBy;
+import org.openqa.selenium.support.PageFactory;
 import org.openqa.selenium.support.ui.Select;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -23,6 +29,26 @@ public class WebPage {
     @CacheLookup
     @FindBy(tagName = "body")
     protected WebElement body;
+
+    private static final Table<Class, EntityDriver, WebPage> PAGES = HashBasedTable.create();
+
+    public static synchronized <T extends WebPage> T getPage(java.lang.Class<T> pageClass, EntityDriver entityDriver)
+            throws EntityCommunicationException {
+        WebPage pageLoaded = PAGES.get(pageClass, entityDriver);
+        if (pageLoaded != null) {
+            return (T) pageLoaded;
+        }
+        EntityCommunication comm = entityDriver.getEntityCommunication();
+        if (comm instanceof WebBrowser) {
+            WebBrowser wb = WebBrowser.class.cast(comm);
+            T page = PageFactory.initElements(wb.getWebDriver(), pageClass);
+            page.setWebBrowser(wb);
+            page.setEntityDriver(entityDriver);
+            PAGES.put(pageClass, entityDriver, page);
+            return page;
+        }
+        throw new EntityCommunicationException("Invalid communication type " + comm.toString());
+    }
 
     public EntityDriver getEntityDriver() {
         return entityDriver;

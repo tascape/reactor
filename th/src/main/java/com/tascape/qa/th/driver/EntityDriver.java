@@ -1,14 +1,13 @@
 package com.tascape.qa.th.driver;
 
-import com.tascape.qa.th.SystemConfiguration;
 import com.tascape.qa.th.Utils;
+import com.tascape.qa.th.comm.EntityCommunication;
 import com.tascape.qa.th.test.AbstractTest;
 import java.awt.AWTException;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.Properties;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -17,22 +16,11 @@ import org.slf4j.LoggerFactory;
  * @author linsong wang
  */
 public abstract class EntityDriver {
-
     private static final Logger LOG = LoggerFactory.getLogger(EntityDriver.class);
 
-    protected Properties properties;
+    private EntityCommunication entityCommunication;
 
     private AbstractTest test;
-
-    public static final Path ROOT_PATH = SystemConfiguration.getInstance().getRootPath();
-
-    public void setProperties(Properties properties) {
-        this.properties = properties;
-    }
-
-    public String getProperty(String name) {
-        return this.properties.getProperty(name);
-    }
 
     public Path getLogDirectory() {
         if (this.test == null) {
@@ -41,8 +29,19 @@ public abstract class EntityDriver {
         return this.test.getLogDirectory();
     }
 
+    public EntityCommunication getEntityCommunication() {
+        return entityCommunication;
+    }
+
+    public void setEntityCommunication(EntityCommunication entityCommunication) {
+        this.entityCommunication = entityCommunication;
+    }
+
     public void setTest(AbstractTest test) {
         this.test = test;
+        if (this.entityCommunication != null) {
+            this.entityCommunication.setTest(test);
+        }
     }
 
     protected AbstractTest getTest() {

@@ -2,7 +2,7 @@ package com.tascape.qa.example.suite;
 
 import com.tascape.qa.example.driver.GoogleSearchUi;
 import com.tascape.qa.example.test.TestClassGoogleSearch;
-import com.tascape.qa.th.driver.WebBrowser;
+import com.tascape.qa.th.comm.WebBrowser;
 import com.tascape.qa.th.suite.AbstractSuite;
 
 /**
@@ -21,9 +21,9 @@ public class TestSuiteOne extends AbstractSuite {
     @Override
     protected void setUpEnvironment() throws Exception {
         browser = WebBrowser.getFirefox(false);
-        GoogleSearchUi search = new GoogleSearchUi();
-        search.setBrowser(browser);
         browser.landscape();
+        GoogleSearchUi search = new GoogleSearchUi();
+        search.setEntityCommunication(browser);
 
         this.putDirver(TestClassGoogleSearch.class, TestClassGoogleSearch.SEARCH_UI, search);
     }

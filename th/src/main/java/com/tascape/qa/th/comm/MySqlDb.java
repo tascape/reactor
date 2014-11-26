@@ -1,5 +1,6 @@
-package com.tascape.qa.th.driver;
+package com.tascape.qa.th.comm;
 
+import java.io.IOException;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
@@ -20,7 +21,7 @@ import org.slf4j.LoggerFactory;
  *
  * @author linsong wang
  */
-public class MySqlDb {
+public class MySqlDb extends EntityCommunication {
     private static final Logger LOG = LoggerFactory.getLogger(MySqlDb.class);
 
     public static final String TEMP_TABLE_NAME_SUFFIX = "_TEMP_TBL_TH_SUFFIX";
@@ -47,7 +48,7 @@ public class MySqlDb {
 
     /**
      *
-     * @param dbUrl    such as "jdbc:mysql://eng005:3570/marketplace");
+     * @param dbUrl    such as "jdbc:mysql://localhost:3570/testharness");
      * @param user
      * @param password
      */
@@ -57,6 +58,14 @@ public class MySqlDb {
         this.password = password;
 
         this.dbInfo = dbUrl.split("\\?")[0];
+    }
+
+    @Override
+    public void connect() throws IOException {
+    }
+
+    @Override
+    public void disconnect() throws IOException {
     }
 
     public boolean tableExists(String tableName) throws SQLException {
@@ -85,6 +94,7 @@ public class MySqlDb {
      * Replicates table structure and data from source to temporary table.
      *
      * @param tableName
+     * @param toCopyData
      *
      * @return
      *

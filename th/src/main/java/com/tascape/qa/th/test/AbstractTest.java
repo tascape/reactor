@@ -33,8 +33,6 @@ import org.slf4j.LoggerFactory;
 public abstract class AbstractTest {
     private static final Logger LOG = LoggerFactory.getLogger(AbstractTest.class);
 
-    public static final Path ROOT_PATH = SystemConfiguration.getInstance().getRootPath();
-
     private static final ThreadLocal<AbstractTest> ABSTRACT_TEST = new ThreadLocal<>();
 
     public static void setTest(AbstractTest test) {
@@ -88,7 +86,7 @@ public abstract class AbstractTest {
         return testLogPath;
     }
 
-    protected <T extends EntityDriver> T getDriver(String name, Class<T> clazz) {
+    protected <T extends EntityDriver> T getEntityDriver(String name, Class<T> clazz) {
         String key = this.getClass().getName() + "." + name;
         LOG.debug("Getting runtime driver (name={}, type={}) from suite test environment", key, clazz.getName());
 

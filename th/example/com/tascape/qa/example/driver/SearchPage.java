@@ -9,7 +9,7 @@ import org.openqa.selenium.support.FindBy;
  * @author linsong wang
  */
 public class SearchPage extends WebPage {
-    
+
     public static final String URL = "http://google.com";
 
     @FindBy(id = "gbqfq")

@@ -1,4 +1,4 @@
-package com.tascape.qa.th.driver;
+package com.tascape.qa.th.comm;
 
 import com.tascape.qa.th.SystemConfiguration;
 import com.tascape.qa.th.Utils;
@@ -66,7 +66,7 @@ public class Firefox extends WebBrowser {
         long end = System.currentTimeMillis() + 180000;
         while (System.currentTimeMillis() < end) {
             try {
-                this.setDriver(new FirefoxDriver(profile));
+                this.setWebDriver(new FirefoxDriver(profile));
                 break;
             } catch (org.openqa.selenium.WebDriverException ex) {
                 String msg = ex.getMessage();

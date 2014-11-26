@@ -1,4 +1,4 @@
-package com.tascape.qa.th.driver;
+package com.tascape.qa.th.comm;
 
 import com.tascape.qa.th.SystemConfiguration;
 import java.util.Arrays;
@@ -20,8 +20,7 @@ public class Chrome extends WebBrowser {
     public Chrome() {
         String chromeServer = System.getProperty("webdriver.chrome.driver");
         if (chromeServer == null) {
-            System.setProperty("webdriver.chrome.driver", CONFIG.getProperty("webdriver.chrome.driver",
-                    CONFIG.getRootPath().resolve("tools/web_browser/chromedriver").toFile().getAbsolutePath()));
+            throw new RuntimeException("Cannot find system property webdriver.chrome.driver");
         }
 
         ChromeOptions options = new ChromeOptions();
@@ -30,7 +29,7 @@ public class Chrome extends WebBrowser {
         DesiredCapabilities capabilities = DesiredCapabilities.chrome();
         capabilities.setCapability(ChromeOptions.CAPABILITY, options);
 
-        this.setDriver(new ChromeDriver(capabilities));
+        this.setWebDriver(new ChromeDriver(capabilities));
     }
 
     @Override

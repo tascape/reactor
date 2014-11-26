@@ -1,6 +1,6 @@
-package com.tascape.qa.th.driver;
+package com.tascape.qa.th.comm;
 
-import com.google.common.base.Predicate;
+import java.io.IOException;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
@@ -11,9 +11,7 @@ import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.Point;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
-import org.openqa.selenium.htmlunit.HtmlUnitDriver;
 import org.openqa.selenium.interactions.Actions;
-import org.openqa.selenium.support.PageFactory;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
 import org.slf4j.Logger;
@@ -23,7 +21,7 @@ import org.slf4j.LoggerFactory;
  *
  * @author linsong wang
  */
-public abstract class WebBrowser implements WebDriver {
+public abstract class WebBrowser extends EntityCommunication implements WebDriver {
 
     private static final Logger LOG = LoggerFactory.getLogger(WebBrowser.class);
 
@@ -35,9 +33,13 @@ public abstract class WebBrowser implements WebDriver {
 
     public static final int HEIGHT = 1080;
 
-    private WebDriver driver;
+    private WebDriver webDriver;
 
     private Actions actions;
+
+    public void setWebDriver(WebDriver webDriver) {
+        this.webDriver = webDriver;
+    }
 
     public enum Type {
         Firefox,
@@ -64,26 +66,26 @@ public abstract class WebBrowser implements WebDriver {
                 wb = new Chrome();
                 break;
 
-            case Html:
-                wb = new HtmlUnit();
-                break;
+            default:
+                throw new RuntimeException("Browser type " + type + " is not supported");
         }
         wb.setDefaults();
         return wb;
     }
 
-    public WebDriver getDriver() {
-        return driver;
+    @Override
+    public void connect() throws IOException {
     }
 
-    public void setDriver(WebDriver driver) {
-        this.driver = driver;
+    @Override
+    public void disconnect() throws IOException {
+        this.webDriver.quit();
     }
 
     @Override
     public void get(String url) {
         LOG.debug("Open url {}", url);
-        this.driver.get(url);
+        this.webDriver.get(url);
     }
 
     public abstract int getPageLoadTimeMillis(String url) throws Exception;
@@ -92,31 +94,31 @@ public abstract class WebBrowser implements WebDriver {
 
     @Override
     public String getCurrentUrl() {
-        String url = this.driver.getCurrentUrl();
+        String url = this.webDriver.getCurrentUrl();
         LOG.debug("Current url is {}", url);
         return url;
     }
 
     @Override
     public String getTitle() {
-        String title = this.driver.getTitle();
+        String title = this.webDriver.getTitle();
         LOG.debug("Title is {}", title);
         return title;
     }
 
     @Override
     public List<WebElement> findElements(By by) {
-        return this.driver.findElements(by);
+        return this.webDriver.findElements(by);
     }
 
     @Override
     public WebElement findElement(By by) {
-        return this.driver.findElement(by);
+        return this.webDriver.findElement(by);
     }
 
     @Override
     public String getPageSource() {
-        String src = this.driver.getPageSource();
+        String src = this.webDriver.getPageSource();
         LOG.debug("Page src length {}", src.length());
         return src;
     }
@@ -124,38 +126,38 @@ public abstract class WebBrowser implements WebDriver {
     @Override
     public void close() {
         LOG.debug("Close browser");
-        this.driver.close();
+        this.webDriver.close();
     }
 
     @Override
     public void quit() {
         LOG.debug("Quit browser");
-        this.driver.quit();
+        this.webDriver.quit();
     }
 
     @Override
     public Set<String> getWindowHandles() {
-        return this.driver.getWindowHandles();
+        return this.webDriver.getWindowHandles();
     }
 
     @Override
     public String getWindowHandle() {
-        return this.driver.getWindowHandle();
+        return this.webDriver.getWindowHandle();
     }
 
     @Override
     public TargetLocator switchTo() {
-        return this.driver.switchTo();
+        return this.webDriver.switchTo();
     }
 
     @Override
     public Navigation navigate() {
-        return this.driver.navigate();
+        return this.webDriver.navigate();
     }
 
     @Override
     public Options manage() {
-        return this.driver.manage();
+        return this.webDriver.manage();
     }
 
     /**
@@ -177,7 +179,7 @@ public abstract class WebBrowser implements WebDriver {
      * @return
      */
     public <T extends Object> T executeScript(Class<T> type, String script, Object... args) {
-        Object object = ((JavascriptExecutor) driver).executeScript(script, args);
+        Object object = ((JavascriptExecutor) webDriver).executeScript(script, args);
         return type.cast(object);
     }
 
@@ -196,11 +198,11 @@ public abstract class WebBrowser implements WebDriver {
     }
 
     public void scrollToTop() {
-        ((JavascriptExecutor) driver).executeScript("window.scrollTo(0, 0 - document.body.scrollHeight);");
+        ((JavascriptExecutor) webDriver).executeScript("window.scrollTo(0, 0 - document.body.scrollHeight);");
     }
 
     public void scrollToBottom() {
-        ((JavascriptExecutor) driver).executeScript("window.scrollTo(0, document.body.scrollHeight);");
+        ((JavascriptExecutor) webDriver).executeScript("window.scrollTo(0, document.body.scrollHeight);");
     }
 
     public String getHtml(WebElement element) {
@@ -222,37 +224,26 @@ public abstract class WebBrowser implements WebDriver {
     public void waitForNoElement(final By by, int seconds) {
         LOG.debug("Wait for element {} to disappear", by);
         WebDriverWait wait = new WebDriverWait(this, seconds);
-        wait.until(new Predicate<WebDriver>() {
-            @Override
-            public boolean apply(WebDriver t) {
-                List<WebElement> es = t.findElements(by);
-                if (es.isEmpty()) {
-                    return true;
-                } else {
-                    for (WebElement e : es) {
-                        if (!e.getCssValue("display").equals("none")) {
-                            return false;
-                        }
-                    }
-                    return true;
-                }
+        wait.until((WebDriver t) -> {
+            List<WebElement> es = t.findElements(by);
+            if (es.isEmpty()) {
+                return true;
+            } else {
+                return es.stream().noneMatch((e) -> (!e.getCssValue("display").equals("none")));
             }
         });
     }
 
-    public <T extends WebPage> T getPage(java.lang.Class<T> pageClass, EntityDriver entityDriver) {
-        T page = PageFactory.initElements(this, pageClass);
-        page.setWebBrowser(this);
-        page.setEntityDriver(entityDriver);
-        return page;
+    private void setDefaults() {
+        this.actions = new Actions(this.webDriver);
+        this.webDriver.manage().timeouts().implicitlyWait(60, TimeUnit.SECONDS);
+        this.webDriver.manage().timeouts().pageLoadTimeout(120, TimeUnit.SECONDS);
+        this.webDriver.manage().timeouts().setScriptTimeout(120, TimeUnit.SECONDS);
+        this.hide();
     }
 
-    private void setDefaults() {
-        this.actions = new Actions(this.driver);
-        this.driver.manage().timeouts().implicitlyWait(60, TimeUnit.SECONDS);
-        this.driver.manage().timeouts().pageLoadTimeout(120, TimeUnit.SECONDS);
-        this.driver.manage().timeouts().setScriptTimeout(120, TimeUnit.SECONDS);
-        this.hide();
+    public WebDriver getWebDriver() {
+        return this.webDriver;
     }
 
     public static interface Ajax {
@@ -276,23 +267,6 @@ public abstract class WebBrowser implements WebDriver {
         @Override
         public By getByDisapper() {
             return null;
-        }
-    }
-
-    public static class HtmlUnit extends WebBrowser {
-
-        public HtmlUnit() {
-            this.setDriver(new HtmlUnitDriver());
-        }
-
-        @Override
-        public int getPageLoadTimeMillis(String url) throws Exception {
-            throw new UnsupportedOperationException("Not supported yet.");
-        }
-
-        @Override
-        public int getAjaxLoadTimeMillis(Ajax ajax) throws Exception {
-            throw new UnsupportedOperationException("Not supported yet.");
         }
     }
 }

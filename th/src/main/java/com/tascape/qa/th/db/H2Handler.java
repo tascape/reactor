@@ -35,7 +35,7 @@ public final class H2Handler extends DbHandler {
         }
     }
 
-    private final String dbPath = CONFIG.getRootPath() + "/db/";
+    private final String dbPath = CONFIG.getLogPath() + "/db/";
 
     private JdbcConnectionPool connPool;
 

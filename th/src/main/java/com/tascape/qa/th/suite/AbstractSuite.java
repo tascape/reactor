@@ -39,8 +39,6 @@ public abstract class AbstractSuite {
         return drivers;
     }
 
-    public static final Path ROOT_PATH = SystemConfiguration.getInstance().getRootPath();
-
     private static final Set<AbstractSuite> SUITES = new HashSet<>();
 
     private final List<Class<? extends AbstractTest>> testClasses = new ArrayList<>();
