@@ -1,7 +1,6 @@
 package com.tascape.qa.th.comm;
 
 import com.tascape.qa.th.test.AbstractTest;
-import java.io.IOException;
 
 /**
  *
@@ -11,9 +10,9 @@ public abstract class EntityCommunication {
 
     private AbstractTest test;
 
-    public abstract void connect() throws IOException;
+    public abstract void connect() throws Exception;
 
-    public abstract void disconnect() throws IOException;
+    public abstract void disconnect() throws Exception;
 
     public void setTest(AbstractTest test) {
         this.test = test;

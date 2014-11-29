@@ -16,7 +16,7 @@ import org.slf4j.LoggerFactory;
 public abstract class SeleniumIdeTests extends AbstractTest {
     private static final Logger LOG = LoggerFactory.getLogger(SeleniumIdeTests.class);
 
-    protected final SeleniumServer seleniumServer;
+    private final SeleniumServer seleniumServer;
 
     public SeleniumIdeTests() throws Exception {
         RemoteControlConfiguration rcc = new RemoteControlConfiguration();
