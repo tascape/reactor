@@ -96,8 +96,8 @@ public class Firefox extends WebBrowser {
         private final String tokenNetExport = UUID.randomUUID().toString();
 
         private final Path harPath = sysConfig.getLogPath()
-                .resolve(sysConfig.getExecId())
-                .resolve(SystemConfiguration.CONSTANT_LOG_KEEP_ALIVE_PREFIX + "har-" + System.currentTimeMillis());
+            .resolve(sysConfig.getExecId())
+            .resolve(SystemConfiguration.CONSTANT_LOG_KEEP_ALIVE_PREFIX + "har-" + System.currentTimeMillis());
 
         public void clearHarDir() throws IOException {
             File[] hars = this.harPath.toFile().listFiles(new FilenameFilter() {
@@ -113,8 +113,8 @@ public class Firefox extends WebBrowser {
             }
         }
 
-        public int getPageLoadTimeMillis(String url) throws IOException, JSONException, InterruptedException,
-                ParseException {
+        public int getPageLoadTimeMillis(String url)
+            throws IOException, JSONException, InterruptedException, ParseException {
             Utils.sleep(2000, "");
             this.clearHarDir();
             Firefox.this.get(url);
@@ -122,8 +122,8 @@ public class Firefox extends WebBrowser {
             return HarLog.parse(json).getOverallLoadTimeMillis();
         }
 
-        public int getAjaxLoadTimeMillis(Ajax ajax) throws IOException, JSONException, InterruptedException,
-                ParseException {
+        public int getAjaxLoadTimeMillis(Ajax ajax)
+            throws IOException, JSONException, InterruptedException, ParseException {
             this.doNetClear();
             ajax.doRequest();
             Utils.sleep(5000, "Wait for ajax to load");

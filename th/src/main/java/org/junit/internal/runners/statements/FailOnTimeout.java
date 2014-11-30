@@ -35,7 +35,7 @@ public class FailOnTimeout extends Statement {
 
         // update the following line, so that thread-based log4j can work
         thread.setName(new StringBuilder(
-                Thread.currentThread().getName()).append("-").append(fTimeout).append("ms").toString());
+            Thread.currentThread().getName()).append("-").append(fTimeout).append("ms").toString());
         thread.start();
         thread.join(fTimeout);
         if (!thread.fFinished) {

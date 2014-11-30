@@ -85,9 +85,9 @@ public class TestCase {
 
     public String formatForLogPath() {
         return String.format("%s.%s.%s.%s",
-                StringUtils.substringAfterLast(this.suiteClass, "."),
-                StringUtils.substringAfterLast(this.testClass, "."), this.testMethod,
-                this.testDataInfo.isEmpty() ? "" : StringUtils.substringAfterLast(this.testDataInfo, "#"));
+                             StringUtils.substringAfterLast(this.suiteClass, "."),
+                             StringUtils.substringAfterLast(this.testClass, "."), this.testMethod,
+                             this.testDataInfo.isEmpty() ? "" : StringUtils.substringAfterLast(this.testDataInfo, "#"));
     }
 
     public String getTestIssues() {

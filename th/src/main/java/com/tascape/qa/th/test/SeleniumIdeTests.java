@@ -39,19 +39,22 @@ public abstract class SeleniumIdeTests extends AbstractTest {
         this.captureScreens(2000);
         HTMLLauncher launcher = new HTMLLauncher(this.seleniumServer);
         String pf = launcher.runHTMLSuite("*firefox", browserURL, suite.toURI().toURL().toString(),
-                result, 36000, true);
+                                          result, 36000, true);
         suite.delete();
         return "PASSED".equals(pf);
     }
 
-    private static final String TEST_SUITE_TEMPLATE = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"
-            + "<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.0 Strict//EN\" \"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd\">\n"
-            + "<html xmlns=\"http://www.w3.org/1999/xhtml\" xml:lang=\"en\" lang=\"en\">\n" + "<head>\n"
-            + "  <meta content=\"text/html; charset=UTF-8\" http-equiv=\"content-type\" />\n"
-            + "  <title>Test Suite</title>\n" + "</head>\n" + "<body>\n"
-            + "<table id=\"suiteTable\" cellpadding=\"1\" cellspacing=\"1\" border=\"1\" class=\"selenium\"><tbody>\n"
-            + "<tr><td><b>Test Suite</b></td></tr>\n"
-            + "<tr><td><a href=\"../XXXXXXXXXXXXXXXXXXXX\">XXXXXXXXXXXXXXXXXXXX</a></td></tr>\n"
-            + "</tbody></table>\n" + "</body>\n" + "</html>";
+    private static final String TEST_SUITE_TEMPLATE = new StringBuilder()
+        .append("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n")
+        .append("<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.0 Strict//EN\" ")
+        .append("http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd\">\n")
+        .append("<html xmlns=\"http://www.w3.org/1999/xhtml\" xml:lang=\"en\" lang=\"en\">\n")
+        .append("<head>\n")
+        .append("  <meta content=\"text/html; charset=UTF-8\" http-equiv=\"content-type\" />\n")
+        .append("  <title>Test Suite</title>\n" + "</head>\n" + "<body>\n")
+        .append("<table id=\"suiteTable\" cellpadding=\"1\" cellspacing=\"1\" border=\"1\" class=\"selenium\"><tbody>\n")
+        .append("<tr><td><b>Test Suite</b></td></tr>\n")
+        .append("<tr><td><a href=\"../XXXXXXXXXXXXXXXXXXXX\">XXXXXXXXXXXXXXXXXXXX</a></td></tr>\n")
+        .append("</tbody></table>\n" + "</body>\n" + "</html>").toString();
 
 }

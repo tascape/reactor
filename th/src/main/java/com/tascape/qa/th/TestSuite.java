@@ -24,12 +24,10 @@ import org.slf4j.LoggerFactory;
 public class TestSuite {
     private static final Logger LOG = LoggerFactory.getLogger(TestSuite.class);
 
-    private String name = "";
-
     private List<TestCase> tests = new ArrayList<>();
 
     public TestSuite(String suiteClass, Pattern testClassRegex, Pattern testMethodRegex, int priority)
-            throws Exception {
+        throws Exception {
         LOG.info("Find test cases in target test suite");
         AbstractSuite suite = AbstractSuite.class.cast(Class.forName(suiteClass).newInstance());
         suite.setUpTestClasses();
@@ -52,10 +50,6 @@ public class TestSuite {
 
     public List<TestCase> getTests() {
         return tests;
-    }
-
-    public String getName() {
-        return name;
     }
 
     private List<TestCase> filter(Pattern testClassRegex, Pattern testMethodRegex) {
@@ -100,7 +94,7 @@ public class TestSuite {
                     tcs.add(tc);
                 } else {
                     LOG.trace("Calling class {}, method {}, with parameters {}", tdp.klass(), tdp.method(),
-                            tdp.parameter());
+                              tdp.parameter());
                     TestData[] data = AbstractTestData.getTestData(tdp.klass(), tdp.method(), tdp.parameter());
                     LOG.debug("{} is a data-driven test case, test data size is {}", tc, data.length);
                     int length = (data.length + "").length();

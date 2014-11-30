@@ -135,7 +135,7 @@ public class ScriptRunner {
                 } else if (trimmedLine.length() < 1 || trimmedLine.startsWith("--")) {
                     // Do nothing
                 } else if (!fullLineDelimiter && trimmedLine.endsWith(getDelimiter())
-                        || fullLineDelimiter && trimmedLine.equals(getDelimiter())) {
+                               || fullLineDelimiter && trimmedLine.equals(getDelimiter())) {
                     command.append(line.substring(0, line.lastIndexOf(getDelimiter())));
                     command.append(" ");
                     Statement statement = conn.createStatement();

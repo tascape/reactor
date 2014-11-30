@@ -174,7 +174,7 @@ public class Utils {
      * @throws InterruptedException
      */
     public static List<String> cmdWithWorkingDir(String[] commands, String workindDir, final long timeout)
-            throws IOException, InterruptedException {
+        throws IOException, InterruptedException {
         return cmd(commands, null, null, timeout, workindDir);
     }
 
@@ -208,7 +208,7 @@ public class Utils {
      * @throws InterruptedException
      */
     public static List<String> cmd(String[] commands, final String pass, final String fail, final long timeout,
-            final String workingDir) throws IOException, InterruptedException {
+                                   final String workingDir) throws IOException, InterruptedException {
         ProcessBuilder pb = new ProcessBuilder(commands);
         if (workingDir != null) {
             pb.directory(new File(workingDir));
@@ -287,7 +287,7 @@ public class Utils {
     }
 
     public static Process cmd(String[] commands, final File file, final File workingDir, final String... ignoreRegex)
-            throws IOException {
+        throws IOException {
         FileUtils.touch(file);
         LOG.debug("Saving console output to {}", file.getAbsolutePath());
 
@@ -295,7 +295,7 @@ public class Utils {
         pb.redirectErrorStream(true);
         pb.directory(workingDir);
         LOG.info("Running command {}:  {}", workingDir == null ? "" : workingDir.getAbsolutePath(),
-                pb.command().toString().replaceAll(",", ""));
+                 pb.command().toString().replaceAll(",", ""));
         final Process p = pb.start();
 
         Thread t = new Thread(Thread.currentThread().getName() + "-" + p.hashCode()) {
@@ -367,7 +367,7 @@ public class Utils {
     }
 
     public static void waitForOutputLine(final Process process, String lineExpected, final long timeout) throws
-            IOException {
+        IOException {
         Thread t = new Thread() {
             @Override
             public void run() {
@@ -490,7 +490,7 @@ public class Utils {
         thread.setName(Thread.currentThread().getName() + "-cleaning-" + thread.hashCode());
         thread.setDaemon(true);
         LOG.info("Starting directory cleaning thread (scanning hourly), all files/directories in {} and older than {} "
-                + "hour(s) and starts with {} will be deleted", dir, keepAliveHour, namePrefix);
+                     + "hour(s) and starts with {} will be deleted", dir, keepAliveHour, namePrefix);
         thread.start();
     }
 

@@ -228,7 +228,7 @@ public class MySqlDb extends EntityCommunication {
         }
         final String sql = "SELECT * FROM " + tempTableName;
         try (Connection conn = this.getConn();
-                Statement stmt = conn.createStatement(ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE)) {
+             Statement stmt = conn.createStatement(ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE)) {
             LOG.debug("{} executing query: {}", this.dbInfo, sql);
             ResultSet rs = stmt.executeQuery(sql);
             boolean autoCommit = conn.getAutoCommit();

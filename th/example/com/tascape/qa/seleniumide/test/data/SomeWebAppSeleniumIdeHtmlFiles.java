@@ -48,8 +48,8 @@ public class SomeWebAppSeleniumIdeHtmlFiles extends AbstractTestData {
             List<File> files = Arrays.asList(fs);
             Collections.sort(files);
             files.stream()
-                    .filter(html -> !html.getName().contains("TestSuite") && html.getName().endsWith(".html"))
-                    .forEach(html -> htmls.add(new SomeWebAppSeleniumIdeHtmlFiles(html)));
+                .filter(html -> !html.getName().contains("TestSuite") && html.getName().endsWith(".html"))
+                .forEach(html -> htmls.add(new SomeWebAppSeleniumIdeHtmlFiles(html)));
             FEATURE_TEST_HTMLS.put(feature, htmls.toArray(new SomeWebAppSeleniumIdeHtmlFiles[0]));
         }
     }

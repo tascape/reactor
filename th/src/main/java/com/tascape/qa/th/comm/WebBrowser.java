@@ -56,7 +56,7 @@ public abstract class WebBrowser extends EntityCommunication implements WebDrive
     }
 
     public static WebBrowser getWebBrowser(Type type, boolean extEnabled) throws Exception {
-        WebBrowser wb = null;
+        WebBrowser wb;
         switch (type) {
             case Firefox:
                 wb = new Firefox(extEnabled);

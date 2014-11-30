@@ -162,7 +162,7 @@ public class SystemConfiguration {
         String suite = this.getProperty(SYSPROP_TEST_SUITE);
         if (suite == null || suite.isEmpty()) {
             throw new RuntimeException("There is no test suite class name specified (system property "
-                    + SYSPROP_TEST_SUITE + ")");
+                                           + SYSPROP_TEST_SUITE + ")");
         }
         return suite;
     }

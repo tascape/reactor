@@ -33,7 +33,7 @@ public class WebPage {
     private static final Table<Class, EntityDriver, WebPage> PAGES = HashBasedTable.create();
 
     public static synchronized <T extends WebPage> T getPage(java.lang.Class<T> pageClass, EntityDriver entityDriver)
-            throws EntityCommunicationException {
+        throws EntityCommunicationException {
         WebPage pageLoaded = PAGES.get(pageClass, entityDriver);
         if (pageLoaded != null) {
             return (T) pageLoaded;

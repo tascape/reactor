@@ -41,7 +41,7 @@ public class SuiteRunner {
     }
 
     public SuiteRunner(TestSuite testSuite) throws Exception {
-        LOG.info("Run suite {} with execution id {}", testSuite.getName(), execId);
+        LOG.info("Run suite with execution id {}", execId);
         this.ts = testSuite;
 
         this.db = DbHandler.getInstance();

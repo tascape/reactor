@@ -64,7 +64,7 @@ public class MysqlHandler extends DbHandler {
 
     @Override
     public void queueSuiteExecution(TestSuite suite, String execId) throws SQLException {
-        LOG.info("Queue test suite {} for execution with execution id {}", suite.getName(), execId);
+        LOG.info("Queue test suite for execution with execution id {}", execId);
         String lock = "testharness." + execId;
         try (Connection conn = this.getConnection()) {
             try {
@@ -85,11 +85,12 @@ public class MysqlHandler extends DbHandler {
     public boolean queueTestSuite(TestSuite suite, String execId) throws SQLException {
         LOG.info("Queueing test suite result with execution id {} ", execId);
         final String sql = "SELECT * FROM " + TABLES.suite_result.name() + " WHERE "
-                + Suite_Result.SUITE_RESULT_ID.name() + " = ?";
+                               + Suite_Result.SUITE_RESULT_ID.name() + " = ?";
 
         try (Connection conn = this.getConnection()) {
-            PreparedStatement stmt = conn.prepareStatement(sql, ResultSet.TYPE_SCROLL_SENSITIVE,
-                    ResultSet.CONCUR_UPDATABLE);
+            PreparedStatement stmt = conn.prepareStatement(sql,
+                                                           ResultSet.TYPE_SCROLL_SENSITIVE,
+                                                           ResultSet.CONCUR_UPDATABLE);
             stmt.setMaxRows(1);
             stmt.setString(1, execId);
             ResultSet rs = stmt.executeQuery();
@@ -126,15 +127,16 @@ public class MysqlHandler extends DbHandler {
     protected int getTestCaseId(TestCase test) throws SQLException {
         LOG.info("Query for id of test case {} ", test.format());
         final String sql = "SELECT * FROM " + TABLES.test_case.name() + " WHERE "
-                + Test_Case.SUITE_CLASS + " = ? AND "
-                + Test_Case.TEST_CLASS + " = ? AND "
-                + Test_Case.TEST_METHOD + " = ? AND "
-                + Test_Case.TEST_DATA_INFO + " = ? AND "
-                + Test_Case.TEST_DATA + " = ?";
+                               + Test_Case.SUITE_CLASS + " = ? AND "
+                               + Test_Case.TEST_CLASS + " = ? AND "
+                               + Test_Case.TEST_METHOD + " = ? AND "
+                               + Test_Case.TEST_DATA_INFO + " = ? AND "
+                               + Test_Case.TEST_DATA + " = ?";
 
         try (Connection conn = this.getConnection()) {
-            PreparedStatement stmt = conn.prepareStatement(sql, ResultSet.TYPE_SCROLL_SENSITIVE,
-                    ResultSet.CONCUR_UPDATABLE);
+            PreparedStatement stmt = conn.prepareStatement(sql,
+                                                           ResultSet.TYPE_SCROLL_SENSITIVE,
+                                                           ResultSet.CONCUR_UPDATABLE);
             stmt.setString(1, test.getSuiteClass());
             stmt.setString(2, test.getTestClass());
             stmt.setString(3, test.getTestMethod());
@@ -163,12 +165,13 @@ public class MysqlHandler extends DbHandler {
     protected void queueTestCaseResults(String execId, List<TestCase> tests) throws SQLException {
         LOG.info("Queue {} test case result(s) with execution id {} ", tests.size(), execId);
         final String sql = "SELECT * FROM " + TABLES.test_result.name() + " WHERE "
-                + Test_Result.SUITE_RESULT + " = ?";
+                               + Test_Result.SUITE_RESULT + " = ?";
         Map<String, Integer> idMap = this.getTestCaseIds(tests);
 
         try (Connection conn = this.getConnection()) {
-            PreparedStatement stmt = conn.prepareStatement(sql, ResultSet.TYPE_SCROLL_SENSITIVE,
-                    ResultSet.CONCUR_UPDATABLE);
+            PreparedStatement stmt = conn.prepareStatement(sql,
+                                                           ResultSet.TYPE_SCROLL_SENSITIVE,
+                                                           ResultSet.CONCUR_UPDATABLE);
             stmt.setMaxRows(1);
             stmt.setString(1, execId);
 
@@ -210,36 +213,6 @@ public class MysqlHandler extends DbHandler {
     }
 
     @Override
-    public void updateTestExecutionResult(TestResult tcr) throws SQLException {
-        LOG.info("Update test result {} ({}) to {}", tcr.getId(), tcr.getTestCase().format(),
-                tcr.getExecutionResult().result());
-        final String sql = "SELECT tr.* FROM " + TABLES.test_result.name() + " tr INNER JOIN " + TABLES.test_case.name()
-                + " tc WHERE tr.TEST_CASE_ID=tc.TEST_CASE_ID AND "
-                + Test_Result.TEST_RESULT_ID.name() + " = ?;";
-
-        try (Connection conn = this.getConnection()) {
-            PreparedStatement stmt = conn.prepareStatement(sql, ResultSet.TYPE_SCROLL_SENSITIVE,
-                    ResultSet.CONCUR_UPDATABLE);
-            stmt.setString(1, tcr.getId());
-            ResultSet rs = stmt.executeQuery();
-            if (rs.first()) {
-// TODO: update test data into test case table
-//                rs.updateString(Test_Case.TEST_DATA.name(), tcr.getTestCase().getTestData());
-                rs.updateString(Test_Result.EXECUTION_RESULT.name(), tcr.getExecutionResult().result());
-                rs.updateString(Test_Result.AUT.name(), tcr.getAut());
-                rs.updateLong(Test_Result.START_TIME.name(), tcr.getStartTime());
-                rs.updateLong(Test_Result.STOP_TIME.name(), tcr.getStopTime());
-                rs.updateInt(Test_Result.RETRY.name(), tcr.getRetry());
-                rs.updateString(Test_Result.TEST_STATION.name(), tcr.getHost());
-                rs.updateString(Test_Result.LOG_DIR.name(), tcr.getLogDirectory());
-                rs.updateRow();
-            } else {
-                LOG.warn("Cannot update test result");
-            }
-        }
-    }
-
-    @Override
     public void updateSuiteExecutionResult(String execId) throws SQLException {
         LOG.info("Update test suite execution result with execution id {}", execId);
         String lock = "testharness." + execId;
@@ -252,9 +225,11 @@ public class MysqlHandler extends DbHandler {
 
             int total = 0, fail = 0;
             final String sql1 = "SELECT " + Test_Result.EXECUTION_RESULT.name() + " FROM "
-                    + TABLES.test_result.name() + " WHERE " + Test_Result.SUITE_RESULT.name() + " = ?;";
+                                    + TABLES.test_result.name() + " WHERE " + Test_Result.SUITE_RESULT.name()
+                                    + " = ?;";
             try (PreparedStatement stmt = this.getConnection().prepareStatement(sql1,
-                    ResultSet.TYPE_FORWARD_ONLY, ResultSet.CONCUR_READ_ONLY)) {
+                                                                                ResultSet.TYPE_FORWARD_ONLY,
+                                                                                ResultSet.CONCUR_READ_ONLY)) {
                 stmt.setString(1, execId);
                 stmt.setFetchSize(Integer.MIN_VALUE);
                 ResultSet rs = stmt.executeQuery();
@@ -268,9 +243,10 @@ public class MysqlHandler extends DbHandler {
             }
 
             final String sql2 = "SELECT * FROM " + TABLES.suite_result.name()
-                    + " WHERE " + Suite_Result.SUITE_RESULT_ID.name() + " = ?;";
+                                    + " WHERE " + Suite_Result.SUITE_RESULT_ID.name() + " = ?;";
             try (PreparedStatement stmt = this.getConnection().prepareStatement(sql2,
-                    ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE)) {
+                                                                                ResultSet.TYPE_SCROLL_SENSITIVE,
+                                                                                ResultSet.CONCUR_UPDATABLE)) {
                 stmt.setString(1, execId);
                 ResultSet rs = stmt.executeQuery();
                 if (rs.first()) {

@@ -65,7 +65,7 @@ public abstract class AbstractTestData implements TestData {
     }
 
     public static TestData[] getTestData(Class<? extends TestData> klass, String method, String parameter)
-            throws Exception {
+        throws Exception {
         Method m;
         if (parameter == null || parameter.isEmpty()) {
             m = klass.getDeclaredMethod(method, (Class<?>[]) null);

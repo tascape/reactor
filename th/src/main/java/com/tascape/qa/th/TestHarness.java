@@ -1,8 +1,6 @@
 package com.tascape.qa.th;
 
-import java.util.Arrays;
 import java.util.regex.Pattern;
-import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -18,7 +16,7 @@ public class TestHarness {
         try {
             SystemConfiguration config = SystemConfiguration.getInstance();
             Utils.cleanDirectory(config.getLogPath().toFile().getAbsolutePath(), 240,
-                    SystemConfiguration.CONSTANT_LOG_KEEP_ALIVE_PREFIX);
+                                 SystemConfiguration.CONSTANT_LOG_KEEP_ALIVE_PREFIX);
 
             String suiteClass = config.getTestSuite();
             Pattern testClassRegex = config.getTestClassRegex();
