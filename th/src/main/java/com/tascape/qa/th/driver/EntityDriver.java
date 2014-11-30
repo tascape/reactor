@@ -40,6 +40,7 @@ public abstract class EntityDriver {
     public void setTest(AbstractTest test) {
         this.test = test;
         if (this.entityCommunication != null) {
+            this.entityCommunication.setDriver(this);
             this.entityCommunication.setTest(test);
         }
     }
