@@ -39,7 +39,7 @@ public abstract class SeleniumIdeTests extends AbstractTest {
         this.captureScreens(2000);
         HTMLLauncher launcher = new HTMLLauncher(this.seleniumServer);
         String pf = launcher.runHTMLSuite("*firefox", browserURL, suite.toURI().toURL().toString(),
-                                          result, 36000, true);
+            result, 36000, true);
         suite.delete();
         return "PASSED".equals(pf);
     }

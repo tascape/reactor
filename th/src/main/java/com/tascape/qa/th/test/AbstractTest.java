@@ -99,7 +99,7 @@ public abstract class AbstractTest {
         EntityDriver driver = env.get(key);
         if (driver == null) {
             LOG.error("Cannot find driver of name={} and type={}, please check suite test environemnt",
-                      key, clazz.getName());
+                key, clazz.getName());
             return null;
         }
         driver.setTest(this);

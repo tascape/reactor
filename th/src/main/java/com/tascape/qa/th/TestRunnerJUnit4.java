@@ -83,7 +83,7 @@ public class TestRunnerJUnit4 extends AbstractTestRunner implements Callable<Tes
         TestCase tc = this.tcr.getTestCase();
         Path testLogPath = sysConfig.getLogPath().resolve(this.execId)
             .resolve(tc.formatForLogPath() + "." + System.currentTimeMillis() + "."
-                         + Thread.currentThread().getName());
+                + Thread.currentThread().getName());
 
         LOG.info("Creating test case execution log directory {}", testLogPath);
         if (!testLogPath.toFile().mkdirs()) {

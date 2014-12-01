@@ -1,5 +1,6 @@
 package com.tascape.qa.th.comm;
 
+import com.tascape.qa.th.SystemConfiguration;
 import com.tascape.qa.th.driver.EntityDriver;
 import com.tascape.qa.th.test.AbstractTest;
 
@@ -8,6 +9,8 @@ import com.tascape.qa.th.test.AbstractTest;
  * @author linsong wang
  */
 public abstract class EntityCommunication {
+
+    protected static final SystemConfiguration SYSCONFIG = SystemConfiguration.getInstance();
 
     private EntityDriver driver;
 

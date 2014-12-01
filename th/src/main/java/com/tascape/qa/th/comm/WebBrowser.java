@@ -22,7 +22,6 @@ import org.slf4j.LoggerFactory;
  * @author linsong wang
  */
 public abstract class WebBrowser extends EntityCommunication implements WebDriver {
-
     private static final Logger LOG = LoggerFactory.getLogger(WebBrowser.class);
 
     public static final String PROP_WEB_BROWSER_TYPE = "qa.comm.WebBrowser.TYPE";
@@ -254,11 +253,7 @@ public abstract class WebBrowser extends EntityCommunication implements WebDrive
         public By getByDisapper();
     }
 
-    public static class AbstractAjax implements Ajax {
-        @Override
-        public void doRequest() {
-        }
-
+    public static abstract class AbstractAjax implements Ajax {
         @Override
         public By getByAppear() {
             return null;

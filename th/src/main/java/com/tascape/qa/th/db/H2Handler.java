@@ -61,18 +61,18 @@ public final class H2Handler extends DbHandler {
     public boolean queueTestSuite(TestSuite suite, String execId) throws SQLException {
         LOG.info("Queueing test suite result with execution id {} ", execId);
         final String sql = "INSERT INTO " + DbHandler.TABLES.suite_result.name() + " ("
-                               + Suite_Result.SUITE_RESULT_ID.name() + ", "
-                               + Suite_Result.SUITE_NAME.name() + ", "
-                               + Suite_Result.JOB_NAME.name() + ", "
-                               + Suite_Result.JOB_BUILD_NUMBER.name() + ", "
-                               + Suite_Result.JOB_BUILD_URL.name() + ", "
-                               + Suite_Result.START_TIME.name() + ", "
-                               + Suite_Result.STOP_TIME.name() + ", "
-                               + Suite_Result.EXECUTION_RESULT.name() + ", "
-                               + Suite_Result.NUMBER_OF_TESTS.name() + ", "
-                               + Suite_Result.NUMBER_OF_FAILURE.name() + ", "
-                               + Suite_Result.PRODUCT_UNDER_TEST.name()
-                               + ") VALUES (?,?,?,?,?,?,?,?,?,?,?);";
+            + Suite_Result.SUITE_RESULT_ID.name() + ", "
+            + Suite_Result.SUITE_NAME.name() + ", "
+            + Suite_Result.JOB_NAME.name() + ", "
+            + Suite_Result.JOB_BUILD_NUMBER.name() + ", "
+            + Suite_Result.JOB_BUILD_URL.name() + ", "
+            + Suite_Result.START_TIME.name() + ", "
+            + Suite_Result.STOP_TIME.name() + ", "
+            + Suite_Result.EXECUTION_RESULT.name() + ", "
+            + Suite_Result.NUMBER_OF_TESTS.name() + ", "
+            + Suite_Result.NUMBER_OF_FAILURE.name() + ", "
+            + Suite_Result.PRODUCT_UNDER_TEST.name()
+            + ") VALUES (?,?,?,?,?,?,?,?,?,?,?);";
 
         try (Connection conn = this.getConnection()) {
             PreparedStatement stmt = conn.prepareStatement(sql);
@@ -98,15 +98,15 @@ public final class H2Handler extends DbHandler {
     protected void queueTestCaseResults(String execId, List<TestCase> tests) throws SQLException {
         LOG.info("Queue {} test case result(s) with execution id {} ", tests.size(), execId);
         final String sql = "INSERT INTO " + TABLES.test_result.name() + " ("
-                               + Test_Result.TEST_RESULT_ID.name() + ", "
-                               + Test_Result.SUITE_RESULT.name() + ", "
-                               + Test_Result.TEST_CASE_ID.name() + ", "
-                               + Test_Result.EXECUTION_RESULT.name() + ", "
-                               + Test_Result.START_TIME.name() + ", "
-                               + Test_Result.STOP_TIME.name() + ", "
-                               + Test_Result.TEST_STATION.name() + ", "
-                               + Test_Result.LOG_DIR.name()
-                               + ") VALUES (?,?,?,?,?,?,?,?);";
+            + Test_Result.TEST_RESULT_ID.name() + ", "
+            + Test_Result.SUITE_RESULT.name() + ", "
+            + Test_Result.TEST_CASE_ID.name() + ", "
+            + Test_Result.EXECUTION_RESULT.name() + ", "
+            + Test_Result.START_TIME.name() + ", "
+            + Test_Result.STOP_TIME.name() + ", "
+            + Test_Result.TEST_STATION.name() + ", "
+            + Test_Result.LOG_DIR.name()
+            + ") VALUES (?,?,?,?,?,?,?,?);";
         Map<String, Integer> idMap = this.getTestCaseIds(tests);
 
         try (Connection conn = this.getConnection()) {
@@ -139,11 +139,11 @@ public final class H2Handler extends DbHandler {
         LOG.info("Query for id of test case {} ", test.format());
         try (Connection conn = this.getConnection()) {
             final String sql = "SELECT * FROM " + TABLES.test_case.name() + " WHERE "
-                                   + Test_Case.SUITE_CLASS + " = ? AND "
-                                   + Test_Case.TEST_CLASS + " = ? AND "
-                                   + Test_Case.TEST_METHOD + " = ? AND "
-                                   + Test_Case.TEST_DATA_INFO + " = ? AND "
-                                   + Test_Case.TEST_DATA + " = ?";
+                + Test_Case.SUITE_CLASS + " = ? AND "
+                + Test_Case.TEST_CLASS + " = ? AND "
+                + Test_Case.TEST_METHOD + " = ? AND "
+                + Test_Case.TEST_DATA_INFO + " = ? AND "
+                + Test_Case.TEST_DATA + " = ?";
 
             PreparedStatement stmt = conn.prepareStatement(sql);
             stmt.setString(1, test.getSuiteClass());
@@ -161,12 +161,12 @@ public final class H2Handler extends DbHandler {
 
         try (Connection conn = this.getConnection()) {
             final String sql = "INSERT INTO " + TABLES.test_case.name() + " ("
-                                   + Test_Case.SUITE_CLASS.name() + ", "
-                                   + Test_Case.TEST_CLASS.name() + ", "
-                                   + Test_Case.TEST_METHOD.name() + ", "
-                                   + Test_Case.TEST_DATA_INFO.name() + ", "
-                                   + Test_Case.TEST_DATA.name()
-                                   + ") VALUES (?,?,?,?,?);";
+                + Test_Case.SUITE_CLASS.name() + ", "
+                + Test_Case.TEST_CLASS.name() + ", "
+                + Test_Case.TEST_METHOD.name() + ", "
+                + Test_Case.TEST_DATA_INFO.name() + ", "
+                + Test_Case.TEST_DATA.name()
+                + ") VALUES (?,?,?,?,?);";
 
             PreparedStatement stmt = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
             stmt.setString(1, test.getSuiteClass());
@@ -179,12 +179,12 @@ public final class H2Handler extends DbHandler {
 
         try (Connection conn = this.getConnection()) {
             final String sql = "SELECT * FROM " + TABLES.test_case.name() + " WHERE "
-                                   + Test_Case.SUITE_CLASS + " = ? AND "
-                                   + Test_Case.TEST_CLASS + " = ? AND "
-                                   + Test_Case.TEST_METHOD + " = ? AND "
-                                   + Test_Case.TEST_DATA_INFO + " = ? AND "
-                                   + Test_Case.TEST_DATA + " = ? ORDER BY " + Test_Case.TEST_CASE_ID.name()
-                                   + " DESC;";
+                + Test_Case.SUITE_CLASS + " = ? AND "
+                + Test_Case.TEST_CLASS + " = ? AND "
+                + Test_Case.TEST_METHOD + " = ? AND "
+                + Test_Case.TEST_DATA_INFO + " = ? AND "
+                + Test_Case.TEST_DATA + " = ? ORDER BY " + Test_Case.TEST_CASE_ID.name()
+                + " DESC;";
 
             PreparedStatement stmt = conn.prepareStatement(sql);
             stmt.setString(1, test.getSuiteClass());
@@ -209,8 +209,8 @@ public final class H2Handler extends DbHandler {
 
         try (Connection conn = this.getConnection();) {
             final String sql1 = "SELECT " + Test_Result.EXECUTION_RESULT.name() + " FROM "
-                                    + TABLES.test_result.name() + " WHERE " + Test_Result.SUITE_RESULT.name()
-                                    + " = ?;";
+                + TABLES.test_result.name() + " WHERE " + Test_Result.SUITE_RESULT.name()
+                + " = ?;";
             try (PreparedStatement stmt = conn.prepareStatement(sql1)) {
                 stmt.setString(1, execId);
                 ResultSet rs = stmt.executeQuery();
@@ -226,10 +226,10 @@ public final class H2Handler extends DbHandler {
 
         try (Connection conn = this.getConnection();) {
             final String sql = "SELECT * FROM " + TABLES.suite_result.name()
-                                   + " WHERE " + Suite_Result.SUITE_RESULT_ID.name() + " = ?;";
+                + " WHERE " + Suite_Result.SUITE_RESULT_ID.name() + " = ?;";
             try (PreparedStatement stmt = conn.prepareStatement(sql,
-                                                                ResultSet.TYPE_SCROLL_SENSITIVE,
-                                                                ResultSet.CONCUR_UPDATABLE)) {
+                ResultSet.TYPE_SCROLL_SENSITIVE,
+                ResultSet.CONCUR_UPDATABLE)) {
                 stmt.setString(1, execId);
                 ResultSet rs = stmt.executeQuery();
                 if (rs.first()) {

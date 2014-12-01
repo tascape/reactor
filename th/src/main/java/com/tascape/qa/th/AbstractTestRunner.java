@@ -84,10 +84,10 @@ public abstract class AbstractTestRunner {
                     if (newline.contains(file.getAbsolutePath())) {
                         if (file.getName().endsWith(".png")) {
                             pw.printf("<a href=\"%s\" target=\"_blank\"><img src=\"%s\" width=\"360px\"/></a>",
-                                      file.getName(), file.getName());
+                                file.getName(), file.getName());
                         }
                         pw.printf("open attachment <a href=\"%s\" target=\"_blank\">%s</a>",
-                                  file.getName(), file.getName());
+                            file.getName(), file.getName());
                         pw.println();
                         files.remove(file);
                         break;

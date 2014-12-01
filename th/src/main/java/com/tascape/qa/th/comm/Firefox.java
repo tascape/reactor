@@ -24,10 +24,7 @@ import org.slf4j.LoggerFactory;
  * @author linsong wang
  */
 public class Firefox extends WebBrowser {
-
     private static final Logger LOG = LoggerFactory.getLogger(Firefox.class);
-
-    private static final SystemConfiguration sysConfig = SystemConfiguration.getInstance();
 
     public static final int FIREBUG_PAGELOADEDTIMEOUT_MILLI = 180000;
 
@@ -41,7 +38,7 @@ public class Firefox extends WebBrowser {
         FirefoxProfile profile;
 
         ProfilesIni profileIni = new ProfilesIni();
-        String profileName = sysConfig.getProperty(SYSPROP_FF_PROFILE_NAME);
+        String profileName = SYSCONFIG.getProperty(SYSPROP_FF_PROFILE_NAME);
         if (profileName != null) {
             LOG.debug("Load Firefox profile named as {}", profileName);
             profile = profileIni.getProfile(profileName);
@@ -95,17 +92,12 @@ public class Firefox extends WebBrowser {
     public class Firebug implements Extension {
         private final String tokenNetExport = UUID.randomUUID().toString();
 
-        private final Path harPath = sysConfig.getLogPath()
-            .resolve(sysConfig.getExecId())
+        private final Path harPath = SYSCONFIG.getLogPath()
+            .resolve(SYSCONFIG.getExecId())
             .resolve(SystemConfiguration.CONSTANT_LOG_KEEP_ALIVE_PREFIX + "har-" + System.currentTimeMillis());
 
         public void clearHarDir() throws IOException {
-            File[] hars = this.harPath.toFile().listFiles(new FilenameFilter() {
-                @Override
-                public boolean accept(File dir, String name) {
-                    return name.endsWith(".har");
-                }
-            });
+            File[] hars = this.harPath.toFile().listFiles((File dir, String name) -> name.endsWith(".har"));
             if (hars != null) {
                 for (File f : hars) {
                     f.delete();
@@ -122,8 +114,7 @@ public class Firefox extends WebBrowser {
             return HarLog.parse(json).getOverallLoadTimeMillis();
         }
 
-        public int getAjaxLoadTimeMillis(Ajax ajax)
-            throws IOException, JSONException, InterruptedException, ParseException {
+        public int getAjaxLoadTimeMillis(Ajax ajax) throws Exception {
             this.doNetClear();
             ajax.doRequest();
             Utils.sleep(5000, "Wait for ajax to load");
@@ -219,7 +210,6 @@ public class Firefox extends WebBrowser {
 }
 
 class HarLog {
-
     private static final Logger LOG = LoggerFactory.getLogger(HarLog.class);
 
     public String version;

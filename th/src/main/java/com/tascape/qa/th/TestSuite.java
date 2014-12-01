@@ -94,7 +94,7 @@ public class TestSuite {
                     tcs.add(tc);
                 } else {
                     LOG.trace("Calling class {}, method {}, with parameters {}", tdp.klass(), tdp.method(),
-                              tdp.parameter());
+                        tdp.parameter());
                     TestData[] data = AbstractTestData.getTestData(tdp.klass(), tdp.method(), tdp.parameter());
                     LOG.debug("{} is a data-driven test case, test data size is {}", tc, data.length);
                     int length = (data.length + "").length();

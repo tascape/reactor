@@ -1,6 +1,5 @@
 package com.tascape.qa.th.comm;
 
-import com.tascape.qa.th.SystemConfiguration;
 import java.util.Arrays;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.chrome.ChromeOptions;
@@ -14,8 +13,6 @@ import org.slf4j.LoggerFactory;
  */
 public class Chrome extends WebBrowser {
     private static final Logger LOG = LoggerFactory.getLogger(Chrome.class);
-
-    private static final SystemConfiguration CONFIG = SystemConfiguration.getInstance();
 
     public Chrome() {
         String chromeServer = System.getProperty("webdriver.chrome.driver");
