@@ -28,6 +28,8 @@ public class Firefox extends WebBrowser {
 
     public static final int FIREBUG_PAGELOADEDTIMEOUT_MILLI = 180000;
 
+    public static final String SYSPROP_FF_BINARY = "qa.comm.FF_BINARY";
+
     public static final String SYSPROP_FF_PROFILE_NAME = "qa.comm.FF_PROFILE_NAME";
 
     public static final String DEFAULT_FF_PROFILE_NAME = "default";

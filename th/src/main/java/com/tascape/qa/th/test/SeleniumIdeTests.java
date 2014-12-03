@@ -1,5 +1,6 @@
 package com.tascape.qa.th.test;
 
+import com.tascape.qa.th.comm.Firefox;
 import com.tascape.qa.th.suite.SeleniumIdeSuite;
 import java.io.File;
 import org.apache.commons.io.FileUtils;
@@ -38,7 +39,12 @@ public abstract class SeleniumIdeTests extends AbstractTest {
 
         this.captureScreens(2000);
         HTMLLauncher launcher = new HTMLLauncher(this.seleniumServer);
-        String pf = launcher.runHTMLSuite("*firefox", browserURL, suite.toURI().toURL().toString(),
+        String ff = "*firefox";
+        String bin = sysConfig.getProperty(Firefox.SYSPROP_FF_BINARY);
+        if (bin != null) {
+            ff += " " + bin;
+        }
+        String pf = launcher.runHTMLSuite(ff, browserURL, suite.toURI().toURL().toString(),
             result, 36000, true);
         suite.delete();
         return "PASSED".equals(pf);
