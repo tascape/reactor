@@ -1,0 +1,110 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets">
+    <h:head>
+        <title>test suite history detail</title>
+        <h:outputStylesheet library="css" name="default.css" />
+        <h:outputStylesheet library="css" name="table-style.css" />
+    </h:head>
+    <h:body>
+        <f:metadata>
+            <f:event type="preRenderView" listener="#{suiteHistoryDetail.loadSuiteHistoryDetail()}" />
+        </f:metadata>
+
+        <h:panelGrid columns="2">
+            <h:link outcome="index.xhtml" >
+                <h:graphicImage library="resources" name="img/home.png" />
+            </h:link>
+            <h3>Suite History Detail</h3>
+        </h:panelGrid>
+
+        <table class="order-table" border="1">
+            <thead>
+                <tr class="order-table-header">
+                    <th>index</th>
+                    <th>suite class</th>
+                    <th>test class</th>
+                    <th>test method</th>
+                    <ui:repeat value='#{suiteHistoryDetail.suiteIds.split(",")}' var="sid">
+                        <th class="table-col-center"><!--
+                            <nobr>
+                                <h:outputLabel value='#{suiteHistoryDetail.suiteMap.get(sid).get("PRODUCT_BUILD_INFO")}' />
+                            </nobr><br />-->
+                            <nobr>
+                                <h:link outcome="suite" target="_blank" value='#{suiteHistoryDetail.suiteIdsDisplay.get(sid)}' style="font: smaller">
+                                    <f:param name="srid" value="#{sid}" />
+                                </h:link>
+                            </nobr><br />
+                            <nobr>
+                                <h:outputLabel value='#{suiteHistoryDetail.convertToDate(suiteHistoryDetail.suiteMap.get(sid).get("START_TIME"))}' style="font: smaller">
+                                    <f:convertDateTime type="date" pattern="yyyy-MM-dd HH:mm" timeZone="US/Pacific" />
+                                </h:outputLabel>
+                            </nobr>
+                        </th>
+                    </ui:repeat>
+                </tr>
+            </thead>
+            <tbody>
+                <ui:repeat value="#{suiteHistoryDetail.suiteHistory}" var="test" varStatus="status">
+                    <h:panelGroup rendered="#{status.odd}">
+                        <tr class="order-table-even-row">
+                            <td>#{test.get("_row_index")}</td>
+                            <td>#{test.get('_suite_class')}</td>
+                            <td class="table-col-left">#{test.get('TEST_CLASS')}</td>
+                            <td class="table-col-left">
+                                <nobr>
+                                    <h:outputLabel value="#{test.get('TEST_METHOD')}(#{test.get('TEST_DATA')})"
+                                                   rendered='#{test.get("_row_result")}' />
+                                    <h:outputLabel value="#{test.get('TEST_METHOD')}(#{test.get('TEST_DATA')})"
+                                                   rendered='#{not test.get("_row_result")}' class='fail' />
+                                </nobr>
+                            </td>
+                            <ui:repeat value='#{suiteHistoryDetail.suiteIds.split(",")}' var="sid">
+                                <td class="table-col-center">
+                                    <h:panelGroup rendered='#{not empty test.get(sid)}'>
+                                        <h:outputLink value ="#{test.get(sid).get('_log_url')}/log.html" target="_blank">
+                                            <h:outputText value='#{test.get(sid).get("EXECUTION_RESULT")}'
+                                                          class='pass' rendered='#{test.get(sid).get("_row_result")}' />
+                                            <h:outputText value='#{test.get(sid).get("EXECUTION_RESULT")}'
+                                                          class='fail' rendered='#{not test.get(sid).get("_row_result")}' />
+                                        </h:outputLink>
+                                    </h:panelGroup>
+                                </td>
+                            </ui:repeat>
+                        </tr>
+                    </h:panelGroup>
+
+                    <h:panelGroup rendered="#{status.even}">
+                        <tr class="order-table-odd-row">
+                            <td>#{test.get("_row_index")}</td>
+                            <td>#{test.get('_suite_class')}</td>
+                            <td class="table-col-left">#{test.get('TEST_CLASS')}</td>
+                            <td class="table-col-left">
+                                <h:outputLabel value="#{test.get('TEST_METHOD')}(#{test.get('TEST_DATA')})"
+                                               rendered='#{test.get("_row_result")}' />
+                                <h:outputLabel value="#{test.get('TEST_METHOD')}(#{test.get('TEST_DATA')})"
+                                               rendered='#{not test.get("_row_result")}' class='fail' />
+                            </td>
+                            <ui:repeat value='#{suiteHistoryDetail.suiteIds.split(",")}' var="sid">
+                                <td class="table-col-center">
+                                    <h:panelGroup rendered='#{not empty test.get(sid)}'>
+                                        <h:outputLink value ="#{test.get(sid).get('_log_url')}/log.html" target="_blank">
+                                            <h:outputText value='#{test.get(sid).get("EXECUTION_RESULT")}'
+                                                          class='pass' rendered='#{test.get(sid).get("_row_result")}' />
+                                            <h:outputText value='#{test.get(sid).get("EXECUTION_RESULT")}'
+                                                          class='fail' rendered='#{not test.get(sid).get("_row_result")}' />
+                                        </h:outputLink>
+                                    </h:panelGroup>
+                                </td>
+                            </ui:repeat>
+                        </tr>
+                    </h:panelGroup>
+
+                </ui:repeat>
+            </tbody>
+        </table>
+    </h:body>
+</html>
