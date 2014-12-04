@@ -16,6 +16,8 @@ public abstract class EntityCommunication {
 
     private AbstractTest test;
 
+    protected final SystemConfiguration SYS_CONFIG = SystemConfiguration.getInstance();
+
     public abstract void connect() throws Exception;
 
     public abstract void disconnect() throws Exception;

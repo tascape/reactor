@@ -1,5 +1,6 @@
 package com.tascape.qa.th.driver;
 
+import com.tascape.qa.th.SystemConfiguration;
 import com.tascape.qa.th.Utils;
 import com.tascape.qa.th.comm.EntityCommunication;
 import com.tascape.qa.th.test.AbstractTest;
@@ -17,6 +18,8 @@ import org.slf4j.LoggerFactory;
  */
 public abstract class EntityDriver {
     private static final Logger LOG = LoggerFactory.getLogger(EntityDriver.class);
+
+    protected final SystemConfiguration SYS_CONFIG = SystemConfiguration.getInstance();
 
     private EntityCommunication entityCommunication;
 
