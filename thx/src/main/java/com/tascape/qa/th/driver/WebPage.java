@@ -30,7 +30,7 @@ public class WebPage {
     @FindBy(tagName = "body")
     protected WebElement body;
 
-    private static final Table<Class, EntityDriver, WebPage> PAGES = HashBasedTable.create();
+    private static final Table<Class<? extends WebPage>, EntityDriver, WebPage> PAGES = HashBasedTable.create();
 
     public static synchronized <T extends WebPage> T getPage(Class<T> pageClass, EntityDriver entityDriver)
         throws EntityCommunicationException {
