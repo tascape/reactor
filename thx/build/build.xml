@@ -1,10 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<project name="th" default="deploy">
-    <description>Builds the project th.</description>
+<project name="th" default="deploy" basedir="..">
+    <description>Build the project of th extentions and examples</description>
+    
+    <property name="src.dir" location="src/main/java"/>
+    <property name="bin.dir" location="bin"/>
+    <property name="lib.dir" location="lib/jars"/>
+    <property name="deploy.dir"  location="deploy"/>
 
     <target name="init">
-        <property file="build.properties" />
         <property file="${conf.dir}/build_info.properties"/>
         <property name="build.number" value="${build.major.number}.${build.minor.number}.${build.revision.number}"/>
         <echo>Current build number: ${build.number}</echo>
@@ -15,17 +19,18 @@
         <mkdir dir="${bin.dir}/classes" />
         <javac includeantruntime="false" debug="true" destdir="${bin.dir}/classes" encoding="UTF-8">
             <compilerarg value="-Xlint"/>
-            <src path="${src.dir}/main/java" />
+            <src path="${src.dir}" />
             <classpath>
+                <fileset dir="${basedir}/../th/deploy" includes="*.jar" />
                 <fileset dir="${lib.dir}" includes="**/*.jar" />
+                <fileset dir="${basedir}/../th/lib/jars" includes="**/*.jar" />
             </classpath>
         </javac>
     </target>
 
     <target name="jar" depends="compile">
-        <jar destfile="${deploy.dir}/th.jar">
+        <jar destfile="${deploy.dir}/thx.jar">
             <fileset dir="${bin.dir}/classes" />
-            <fileset dir="${conf.dir}" />
         </jar>
     </target>
 
