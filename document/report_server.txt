@@ -1,3 +1,11 @@
+Java Runtime
+
+1. Install latest Java runtime.
+2. Make sure java is on PATH - run ‘java -version’ in command line.
+
+
+
+Database Server
 
 1. Install mysql database server 5.5+.
 2. Login as root and create schema 'testharness'.
@@ -50,3 +58,12 @@ CREATE TABLE `test_result` (
   CONSTRAINT `fk_test_case` FOREIGN KEY (`TEST_CASE_ID`) REFERENCES `test_case` (`TEST_CASE_ID`) ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
+
+
+Application Server
+
+1. install latest Apache Tomcat at port 6080.
+2. Configure tomcat user so that you can access http://report-server:6080/manager/html.
+3. Copy all jar files in https://github.com/tascape/testharness/tree/master/thr/lib/ into tomcat lib folder.
+4. Use http://report-server:6080/manager/html to deploy https://github.com/tascape/testharness/tree/master/thr/deploy/thr.war
+5. Restart tomcat.
