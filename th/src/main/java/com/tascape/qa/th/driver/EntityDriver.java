@@ -19,7 +19,7 @@ import org.slf4j.LoggerFactory;
 public abstract class EntityDriver {
     private static final Logger LOG = LoggerFactory.getLogger(EntityDriver.class);
 
-    protected final SystemConfiguration SYS_CONFIG = SystemConfiguration.getInstance();
+    protected static final SystemConfiguration SYS_CONFIG = SystemConfiguration.getInstance();
 
     private EntityCommunication entityCommunication;
 

@@ -1,6 +1,5 @@
 package com.tascape.qa.th.comm;
 
-import com.tascape.qa.th.comm.EntityCommunication;
 import java.io.IOException;
 import java.util.List;
 import java.util.Set;
@@ -25,7 +24,7 @@ import org.slf4j.LoggerFactory;
 public abstract class WebBrowser extends EntityCommunication implements WebDriver {
     private static final Logger LOG = LoggerFactory.getLogger(WebBrowser.class);
 
-    public static final String SYSPROP_WEB_BROWSER_TYPE = "qa.comm.WEB_BROWSER_TYPE";
+    public static final String SYSPROP_WEBBROWSER_TYPE = "qa.comm.WEBBROWSER_TYPE";
 
     public static final int AJAX_TIMEOUT_SECONDS = 180;
 
@@ -41,34 +40,28 @@ public abstract class WebBrowser extends EntityCommunication implements WebDrive
         this.webDriver = webDriver;
     }
 
-    public enum Type {
-        Firefox,
-        Chrome,
-        Html,
-    }
-
-    public static WebBrowser getWebBrowser(Type type) throws Exception {
-        return WebBrowser.getWebBrowser(type, false);
-    }
-
-    public static WebBrowser getFirefox(boolean extEnabled) throws Exception {
-        return getWebBrowser(Type.Firefox, extEnabled);
-    }
-
-    public static WebBrowser getWebBrowser(Type type, boolean extEnabled) throws Exception {
-        WebBrowser wb;
-        switch (type) {
-            case Firefox:
-                wb = new Firefox(extEnabled);
-                break;
-
-            case Chrome:
-                wb = new Chrome();
-                break;
-
-            default:
-                throw new RuntimeException("Browser type " + type + " is not supported");
+    public static WebBrowser newBrowser(boolean extEnabled) throws Exception {
+        String type = SYS_CONFIG.getProperty(SYSPROP_WEBBROWSER_TYPE);
+        if (type == null) {
+            throw new RuntimeException("System property " + SYSPROP_WEBBROWSER_TYPE + " is not specified");
         }
+        switch (type) {
+            case "firefox":
+                return newFirefox(extEnabled);
+            case "chrome":
+                return newChrome(extEnabled);
+        }
+        throw new RuntimeException("System property " + SYSPROP_WEBBROWSER_TYPE + "=" + type + " is not supported");
+    }
+
+    public static Chrome newChrome(boolean extEnabled) {
+        Chrome wb = new Chrome();
+        wb.setDefaults();
+        return wb;
+    }
+
+    public static Firefox newFirefox(boolean extEnabled) throws Exception {
+        Firefox wb = new Firefox(extEnabled);
         wb.setDefaults();
         return wb;
     }
@@ -234,7 +227,7 @@ public abstract class WebBrowser extends EntityCommunication implements WebDrive
         });
     }
 
-    private void setDefaults() {
+    protected void setDefaults() {
         this.actions = new Actions(this.webDriver);
         this.webDriver.manage().timeouts().implicitlyWait(60, TimeUnit.SECONDS);
         this.webDriver.manage().timeouts().pageLoadTimeout(120, TimeUnit.SECONDS);

@@ -20,7 +20,7 @@ public class TestSuiteOne extends AbstractSuite {
 
     @Override
     protected void setUpEnvironment() throws Exception {
-        browser = WebBrowser.getFirefox(false);
+        browser = WebBrowser.newBrowser(false);
         browser.landscape();
         GoogleSearchUi search = new GoogleSearchUi();
         search.setEntityCommunication(browser);
