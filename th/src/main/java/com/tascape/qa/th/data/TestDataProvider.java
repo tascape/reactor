@@ -12,9 +12,11 @@ import java.lang.annotation.Target;
 @Target(value = {ElementType.METHOD})
 @Retention(RetentionPolicy.RUNTIME)
 public @interface TestDataProvider {
+    String DEFAULT_METHOD_NAME = "getData";
+
     Class<? extends TestData> klass();
 
-    String method() default TestData.DEFAULT_METHOD;
+    String method() default DEFAULT_METHOD_NAME;
 
     String parameter() default "";
 }

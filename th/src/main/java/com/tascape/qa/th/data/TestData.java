@@ -5,7 +5,6 @@ package com.tascape.qa.th.data;
  * @author linsong wang
  */
 public interface TestData {
-    String DEFAULT_METHOD = "getData";
 
     /**
      * The string representation of one piece of test data.

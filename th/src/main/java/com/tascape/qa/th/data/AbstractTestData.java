@@ -2,7 +2,6 @@ package com.tascape.qa.th.data;
 
 import com.tascape.qa.th.test.Priority;
 import java.lang.reflect.Method;
-import java.util.Random;
 
 /**
  *
@@ -18,8 +17,6 @@ public abstract class AbstractTestData implements TestData {
     public static TestData getTestData() {
         return TEST_DATA.get();
     }
-
-    private final Random random = new Random();
 
     private String value = null;
 
@@ -74,9 +71,5 @@ public abstract class AbstractTestData implements TestData {
             m = klass.getDeclaredMethod(method, new Class<?>[]{parameter.getClass()});
             return (TestData[]) m.invoke(null, new Object[]{parameter});
         }
-    }
-
-    public int getRandomInt() {
-        return random.nextInt(1000000);
     }
 }

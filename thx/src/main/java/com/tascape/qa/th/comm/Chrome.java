@@ -14,10 +14,12 @@ import org.slf4j.LoggerFactory;
 public class Chrome extends WebBrowser {
     private static final Logger LOG = LoggerFactory.getLogger(Chrome.class);
 
+    public static String SYSPROP_CHROME_DRIVER = "webdriver.chrome.driver";
+
     public Chrome() {
-        String chromeServer = System.getProperty("webdriver.chrome.driver");
+        String chromeServer = System.getProperty(SYSPROP_CHROME_DRIVER);
         if (chromeServer == null) {
-            throw new RuntimeException("Cannot find system property webdriver.chrome.driver");
+            throw new RuntimeException("Cannot find system property " + SYSPROP_CHROME_DRIVER);
         }
 
         ChromeOptions options = new ChromeOptions();

@@ -12,7 +12,6 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Properties;
 import java.util.regex.Pattern;
-import org.apache.commons.io.FileUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -74,11 +73,6 @@ public class SystemConfiguration {
             conf = Paths.get(confFile);
         }
         LOG.info("Loading system configuration from {}", conf);
-        try {
-            FileUtils.touch(conf.toFile());
-        } catch (IOException ex) {
-            throw new RuntimeException("Cannot touch system configuration from " + conf, ex);
-        }
         try (InputStream is = new FileInputStream(conf.toFile())) {
             this.properties.load(is);
         } catch (IOException ex) {
