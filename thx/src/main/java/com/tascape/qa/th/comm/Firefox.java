@@ -395,8 +395,8 @@ class HarLog {
             o.request = Request.parse(json.getJSONObject("request"));
             o.response = Response.parse(json.getJSONObject("response"));
             o.timings = Timings.paser(json.getJSONObject("timings"));
-            o.serverIPAddress = json.getString("serverIPAddress");
-            o.connection = json.getInt("connection");
+            o.serverIPAddress = json.optString("serverIPAddress");
+            o.connection = json.optInt("connection");
             return o;
         }
     }
