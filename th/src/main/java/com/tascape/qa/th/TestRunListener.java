@@ -150,10 +150,12 @@ public class TestRunListener extends RunListener {
 
         test.cleanBackgoundTasks();
 
-        Map<String, Long> perfData = test.getPerfData();
-        if (!perfData.isEmpty()) {
-            LOG.info("Save performance data {}", perfData);
-            db.savePerfData(tcr.getId(), perfData);
+        Map<String, Map<String, Double>> metricData = test.getMetricData();
+        if (!metricData.isEmpty()) {
+            LOG.info("Save result metric data {}", metricData);
+            for (String group : metricData.keySet()) {
+                db.saveTestResultMetrics(tcr.getId(), group, metricData.get(group));
+            }
         }
     }
 

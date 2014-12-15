@@ -84,20 +84,22 @@ CREATE TABLE `test_result` (
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
 
 --
--- Table structure for table `test_perf`
+-- Table structure for table `test_result_ metric`
 --
 
-DROP TABLE IF EXISTS `test_perf`;
+DROP TABLE IF EXISTS `test_result_ metric`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8 */;
-CREATE TABLE `test_perf` (
-  `TEST_PERF_ID` int(11) NOT NULL AUTO_INCREMENT,
-  `TEST_RESULT_ID` varchar(63) NOT NULL,
-  `PERF_NAME` varchar(200) DEFAULT NULL,
-  `PERF_DATA` int(11) DEFAULT NULL,
-  PRIMARY KEY (`TEST_PERF_ID`),
+CREATE TABLE `test_result_ metric` (
+  `TEST_RESULT_METRIC_ID` int(11) NOT NULL AUTO_INCREMENT,
+  `TEST_RESULT_ID` varchar(63) DEFAULT NULL,
+  `METRIC_GROUP` varchar(63) DEFAULT NULL,
+  `METRIC_NAME` varchar(127) DEFAULT NULL,
+  `METRIC_VALUE` double DEFAULT NULL,
+  PRIMARY KEY (`TEST_RESULT_METRIC_ID`),
+  KEY `fk_test_result_idx` (`TEST_RESULT_ID`),
   CONSTRAINT `fk_test_result` FOREIGN KEY (`TEST_RESULT_ID`) REFERENCES `test_result` (`TEST_RESULT_ID`) ON DELETE CASCADE ON UPDATE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=2562 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 /*!40101 SET SQL_MODE=@OLD_SQL_MODE */;

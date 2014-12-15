@@ -66,7 +66,7 @@ public abstract class AbstractTest {
 
     private final ExecutorService backgroundExecutorService;
 
-    private final Map<String, Long> perfData = new HashMap<>();
+    private final Map<String, Map<String, Double>> metricData = new HashMap<>();
 
     public abstract String getApplicationUnderTest();
 
@@ -99,7 +99,7 @@ public abstract class AbstractTest {
         EntityDriver driver = env.get(key);
         if (driver == null) {
             LOG.error("Cannot find driver of name={} and type={}, please check suite test environemnt",
-                key, clazz.getName());
+                    key, clazz.getName());
             return null;
         }
         driver.setTest(this);
@@ -135,7 +135,7 @@ public abstract class AbstractTest {
     }
 
     /**
-     * Updates the test data presentation for easy understanding.
+     * Updates the test metrics presentation for easy understanding.
      *
      * @param value
      */
@@ -148,30 +148,17 @@ public abstract class AbstractTest {
         this.result = executionResult;
     }
 
-    public Map<String, Long> getPerfData() {
-        return perfData;
+    public Map<String, Map<String, Double>> getMetricData() {
+        return metricData;
     }
 
-    protected void startPerfMeasurement(String name) {
-        this.perfData.put(name, System.currentTimeMillis());
-    }
-
-    protected void stopPerfMeasurement(String name) {
-        Long stop = System.currentTimeMillis();
-        Long start = this.perfData.get(name);
-        if (start == null) {
-            this.perfData.put(name, -2L);
-        } else {
-            this.perfData.put(name, stop - start);
+    protected void putResultMetric(String group, String name, double value) {
+        Map<String, Double> metrics = this.metricData.get(group);
+        if (metrics == null) {
+            metrics = new HashMap<>();
+            this.metricData.put(group, metrics);
         }
-    }
-
-    protected void setPerfMeasurement(String name, int millis) {
-        if (name == null || name.trim().isEmpty()) {
-            LOG.warn("no perf name specified");
-            return;
-        }
-        this.perfData.put(name.trim(), (long) millis);
+        metrics.put(name, value);
     }
 
     /**

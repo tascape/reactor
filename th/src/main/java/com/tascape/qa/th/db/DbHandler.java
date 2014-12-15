@@ -3,7 +3,6 @@ package com.tascape.qa.th.db;
 import com.tascape.qa.th.ExecutionResult;
 import com.tascape.qa.th.SystemConfiguration;
 import com.tascape.qa.th.TestSuite;
-import com.jolbox.bonecp.BoneCP;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -37,20 +36,11 @@ public abstract class DbHandler {
 
     public static final String SYSPROP_DATABASE_PASS = "qa.th.db.pass";
 
-    private static final String DB_HOST = CONFIG.getDatabaseHost();
-
-    private static final String DB_SCHEMA = CONFIG.getDatabaseSchema();
-
-    private static final String DB_USER = CONFIG.getDatabaseUser();
-
-    private static final String DB_PASS = CONFIG.getDatabasePass();
-
     protected enum TABLES {
         suite_result,
-        test_result,
         test_case,
-        test_perf,
-        test_status,
+        test_result,
+        test_result_metric,
     }
 
     protected enum Suite_Result {
@@ -67,6 +57,16 @@ public abstract class DbHandler {
         PRODUCT_UNDER_TEST,
     }
 
+    protected enum Test_Case {
+        TEST_CASE_ID,
+        SUITE_CLASS,
+        TEST_CLASS,
+        TEST_METHOD,
+        TEST_DATA_INFO,
+        TEST_DATA,
+        TEST_ISSUES,
+    }
+
     protected enum Test_Result {
         TEST_RESULT_ID,
         SUITE_RESULT,
@@ -80,48 +80,30 @@ public abstract class DbHandler {
         LOG_DIR,
     }
 
-    protected enum Test_Case {
-        TEST_CASE_ID,
-        SUITE_CLASS,
-        TEST_CLASS,
-        TEST_METHOD,
-        TEST_DATA_INFO,
-        TEST_DATA,
-        TEST_ISSUES,
-    }
-
-    protected enum Test_Perf {
-        TEST_PERF_ID,
+    protected enum Test_Result_Metric {
+        TEST_RESULT_METRIC_ID,
         TEST_RESULT_ID,
-        PERF_NAME,
-        PERF_DATA,
+        METRIC_GROUP,
+        METRIC_NAME,
+        METRIC_VALUE,
     }
-
-    protected enum Test_Status {
-        TEST_STATUS_ID,
-        TEST_RESULT_ID,
-        STATUS_NAME,
-        STATUS_VALUE,
-    }
-
-    private BoneCP connPool;
 
     public static DbHandler getInstance() {
         String type = SystemConfiguration.getInstance().getDatabaseType();
-        DbHandler h;
+        DbHandler dbh;
         switch (type) {
             case "none":
-                h = new H2Handler();
+                dbh = new H2Handler();
                 break;
             default:
-                h = new MysqlHandler();
+                dbh = new MysqlHandler();
         }
         try {
-            h.init();
+            dbh.init();
         } catch (Exception ex) {
             throw new RuntimeException("Cannot connect to db", ex);
         }
-        return h;
+        return dbh;
     }
 
     protected abstract void init() throws Exception;
@@ -131,7 +113,7 @@ public abstract class DbHandler {
     public SuiteResult getSuiteResult(String id) throws SQLException {
         LOG.info("Query for suite result with execution id {}", id);
         final String sql = "SELECT * FROM " + TABLES.suite_result.name() + " WHERE "
-            + Suite_Result.SUITE_RESULT_ID.name() + " = ?";
+                + Suite_Result.SUITE_RESULT_ID.name() + " = ?";
 
         try (Connection conn = this.getConnection()) {
             PreparedStatement stmt = conn.prepareStatement(sql);
@@ -176,9 +158,9 @@ public abstract class DbHandler {
 
     protected Map<String, Integer> getTestCaseIds(List<TestCase> tests) throws SQLException {
         Set<String> suiteClasses = new HashSet<>();
-        for (TestCase tc : tests) {
+        tests.stream().forEach((tc) -> {
             suiteClasses.add(tc.getSuiteClass());
-        }
+        });
 
         Map<String, Integer> idMap = new HashMap<>();
         String sql = "SELECT * FROM " + TABLES.test_case + " WHERE ";
@@ -209,12 +191,12 @@ public abstract class DbHandler {
 
     public List<TestResult> getQueuedTestCaseResults(String execId, int limit) throws SQLException {
         LOG.info("Query database for all queued test cases");
-        final String sql = "SELECT * FROM " + TABLES.test_result.name() + " tr INNER JOIN " + TABLES.test_case.name()
-            + " tc WHERE tr.TEST_CASE_ID=tc.TEST_CASE_ID AND "
-            + Test_Result.EXECUTION_RESULT.name() + " = ? AND "
-            + Test_Result.SUITE_RESULT.name() + " = ? "
-            + "ORDER BY SUITE_CLASS, TEST_CLASS, TEST_METHOD, TEST_DATA_INFO "
-            + "LIMIT ?;";
+        final String sql = "SELECT * FROM " + TABLES.test_result.name() + " tr "
+                + "INNER JOIN " + TABLES.test_case.name() + " tc "
+                + "ON tr.TEST_CASE_ID=tc.TEST_CASE_ID AND " + Test_Result.EXECUTION_RESULT.name() + " = ? "
+                + "WHERE " + Test_Result.SUITE_RESULT.name() + " = ? "
+                + "ORDER BY SUITE_CLASS, TEST_CLASS, TEST_METHOD, TEST_DATA_INFO "
+                + "LIMIT ?;";
         List<TestResult> tcrs = new ArrayList<>();
 
         try (Connection conn = this.getConnection()) {
@@ -254,11 +236,11 @@ public abstract class DbHandler {
     public boolean acquireTestCaseResult(TestResult tcr) throws SQLException {
         LOG.info("Acquire test case {}", tcr.getTestCase().format());
         final String sql = "SELECT * FROM " + TABLES.test_result.name() + " WHERE "
-            + Test_Result.TEST_RESULT_ID.name() + " = ? LIMIT 1;";
+                + Test_Result.TEST_RESULT_ID.name() + " = ? LIMIT 1;";
 
         try (Connection conn = this.getConnection()) {
-            PreparedStatement stmt = conn.prepareStatement(sql, ResultSet.TYPE_SCROLL_SENSITIVE,
-                ResultSet.CONCUR_UPDATABLE);
+            PreparedStatement stmt = conn.prepareStatement(sql,
+                    ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE);
             stmt.setString(1, tcr.getId());
             ResultSet rs = stmt.executeQuery();
             if (rs.next()) {
@@ -283,14 +265,14 @@ public abstract class DbHandler {
 
     public void updateTestExecutionResult(TestResult tcr) throws SQLException {
         LOG.info("Update test result {} ({}) to {}", tcr.getId(), tcr.getTestCase().format(),
-            tcr.getExecutionResult().result());
+                tcr.getExecutionResult().result());
         final String sql = "SELECT tr.* FROM " + TABLES.test_result.name() + " tr INNER JOIN " + TABLES.test_case.name()
-            + " tc WHERE tr.TEST_CASE_ID=tc.TEST_CASE_ID AND "
-            + Test_Result.TEST_RESULT_ID.name() + " = ?;";
+                + " tc WHERE tr.TEST_CASE_ID=tc.TEST_CASE_ID AND "
+                + Test_Result.TEST_RESULT_ID.name() + " = ?;";
 
         try (Connection conn = this.getConnection()) {
-            PreparedStatement stmt = conn.prepareStatement(sql, ResultSet.TYPE_SCROLL_SENSITIVE,
-                ResultSet.CONCUR_UPDATABLE);
+            PreparedStatement stmt = conn.prepareStatement(sql,
+                    ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE);
             stmt.setString(1, tcr.getId());
             ResultSet rs = stmt.executeQuery();
             if (rs.first()) {
@@ -312,26 +294,26 @@ public abstract class DbHandler {
 
     public abstract void updateSuiteExecutionResult(String execId) throws SQLException;
 
-    public void savePerfData(String trid, Map<String, Long> perfData) throws SQLException {
-        final String sql = "SELECT * FROM " + TABLES.test_perf.name() + ";";
+    public void saveTestResultMetrics(String trid, String group, Map<String, Double> metricData) throws SQLException {
+        final String sql = "SELECT * FROM " + TABLES.test_result_metric.name() + ";";
         try (Connection conn = this.getConnection();
-            PreparedStatement stmt = conn.prepareStatement(sql,
-                ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE)) {
+                PreparedStatement stmt = conn.prepareStatement(sql,
+                        ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE)) {
             stmt.setMaxRows(1);
-            LOG.trace("save perf data {}", perfData);
-            try (ResultSet rs = stmt.executeQuery()) {
-                for (Entry<String, Long> entry : perfData.entrySet()) {
-                    rs.moveToInsertRow();
+            LOG.trace("save metric data {}", metricData);
+            ResultSet rs = stmt.executeQuery();
 
-                    rs.updateString(Test_Perf.TEST_RESULT_ID.name(), trid);
-                    rs.updateString(Test_Perf.PERF_NAME.name(), entry.getKey());
-                    Long perf = entry.getValue();
-                    rs.updateLong(Test_Perf.PERF_DATA.name(), perf == null ? -1 : perf > 100000000 ? -3 : perf);
+            for (Entry<String, Double> entry : metricData.entrySet()) {
+                rs.moveToInsertRow();
 
-                    rs.insertRow();
-                    rs.last();
-                    rs.updateRow();
-                }
+                rs.updateString(Test_Result_Metric.TEST_RESULT_ID.name(), trid);
+                rs.updateString(Test_Result_Metric.METRIC_GROUP.name(), group);
+                rs.updateString(Test_Result_Metric.METRIC_NAME.name(), entry.getKey());
+                rs.updateDouble(Test_Result_Metric.METRIC_VALUE.name(), entry.getValue());
+
+                rs.insertRow();
+                rs.last();
+                rs.updateRow();
             }
         }
     }
