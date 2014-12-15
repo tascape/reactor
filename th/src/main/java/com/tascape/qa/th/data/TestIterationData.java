@@ -41,4 +41,12 @@ public class TestIterationData extends AbstractTestData {
     public String format() {
         return (this.iteration + 1) + "/" + this.iterations;
     }
+
+    public int getIteration() {
+        return iteration;
+    }
+
+    public int getIterations() {
+        return iterations;
+    }
 }
