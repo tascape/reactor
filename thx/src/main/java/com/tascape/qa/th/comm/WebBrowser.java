@@ -43,7 +43,8 @@ public abstract class WebBrowser extends EntityCommunication implements WebDrive
     public static WebBrowser newBrowser(boolean extEnabled) throws Exception {
         String type = SYS_CONFIG.getProperty(SYSPROP_WEBBROWSER_TYPE);
         if (type == null) {
-            throw new RuntimeException("System property " + SYSPROP_WEBBROWSER_TYPE + " is not specified");
+            throw new RuntimeException("System property " + SYSPROP_WEBBROWSER_TYPE + " is not specified. "
+                    + "firefox and chrome are supported.");
         }
         switch (type) {
             case "firefox":
