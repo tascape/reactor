@@ -25,7 +25,7 @@ public class TestClassGoogleSearch extends JUnit4Test {
     @TestDataProvider(klass = TestIterationData.class, method = "useIterations", parameter = "4")
     public void testSearch() throws Exception {
         TestIterationData data = this.getTestData(TestIterationData.class);
-        this.searchUi.search("test automation " + data.format());
-        Utils.sleep(2000, "wait");
+        this.searchUi.search("test automation " + data.getIteration());
+        Utils.sleep(5000, "wait");
     }
 }

@@ -16,14 +16,15 @@ public class GoogleSearchUi extends EntityDriver {
     }
 
     public void search(String term) throws Exception {
-        this.reset();
         SearchPage searchPage = WebPage.getPage(SearchPage.class, this);
+        searchPage.get();
         searchPage.submitSearch(term);
     }
 
     @Override
     public void reset() throws Exception {
         WebBrowser browser = WebBrowser.class.cast(this.getEntityCommunication());
-        browser.get(SearchPage.URL);
+        SearchPage searchPage = WebPage.getPage(SearchPage.class, this);
+        searchPage.get();
     }
 }
