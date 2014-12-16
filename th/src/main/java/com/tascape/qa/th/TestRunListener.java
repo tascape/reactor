@@ -2,10 +2,11 @@ package com.tascape.qa.th;
 
 import com.tascape.qa.th.db.DbHandler;
 import com.tascape.qa.th.db.TestResult;
+import com.tascape.qa.th.db.TestResultMetric;
 import com.tascape.qa.th.test.AbstractTest;
 import java.lang.reflect.Field;
 import java.sql.SQLException;
-import java.util.Map;
+import java.util.List;
 import org.junit.internal.AssumptionViolatedException;
 import org.junit.runner.Description;
 import org.junit.runner.Result;
@@ -150,12 +151,9 @@ public class TestRunListener extends RunListener {
 
         test.cleanBackgoundTasks();
 
-        Map<String, Map<String, Double>> metricData = test.getMetricData();
-        if (!metricData.isEmpty()) {
-            LOG.info("Save result metric data {}", metricData);
-            for (String group : metricData.keySet()) {
-                db.saveTestResultMetrics(tcr.getId(), group, metricData.get(group));
-            }
+        List<TestResultMetric> resultMetrics = test.getTestResultMetrics();
+        if (!resultMetrics.isEmpty()) {
+            db.saveTestResultMetrics(tcr.getId(), resultMetrics);
         }
     }
 

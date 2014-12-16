@@ -12,7 +12,6 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.Set;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -113,7 +112,7 @@ public abstract class DbHandler {
     public SuiteResult getSuiteResult(String id) throws SQLException {
         LOG.info("Query for suite result with execution id {}", id);
         final String sql = "SELECT * FROM " + TABLES.suite_result.name() + " WHERE "
-                + Suite_Result.SUITE_RESULT_ID.name() + " = ?";
+            + Suite_Result.SUITE_RESULT_ID.name() + " = ?";
 
         try (Connection conn = this.getConnection()) {
             PreparedStatement stmt = conn.prepareStatement(sql);
@@ -192,11 +191,11 @@ public abstract class DbHandler {
     public List<TestResult> getQueuedTestCaseResults(String execId, int limit) throws SQLException {
         LOG.info("Query database for all queued test cases");
         final String sql = "SELECT * FROM " + TABLES.test_result.name() + " tr "
-                + "INNER JOIN " + TABLES.test_case.name() + " tc "
-                + "ON tr.TEST_CASE_ID=tc.TEST_CASE_ID AND " + Test_Result.EXECUTION_RESULT.name() + " = ? "
-                + "WHERE " + Test_Result.SUITE_RESULT.name() + " = ? "
-                + "ORDER BY SUITE_CLASS, TEST_CLASS, TEST_METHOD, TEST_DATA_INFO "
-                + "LIMIT ?;";
+            + "INNER JOIN " + TABLES.test_case.name() + " tc "
+            + "ON tr.TEST_CASE_ID=tc.TEST_CASE_ID AND " + Test_Result.EXECUTION_RESULT.name() + " = ? "
+            + "WHERE " + Test_Result.SUITE_RESULT.name() + " = ? "
+            + "ORDER BY SUITE_CLASS, TEST_CLASS, TEST_METHOD, TEST_DATA_INFO "
+            + "LIMIT ?;";
         List<TestResult> tcrs = new ArrayList<>();
 
         try (Connection conn = this.getConnection()) {
@@ -236,11 +235,11 @@ public abstract class DbHandler {
     public boolean acquireTestCaseResult(TestResult tcr) throws SQLException {
         LOG.info("Acquire test case {}", tcr.getTestCase().format());
         final String sql = "SELECT * FROM " + TABLES.test_result.name() + " WHERE "
-                + Test_Result.TEST_RESULT_ID.name() + " = ? LIMIT 1;";
+            + Test_Result.TEST_RESULT_ID.name() + " = ? LIMIT 1;";
 
         try (Connection conn = this.getConnection()) {
             PreparedStatement stmt = conn.prepareStatement(sql,
-                    ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE);
+                ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE);
             stmt.setString(1, tcr.getId());
             ResultSet rs = stmt.executeQuery();
             if (rs.next()) {
@@ -265,14 +264,14 @@ public abstract class DbHandler {
 
     public void updateTestExecutionResult(TestResult tcr) throws SQLException {
         LOG.info("Update test result {} ({}) to {}", tcr.getId(), tcr.getTestCase().format(),
-                tcr.getExecutionResult().result());
+            tcr.getExecutionResult().result());
         final String sql = "SELECT tr.* FROM " + TABLES.test_result.name() + " tr INNER JOIN " + TABLES.test_case.name()
-                + " tc WHERE tr.TEST_CASE_ID=tc.TEST_CASE_ID AND "
-                + Test_Result.TEST_RESULT_ID.name() + " = ?;";
+            + " tc WHERE tr.TEST_CASE_ID=tc.TEST_CASE_ID AND "
+            + Test_Result.TEST_RESULT_ID.name() + " = ?;";
 
         try (Connection conn = this.getConnection()) {
             PreparedStatement stmt = conn.prepareStatement(sql,
-                    ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE);
+                ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE);
             stmt.setString(1, tcr.getId());
             ResultSet rs = stmt.executeQuery();
             if (rs.first()) {
@@ -294,22 +293,22 @@ public abstract class DbHandler {
 
     public abstract void updateSuiteExecutionResult(String execId) throws SQLException;
 
-    public void saveTestResultMetrics(String trid, String group, Map<String, Double> metricData) throws SQLException {
+    public void saveTestResultMetrics(String trid, List<TestResultMetric> resultMetrics) throws SQLException {
         final String sql = "SELECT * FROM " + TABLES.test_result_metric.name() + ";";
         try (Connection conn = this.getConnection();
-                PreparedStatement stmt = conn.prepareStatement(sql,
-                        ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE)) {
+            PreparedStatement stmt = conn.prepareStatement(sql,
+                ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE)) {
             stmt.setMaxRows(1);
-            LOG.trace("save metric data {}", metricData);
+            LOG.trace("save metric data {}", resultMetrics);
             ResultSet rs = stmt.executeQuery();
 
-            for (Entry<String, Double> entry : metricData.entrySet()) {
+            for (TestResultMetric metric : resultMetrics) {
                 rs.moveToInsertRow();
 
                 rs.updateString(Test_Result_Metric.TEST_RESULT_ID.name(), trid);
-                rs.updateString(Test_Result_Metric.METRIC_GROUP.name(), group);
-                rs.updateString(Test_Result_Metric.METRIC_NAME.name(), entry.getKey());
-                rs.updateDouble(Test_Result_Metric.METRIC_VALUE.name(), entry.getValue());
+                rs.updateString(Test_Result_Metric.METRIC_GROUP.name(), metric.getMetricGroup());
+                rs.updateString(Test_Result_Metric.METRIC_NAME.name(), metric.getMetricName());
+                rs.updateDouble(Test_Result_Metric.METRIC_VALUE.name(), metric.getMetricValue());
 
                 rs.insertRow();
                 rs.last();

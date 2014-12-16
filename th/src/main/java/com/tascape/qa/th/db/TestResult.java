@@ -13,6 +13,8 @@ import org.slf4j.LoggerFactory;
 public class TestResult {
     private static final Logger LOG = LoggerFactory.getLogger(TestResult.class);
 
+    private static final long serialVersionUID = 1L;
+
     private TestCase testCase = null;
 
     private String id = "";

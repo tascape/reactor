@@ -10,11 +10,13 @@ import com.tascape.qa.th.db.TestResult;
 import com.tascape.qa.th.driver.EntityDriver;
 import com.tascape.qa.th.suite.AbstractSuite;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
+import com.tascape.qa.th.db.TestResultMetric;
 import java.awt.AWTException;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Path;
-import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -66,7 +68,7 @@ public abstract class AbstractTest {
 
     private final ExecutorService backgroundExecutorService;
 
-    private final Map<String, Map<String, Double>> metricData = new HashMap<>();
+    private final List<TestResultMetric> resultMetrics = new LinkedList<>();
 
     public abstract String getApplicationUnderTest();
 
@@ -99,7 +101,7 @@ public abstract class AbstractTest {
         EntityDriver driver = env.get(key);
         if (driver == null) {
             LOG.error("Cannot find driver of name={} and type={}, please check suite test environemnt",
-                    key, clazz.getName());
+                key, clazz.getName());
             return null;
         }
         driver.setTest(this);
@@ -148,17 +150,16 @@ public abstract class AbstractTest {
         this.result = executionResult;
     }
 
-    public Map<String, Map<String, Double>> getMetricData() {
-        return metricData;
+    public List<TestResultMetric> getTestResultMetrics() {
+        return resultMetrics;
     }
 
     protected void putResultMetric(String group, String name, double value) {
-        Map<String, Double> metrics = this.metricData.get(group);
-        if (metrics == null) {
-            metrics = new HashMap<>();
-            this.metricData.put(group, metrics);
-        }
-        metrics.put(name, value);
+        TestResultMetric metric = new TestResultMetric();
+        metric.setMetricGroup(group);
+        metric.setMetricName(name);
+        metric.setMetricValue(value);
+        this.resultMetrics.add(metric);
     }
 
     /**
