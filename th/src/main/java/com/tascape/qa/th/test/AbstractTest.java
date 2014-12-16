@@ -84,7 +84,7 @@ public abstract class AbstractTest {
         AbstractTest.setTest(this); // TODO: move this to somewhere else
     }
 
-    public Path getLogDirectory() {
+    public Path getTestLogPath() {
         return testLogPath;
     }
 
@@ -166,7 +166,7 @@ public abstract class AbstractTest {
      * @return png file
      */
     public File captureScreen() {
-        Path path = this.getLogDirectory();
+        Path path = this.getTestLogPath();
         File png = path.resolve("screen-" + System.currentTimeMillis() + ".png").toFile();
         png = Utils.getKeepAliveFile(png);
         try {

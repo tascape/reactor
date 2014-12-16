@@ -1,6 +1,5 @@
 package com.tascape.qa.th.suite;
 
-import com.tascape.qa.th.suite.AbstractSuite;
 import org.openqa.selenium.server.RemoteControlConfiguration;
 import org.openqa.selenium.server.SeleniumServer;
 import org.slf4j.Logger;

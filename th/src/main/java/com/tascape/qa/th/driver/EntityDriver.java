@@ -25,11 +25,11 @@ public abstract class EntityDriver {
 
     private AbstractTest test;
 
-    public Path getLogDirectory() {
+    public Path getLogPath() {
         if (this.test == null) {
             return Paths.get(System.getProperty("user.home"), "test");
         }
-        return this.test.getLogDirectory();
+        return this.test.getTestLogPath();
     }
 
     public EntityCommunication getEntityCommunication() {
@@ -57,12 +57,12 @@ public abstract class EntityDriver {
     }
 
     protected File createDataFile(String prefix, String extension) throws IOException {
-        File f = File.createTempFile(prefix + "-", "." + extension, this.getLogDirectory().toFile());
+        File f = File.createTempFile(prefix + "-", "." + extension, this.getLogPath().toFile());
         return f;
     }
 
     protected File createKeepAliveLogFile(String prefix, String extension) throws IOException {
-        File f = File.createTempFile(prefix + "-", "." + extension, this.getLogDirectory().toFile());
+        File f = File.createTempFile(prefix + "-", "." + extension, this.getLogPath().toFile());
         return Utils.getKeepAliveFile(f);
     }
 
@@ -74,7 +74,7 @@ public abstract class EntityDriver {
      * @return png file
      */
     protected File captureScreen() {
-        Path path = this.getLogDirectory();
+        Path path = this.getLogPath();
         File png = path.resolve("screen-" + System.currentTimeMillis() + ".png").toFile();
         try {
             Utils.captureScreen(png);

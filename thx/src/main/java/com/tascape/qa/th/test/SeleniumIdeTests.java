@@ -2,7 +2,6 @@ package com.tascape.qa.th.test;
 
 import com.tascape.qa.th.comm.Firefox;
 import com.tascape.qa.th.suite.SeleniumIdeSuite;
-import com.tascape.qa.th.test.AbstractTest;
 import java.io.File;
 import org.apache.commons.io.FileUtils;
 import org.openqa.selenium.server.RemoteControlConfiguration;
@@ -35,7 +34,7 @@ public abstract class SeleniumIdeTests extends AbstractTest {
         FileUtils.write(suite, content);
         LOG.debug("Temp test suite file {}", suite.getAbsolutePath());
 
-        File result = this.getLogDirectory().resolve("ide-result.html").toFile();
+        File result = this.getTestLogPath().resolve("ide-result.html").toFile();
         LOG.debug("Test result file {}", result.getAbsolutePath());
 
         this.captureScreens(2000);
@@ -45,23 +44,22 @@ public abstract class SeleniumIdeTests extends AbstractTest {
         if (bin != null) {
             ff += " " + bin;
         }
-        String pf = launcher.runHTMLSuite(ff, browserURL, suite.toURI().toURL().toString(),
-            result, 36000, true);
+        String pf = launcher.runHTMLSuite(ff, browserURL, suite.toURI().toURL().toString(), result, 36000, true);
         suite.delete();
         return "PASSED".equals(pf);
     }
 
     private static final String TEST_SUITE_TEMPLATE = new StringBuilder()
-        .append("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n")
-        .append("<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.0 Strict//EN\" ")
-        .append("http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd\">\n")
-        .append("<html xmlns=\"http://www.w3.org/1999/xhtml\" xml:lang=\"en\" lang=\"en\">\n")
-        .append("<head>\n")
-        .append("  <meta content=\"text/html; charset=UTF-8\" http-equiv=\"content-type\" />\n")
-        .append("  <title>Test Suite</title>\n" + "</head>\n" + "<body>\n")
-        .append("<table id=\"suiteTable\" cellpadding=\"1\" cellspacing=\"1\" border=\"1\" class=\"selenium\"><tbody>\n")
-        .append("<tr><td><b>Test Suite</b></td></tr>\n")
-        .append("<tr><td><a href=\"../XXXXXXXXXXXXXXXXXXXX\">XXXXXXXXXXXXXXXXXXXX</a></td></tr>\n")
-        .append("</tbody></table>\n" + "</body>\n" + "</html>").toString();
+            .append("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n")
+            .append("<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.0 Strict//EN\" ")
+            .append("http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd\">\n")
+            .append("<html xmlns=\"http://www.w3.org/1999/xhtml\" xml:lang=\"en\" lang=\"en\">\n")
+            .append("<head>\n")
+            .append("  <meta content=\"text/html; charset=UTF-8\" http-equiv=\"content-type\" />\n")
+            .append("  <title>Test Suite</title>\n" + "</head>\n" + "<body>\n")
+            .append("<table id=\"suiteTable\" cellpadding=\"1\" cellspacing=\"1\" border=\"1\" class=\"selenium\"><tbody>\n")
+            .append("<tr><td><b>Test Suite</b></td></tr>\n")
+            .append("<tr><td><a href=\"../XXXXXXXXXXXXXXXXXXXX\">XXXXXXXXXXXXXXXXXXXX</a></td></tr>\n")
+            .append("</tbody></table>\n" + "</body>\n" + "</html>").toString();
 
 }
