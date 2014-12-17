@@ -22,12 +22,12 @@ public abstract class AbstractSuite {
     private static final Logger LOG = LoggerFactory.getLogger(AbstractSuite.class);
 
     private static final ThreadLocal<Map<String, Map<String, EntityDriver>>> ENVIRONMENTS
-        = new ThreadLocal<Map<String, Map<String, EntityDriver>>>() {
-            @Override
-            protected Map<String, Map<String, EntityDriver>> initialValue() {
-                return new HashMap<>();
-            }
-        };
+            = new ThreadLocal<Map<String, Map<String, EntityDriver>>>() {
+                @Override
+                protected Map<String, Map<String, EntityDriver>> initialValue() {
+                    return new HashMap<>();
+                }
+            };
 
     public static void putEnvionment(String suiteClass, Map<String, EntityDriver> drivers) {
         ENVIRONMENTS.get().put(suiteClass, drivers);
@@ -94,6 +94,8 @@ public abstract class AbstractSuite {
         }
         return value;
     }
+
+    public abstract String getName();
 
     public abstract void setUpTestClasses();
 
