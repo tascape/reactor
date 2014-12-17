@@ -108,7 +108,7 @@ public class ResultBase implements Serializable {
 
     protected Connection getConnection() throws NamingException, SQLException {
         Context ctx = new InitialContext();
-        ctx = (Context) ctx.lookup("java:/comp/env");
+        ctx = (Context) ctx.lookup("java:comp/env");
         ds = (DataSource) ctx.lookup("jdbc/thr");
         LOG.trace("datasource {}", ds);
 
