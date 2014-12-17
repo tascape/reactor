@@ -15,6 +15,11 @@ public class TestSuiteOne extends AbstractSuite {
     private Firefox firefox;
 
     @Override
+    public String getName() {
+        return null;
+    }
+
+    @Override
     public void setUpTestClasses() {
         this.addTestClass(TestGithubPageLoad.class);
     }

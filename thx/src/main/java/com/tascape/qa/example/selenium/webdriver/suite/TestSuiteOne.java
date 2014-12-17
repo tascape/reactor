@@ -14,6 +14,11 @@ public class TestSuiteOne extends AbstractSuite {
     private WebBrowser browser;
 
     @Override
+    public String getName() {
+        return "Web Driver Test Suite Example One";
+    }
+
+    @Override
     public void setUpTestClasses() {
         this.addTestClass(TestClassGoogleSearch.class);
     }

@@ -14,6 +14,11 @@ public class SomeWebAppTestSuite extends SeleniumIdeSuite {
     private static final Logger LOG = LoggerFactory.getLogger(SomeWebAppTestSuite.class);
 
     @Override
+    public String getName() {
+        return "Selenium IDE Test Suite Example One";
+    }
+
+    @Override
     public void setUpTestClasses() {
         this.addTestClass(SomeWebAppSeleniumIdeTests.class);
     }
