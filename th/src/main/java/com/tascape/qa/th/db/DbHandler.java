@@ -35,14 +35,14 @@ public abstract class DbHandler {
 
     public static final String SYSPROP_DATABASE_PASS = "qa.th.db.pass";
 
-    protected enum TABLES {
+    public enum TABLES {
         suite_result,
         test_case,
         test_result,
         test_result_metric,
     }
 
-    protected enum Suite_Result {
+    public enum Suite_Result {
         SUITE_RESULT_ID,
         SUITE_NAME,
         JOB_NAME,

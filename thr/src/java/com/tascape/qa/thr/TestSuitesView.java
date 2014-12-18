@@ -1,11 +1,16 @@
 package com.tascape.qa.thr;
 
 import java.io.Serializable;
+import java.sql.SQLException;
+import java.util.List;
+import java.util.Map;
 import javax.annotation.PostConstruct;
 import javax.enterprise.context.RequestScoped;
 import javax.faces.context.FacesContext;
+import javax.inject.Inject;
 import javax.inject.Named;
-import javax.servlet.http.HttpServletRequest;
+import javax.naming.NamingException;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -24,11 +29,18 @@ public class TestSuitesView implements Serializable {
 
     private long stopTime = System.currentTimeMillis() + 86400000L; // one day
 
-    private int numberOfRecords = 100;
+    private int numberOfEntries = 100;
 
     private boolean invisibleIncluded = false;
-    
+
     private String suiteName = null;
+
+    @Inject
+    private MySqlBaseBean mysql;
+
+    private List<Map<String, Object>> results;
+
+    private List<Map<String, Object>> resultsSelected;
 
     @PostConstruct
     public void init() {
@@ -42,7 +54,7 @@ public class TestSuitesView implements Serializable {
         }
         v = this.getParameter("number");
         if (v != null) {
-            this.numberOfRecords = Integer.parseInt(v);
+            this.numberOfEntries = Integer.parseInt(v);
         }
         v = this.getParameter("invisible");
         if (v != null) {
@@ -50,6 +62,16 @@ public class TestSuitesView implements Serializable {
         }
         this.suiteName = this.getParameter("suite");
         LOG.info("{} -> {}", this.startTime, this.stopTime);
+
+        try {
+            this.results = this.mysql.getTestSuiteResults(this.startTime, this.stopTime, this.numberOfEntries,
+                    this.suiteName, this.invisibleIncluded);
+            this.results.stream().forEach(row -> {
+                row.put("_EXEC_ID", StringUtils.right(row.get("SUITE_RESULT_ID") + "", 10));
+            });
+        } catch (NamingException | SQLException ex) {
+            throw new RuntimeException(ex);
+        }
     }
 
     public long getStartTime() {
@@ -60,8 +82,8 @@ public class TestSuitesView implements Serializable {
         return stopTime;
     }
 
-    public int getNumberOfRecords() {
-        return numberOfRecords;
+    public int getNumberOfEntries() {
+        return numberOfEntries;
     }
 
     public boolean isInvisibleIncluded() {
@@ -72,9 +94,20 @@ public class TestSuitesView implements Serializable {
         return suiteName;
     }
 
+    public List<Map<String, Object>> getResults() {
+        return results;
+    }
+
+    public List<Map<String, Object>> getResultsSelected() {
+        return resultsSelected;
+    }
+
+    public void setResultsSelected(List<Map<String, Object>> resultsSelected) {
+        this.resultsSelected = resultsSelected;
+    }
+
     private String getParameter(String name) {
-        HttpServletRequest req
-                = (HttpServletRequest) FacesContext.getCurrentInstance().getExternalContext().getRequest();
-        return req.getParameter(name);
+        Map<String, String> map = FacesContext.getCurrentInstance().getExternalContext().getRequestParameterMap();
+        return map.get(name);
     }
 }

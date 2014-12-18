@@ -95,7 +95,9 @@ public abstract class AbstractSuite {
         return value;
     }
 
-    public abstract String getName();
+    public String getName() {
+        return this.getClass().getName();
+    }
 
     public abstract void setUpTestClasses();
 

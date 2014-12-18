@@ -1,4 +1,9 @@
 
+.ui-datatable-data > tr:hover {
+    background: #D8D8D8;    
+}
+
+
 .order-table {
     width: 100%;
     border-collapse: collapse;

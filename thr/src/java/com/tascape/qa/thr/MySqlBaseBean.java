@@ -1,19 +1,29 @@
 package com.tascape.qa.thr;
 
+import com.tascape.qa.th.db.DbHandler.Suite_Result;
+import com.tascape.qa.th.db.DbHandler.TABLES;
 import java.io.Serializable;
 import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.ZoneOffset;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.Properties;
 import javax.annotation.Resource;
-import javax.faces.context.FacesContext;
+import javax.enterprise.context.ApplicationScoped;
+import javax.inject.Named;
 import javax.naming.Context;
 import javax.naming.InitialContext;
 import javax.naming.NamingException;
-import javax.servlet.http.HttpServletRequest;
 import javax.sql.DataSource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -22,6 +32,8 @@ import org.slf4j.LoggerFactory;
  *
  * @author linsong wang
  */
+@Named
+@ApplicationScoped
 public class MySqlBaseBean implements Serializable {
     private static final Logger LOG = LoggerFactory.getLogger(MySqlBaseBean.class);
 
@@ -30,11 +42,29 @@ public class MySqlBaseBean implements Serializable {
 
     protected Properties params;
 
-    MySqlBaseBean() {
-        this.loadParameters();
+    public List<Map<String, Object>> getTestSuiteResults(long startTime, long stopTime, int numberOfEntries,
+            String suiteName, boolean invisibleIncluded) throws NamingException, SQLException {
+        String sql = "SELECT * FROM " + TABLES.suite_result.name() + " "
+                + "WHERE " + Suite_Result.START_TIME.name() + " > ? "
+                + "AND " + Suite_Result.STOP_TIME.name() + " < ? ";
+        if (suiteName != null && !suiteName.isEmpty()) {
+            sql += "AND " + Suite_Result.SUITE_NAME.name() + " = ? ";
+        }
+        sql += ";";
+        try (Connection conn = this.getConnection()) {
+            PreparedStatement stmt = conn.prepareStatement(sql);
+            stmt.setLong(1, startTime);
+            stmt.setLong(2, stopTime);
+            if (suiteName != null && !suiteName.isEmpty()) {
+                stmt.setString(3, suiteName);
+            }
+            stmt.setMaxRows(numberOfEntries);
+            ResultSet rs = stmt.executeQuery();
+            return this.dumpResultSetToList(rs);
+        }
     }
 
-    Connection getConnection() throws NamingException, SQLException {
+    private Connection getConnection() throws NamingException, SQLException {
         Context ctx = new InitialContext();
         ctx = (Context) ctx.lookup("java:comp/env");
         ds = (DataSource) ctx.lookup("jdbc/thr");
@@ -49,6 +79,26 @@ public class MySqlBaseBean implements Serializable {
         return conn;
     }
 
+    public List<Map<String, Object>> dumpResultSetToList(ResultSet rs) throws SQLException {
+        List<Map<String, Object>> rsml = new ArrayList<>();
+        ResultSetMetaData rsmd = rs.getMetaData();
+
+        while (rs.next()) {
+            Map<String, Object> d = new LinkedHashMap<>();
+            for (int col = 1; col <= rsmd.getColumnCount(); col++) {
+                d.put(rsmd.getColumnLabel(col), rs.getObject(col));
+            }
+            rsml.add(d);
+        }
+        LOG.trace("{} rows loaded", rsml.size());
+        return rsml;
+    }
+    
+
+    public Date convertToDate(long time) {
+        return new Date(time);
+    }
+
     public static long getMillis(String time) {
         if (time == null || time.trim().isEmpty()) {
             return System.currentTimeMillis();
@@ -59,18 +109,6 @@ public class MySqlBaseBean implements Serializable {
             ldt.atZone(zone);
             LOG.trace("ldt {}", ldt);
             return ldt.toInstant(ZoneOffset.ofHours(-8)).toEpochMilli();
-        }
-    }
-
-    private void loadParameters() {
-        HttpServletRequest req
-                = (HttpServletRequest) FacesContext.getCurrentInstance().getExternalContext().getRequest();
-        this.params = new Properties();
-
-        LOG.trace("{}", req.getRequestURL());
-        for (String p : req.getParameterMap().keySet()) {
-            LOG.trace("{}={}", p, req.getParameter(p));
-            this.params.setProperty(p, req.getParameter(p));
         }
     }
 }
