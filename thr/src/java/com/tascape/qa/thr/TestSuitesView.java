@@ -33,7 +33,7 @@ public class TestSuitesView implements Serializable {
 
     private boolean invisibleIncluded = false;
 
-    private String suiteName = null;
+    private String suiteName = "";
 
     @Inject
     private MySqlBaseBean mysql;
@@ -44,24 +44,7 @@ public class TestSuitesView implements Serializable {
 
     @PostConstruct
     public void init() {
-        String v = this.getParameter("start");
-        if (v != null) {
-            this.startTime = Long.parseLong(v);
-        }
-        v = this.getParameter("stop");
-        if (v != null) {
-            this.stopTime = Long.parseLong(v);
-        }
-        v = this.getParameter("number");
-        if (v != null) {
-            this.numberOfEntries = Integer.parseInt(v);
-        }
-        v = this.getParameter("invisible");
-        if (v != null) {
-            this.invisibleIncluded = Boolean.parseBoolean(v);
-        }
-        this.suiteName = this.getParameter("suite");
-        LOG.info("{} -> {}", this.startTime, this.stopTime);
+        this.getParameters();
 
         try {
             this.results = this.mysql.getTestSuiteResults(this.startTime, this.stopTime, this.numberOfEntries,
@@ -106,8 +89,52 @@ public class TestSuitesView implements Serializable {
         this.resultsSelected = resultsSelected;
     }
 
-    private String getParameter(String name) {
+    public void setStartTime(long startTime) {
+        this.startTime = startTime;
+    }
+
+    public void setStopTime(long stopTime) {
+        this.stopTime = stopTime;
+    }
+
+    public void setNumberOfEntries(int numberOfEntries) {
+        this.numberOfEntries = numberOfEntries;
+    }
+
+    public void setInvisibleIncluded(boolean invisibleIncluded) {
+        this.invisibleIncluded = invisibleIncluded;
+    }
+
+    public void setSuiteName(String suiteName) {
+        this.suiteName = suiteName;
+    }
+
+    private void getParameters() {
         Map<String, String> map = FacesContext.getCurrentInstance().getExternalContext().getRequestParameterMap();
-        return map.get(name);
+        String v = map.get("start");
+        if (v != null) {
+            this.startTime = Long.parseLong(v);
+            LOG.debug("start={}", this.startTime);
+        }
+        v = map.get("stop");
+        if (v != null) {
+            this.stopTime = Long.parseLong(v);
+            LOG.debug("stop={}", this.stopTime);
+        }
+        v = map.get("number");
+        if (v != null) {
+            this.numberOfEntries = Integer.parseInt(v);
+            LOG.debug("number={}", this.numberOfEntries);
+        }
+        v = map.get("invisible");
+        if (v != null) {
+            this.invisibleIncluded = Boolean.parseBoolean(v);
+            LOG.debug("invisible={}", this.invisibleIncluded);
+        }
+        v = map.get("suite");
+        if (v != null) {
+            this.suiteName = v;
+            LOG.debug("suite={}", this.suiteName);
+        }
     }
 }

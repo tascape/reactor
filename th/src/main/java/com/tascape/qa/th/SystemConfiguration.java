@@ -257,6 +257,6 @@ public class SystemConfiguration {
     }
 
     private String getLocalJobName() {
-        return this.getHostName() + " | " + this.getTestSuite();
+        return this.getHostName();
     }
 }
