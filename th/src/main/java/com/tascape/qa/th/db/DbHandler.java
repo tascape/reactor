@@ -53,6 +53,7 @@ public abstract class DbHandler {
         STOP_TIME,
         NUMBER_OF_TESTS,
         NUMBER_OF_FAILURE,
+        INVISIBLE_ENTRY,
         PRODUCT_UNDER_TEST,
     }
 
@@ -66,7 +67,7 @@ public abstract class DbHandler {
         TEST_ISSUES,
     }
 
-    protected enum Test_Result {
+    public enum Test_Result {
         TEST_RESULT_ID,
         SUITE_RESULT,
         TEST_CASE_ID,

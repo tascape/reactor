@@ -12,66 +12,47 @@
         <title>Test Suites Result</title>
     </h:head>
     <h:body>
-        <ui:param name="suite" value="#{testSuitesView.suiteName}" />
+        <ui:param name="suite" value="#{suitesResultView.suiteName}" />
 
         <h:panelGrid>
-            <h:outputText value="All Test Suite Results" style="font-size: x-large; font-variant: small-caps; font-weight: bold;" />
-            <p:spacer width="10px" />
+            <h:outputText value="All Test Suites Result" style="font-size: x-large; font-variant: small-caps; font-weight: bold;" />
+            <p:spacer height="10px" />
         </h:panelGrid>
 
-        <h:panelGrid columns="20" rendered="#{empty suite}">
+        <h:panelGrid columns="11">
             <h:outputText value="From" />
-            <p:calendar id="starttime" widgetVar="wv_start" pattern="yyyy-MM-dd HH:mm" value="#{testSuitesView.startTime}">
-                <p:ajax event="dateSelect" oncomplete="thr.querySuiteResults()" global="false" />
-            </p:calendar>
-            <h:outputText value="to" />
-            <p:calendar id="stoptime" widgetVar="wv_stop" pattern="yyyy-MM-dd HH:mm" value="#{testSuitesView.stopTime}">
-                <p:ajax event="dateSelect" oncomplete="thr.querySuiteResults()" global="false" />
-            </p:calendar>
-            <h:outputText value="," />
-            <h:outputText value="with maximum" />
-            <p:spinner id="number" widgetVar="wv_number" value="#{testSuitesView.numberOfEntries}"
-                       min="1" max="10000" size="5" onchange="thr.querySuiteResults()" />
-            <h:outputText value="entries," />
-            <p:selectOneMenu id="invisibleIncluded" widgetVar="wv_invisible" value="#{testSuitesView.invisibleIncluded}"
-                             onchange="thr.querySuiteResults()">
-                <f:selectItem id="invisibleIncluded_true" itemLabel="including invisible entries" itemValue="true" />
-                <f:selectItem id="invisibleIncluded_false" itemLabel="including no invisible entries" itemValue="false" />
-            </p:selectOneMenu>
-        </h:panelGrid>
-        <h:panelGrid columns="20" rendered="#{not empty suite}">
-            <h:outputText value="From" />
-            <p:calendar id="starttime" widgetVar="wv_start" pattern="yyyy-MM-dd HH:mm" value="#{testSuitesView.startTime}">
+            <p:calendar id="starttime" widgetVar="wv_start" pattern="yyyy-MM-dd HH:mm" value="#{suitesResultView.startTime}">
                 <p:ajax event="dateSelect" oncomplete="thr.querySuiteResults('#{suite}')" global="false" />
             </p:calendar>
             <h:outputText value="to" />
-            <p:calendar id="stoptime" widgetVar="wv_stop" pattern="yyyy-MM-dd HH:mm" value="#{testSuitesView.stopTime}">
+            <p:calendar id="stoptime" widgetVar="wv_stop" pattern="yyyy-MM-dd HH:mm" value="#{suitesResultView.stopTime}">
                 <p:ajax event="dateSelect" oncomplete="thr.querySuiteResults('#{suite}')" global="false" />
             </p:calendar>
             <h:outputText value="," />
             <h:outputText value="with maximum" />
-            <p:spinner id="number" widgetVar="wv_number" value="#{testSuitesView.numberOfEntries}"
+            <p:spinner id="number" widgetVar="wv_number" value="#{suitesResultView.numberOfEntries}"
                        min="1" max="10000" size="5" onchange="thr.querySuiteResults('#{suite}')" />
             <h:outputText value="entries," />
-            <p:selectOneMenu id="invisibleIncluded" widgetVar="wv_invisible" value="#{testSuitesView.invisibleIncluded}"
+            <p:selectOneMenu id="invisibleIncluded" widgetVar="wv_invisible" value="#{suitesResultView.invisibleIncluded}"
                              onchange="thr.querySuiteResults('#{suite}')">
-                <f:selectItem id="invisibleIncluded_true" itemLabel="including invisible entries" itemValue="true" />
                 <f:selectItem id="invisibleIncluded_false" itemLabel="including no invisible entries" itemValue="false" />
+                <f:selectItem id="invisibleIncluded_true" itemLabel="including invisible entries" itemValue="true" />
             </p:selectOneMenu>
-            <p:commandButton onclick="thr.querySuiteResults()" value="All Test Suites" style="font-size: xx-small" />
+            <p:commandButton onclick="thr.querySuiteResults()" value="All Test Suites" style="font-size: xx-small" rendered="#{not empty suite}" />
         </h:panelGrid>
 
-        <p:dataTable value="#{testSuitesView.results}" var="row" rowIndexVar="rowIndex" resizableColumns="true"
-                     rowKey="#{row.get('SUITE_RESULT_ID')}" selection="#{testSuitesView.resultsSelected}">
+        <p:dataTable value="#{suitesResultView.results}" var="row" rowIndexVar="rowIndex" resizableColumns="true"
+                     rowKey="#{row.get('SUITE_RESULT_ID')}" selection="#{suitesResultView.resultsSelected}">
             <p:column headerText="Index" width="36">
-                <h:outputText value="#{rowIndex + 1}" />
+                <h:outputText value="#{rowIndex + 1}" rendered="#{row.get('INVISIBLE_ENTRY') == 0}" />
+                <h:outputText value="#{rowIndex + 1}" rendered="#{row.get('INVISIBLE_ENTRY') != 0}" style="color: darkgray" />
             </p:column>
 
             <p:column width="80">
                 <f:facet name="header">
                     <h:outputText value="Execution&#10;Id" escape="false" style="white-space: pre-line;" />
                 </f:facet>
-                <h:outputLink value="testSuite.xhtml?srid=#{row.get('SUITE_RESULT_ID')}" target="_blank"
+                <h:outputLink value="suite_result.xhtml?srid=#{row.get('SUITE_RESULT_ID')}" target="_blank"
                               style="font-family: monospace" >#{row.get('_EXEC_ID')}</h:outputLink>
             </p:column>
 
@@ -127,11 +108,5 @@
                 </nobr>
             </p:column>
         </p:dataTable>
-
-        <script>
-            jQuery(document).ready(function () {
-                console.log(location);
-            });
-        </script>
     </h:body>
 </html>

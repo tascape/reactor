@@ -2,6 +2,7 @@ package com.tascape.qa.thr;
 
 import com.tascape.qa.th.db.DbHandler.Suite_Result;
 import com.tascape.qa.th.db.DbHandler.TABLES;
+import com.tascape.qa.th.db.DbHandler.Test_Result;
 import java.io.Serializable;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -17,12 +18,9 @@ import java.util.Date;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Properties;
 import javax.annotation.Resource;
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Named;
-import javax.naming.Context;
-import javax.naming.InitialContext;
 import javax.naming.NamingException;
 import javax.sql.DataSource;
 import org.slf4j.Logger;
@@ -40,17 +38,18 @@ public class MySqlBaseBean implements Serializable {
     @Resource(name = "jdbc/thr")
     private DataSource ds;
 
-    protected Properties params;
-
-    public List<Map<String, Object>> getTestSuiteResults(long startTime, long stopTime, int numberOfEntries,
-            String suiteName, boolean invisibleIncluded) throws NamingException, SQLException {
-        String sql = "SELECT * FROM " + TABLES.suite_result.name() + " "
-                + "WHERE " + Suite_Result.START_TIME.name() + " > ? "
-                + "AND " + Suite_Result.STOP_TIME.name() + " < ? ";
+    public List<Map<String, Object>> getSuitesResult(long startTime, long stopTime, int numberOfEntries,
+        String suiteName, boolean invisibleIncluded) throws NamingException, SQLException {
+        String sql = "SELECT * FROM " + TABLES.suite_result.name()
+            + " WHERE " + Suite_Result.START_TIME.name() + " > ?"
+            + " AND " + Suite_Result.STOP_TIME.name() + " < ?";
         if (suiteName != null && !suiteName.isEmpty()) {
-            sql += "AND " + Suite_Result.SUITE_NAME.name() + " = ? ";
+            sql += " AND " + Suite_Result.SUITE_NAME.name() + " = ?";
         }
-        sql += ";";
+        if (!invisibleIncluded) {
+            sql += " AND NOT " + Suite_Result.INVISIBLE_ENTRY.name();
+        }
+        sql += " ORDER BY " + Suite_Result.START_TIME.name() + " DESC;";
         try (Connection conn = this.getConnection()) {
             PreparedStatement stmt = conn.prepareStatement(sql);
             stmt.setLong(1, startTime);
@@ -58,25 +57,57 @@ public class MySqlBaseBean implements Serializable {
             if (suiteName != null && !suiteName.isEmpty()) {
                 stmt.setString(3, suiteName);
             }
+            LOG.trace("{}", stmt);
             stmt.setMaxRows(numberOfEntries);
             ResultSet rs = stmt.executeQuery();
             return this.dumpResultSetToList(rs);
         }
     }
 
-    private Connection getConnection() throws NamingException, SQLException {
-        Context ctx = new InitialContext();
-        ctx = (Context) ctx.lookup("java:comp/env");
-        ds = (DataSource) ctx.lookup("jdbc/thr");
-        if (ds == null) {
-            throw new SQLException("Can't get data source");
+    public Map<String, Object> getSuiteResult(String srid) throws NamingException, SQLException {
+        String sql = "SELECT * FROM " + TABLES.suite_result.name()
+            + " WHERE " + Suite_Result.SUITE_RESULT_ID.name() + " = ?;";
+        try (Connection conn = this.getConnection()) {
+            PreparedStatement stmt = conn.prepareStatement(sql);
+            stmt.setString(1, srid);
+            LOG.trace("{}", stmt);
+            ResultSet rs = stmt.executeQuery();
+            List<Map<String, Object>> data = this.dumpResultSetToList(rs);
+            if (data.isEmpty()) {
+                throw new SQLException("No data for suite result id " + srid);
+            }
+            return data.get(0);
         }
+    }
 
-        Connection conn = ds.getConnection();
-        if (conn == null) {
-            throw new SQLException("Can't get database connection");
+    public List<Map<String, Object>> getTestsResult(String srid) throws NamingException, SQLException {
+        String sql = "SELECT * FROM " + TABLES.test_result.name() + " TR "
+            + "INNER JOIN " + TABLES.test_case + " TC "
+            + "ON TR.TEST_CASE_ID = TC.TEST_CASE_ID "
+            + "WHERE " + Test_Result.SUITE_RESULT.name() + " = ? "
+            + "ORDER BY " + Test_Result.START_TIME.name() + " DESC;";
+        try (Connection conn = this.getConnection()) {
+            PreparedStatement stmt = conn.prepareStatement(sql);
+            stmt.setString(1, srid);
+            LOG.trace("{}", stmt);
+            ResultSet rs = stmt.executeQuery();
+            return this.dumpResultSetToList(rs);
         }
-        return conn;
+    }
+
+    public void setSuiteResultInvisible(String srid, boolean invisible) throws NamingException, SQLException {
+        String sql = "UPDATE " + TABLES.suite_result.name()
+            + " SET " + Suite_Result.INVISIBLE_ENTRY.name() + " = ?"
+            + " WHERE " + Suite_Result.SUITE_RESULT_ID.name() + " = ?;";
+        try (Connection conn = this.getConnection()) {
+            PreparedStatement stmt = conn.prepareStatement(sql,
+                    ResultSet.TYPE_SCROLL_SENSITIVE,
+                    ResultSet.CONCUR_UPDATABLE);
+            stmt.setBoolean(1, invisible);
+            stmt.setString(2, srid);
+            LOG.trace("{}", stmt);
+            stmt.executeUpdate();
+        }
     }
 
     public List<Map<String, Object>> dumpResultSetToList(ResultSet rs) throws SQLException {
@@ -93,7 +124,6 @@ public class MySqlBaseBean implements Serializable {
         LOG.trace("{} rows loaded", rsml.size());
         return rsml;
     }
-    
 
     public Date convertToDate(long time) {
         return new Date(time);
@@ -111,4 +141,13 @@ public class MySqlBaseBean implements Serializable {
             return ldt.toInstant(ZoneOffset.ofHours(-8)).toEpochMilli();
         }
     }
+
+    private Connection getConnection() throws NamingException, SQLException {
+        Connection conn = this.ds.getConnection();
+        if (conn == null) {
+            throw new SQLException("Can't get database connection");
+        }
+        return conn;
+    }
+
 }

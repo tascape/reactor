@@ -20,8 +20,8 @@ import org.slf4j.LoggerFactory;
  */
 @Named
 @RequestScoped
-public class TestSuitesView implements Serializable {
-    private static final Logger LOG = LoggerFactory.getLogger(TestSuitesView.class);
+public class SuitesResultView implements Serializable {
+    private static final Logger LOG = LoggerFactory.getLogger(SuitesResultView.class);
 
     private static final long serialVersionUID = 1L;
 
@@ -36,7 +36,7 @@ public class TestSuitesView implements Serializable {
     private String suiteName = "";
 
     @Inject
-    private MySqlBaseBean mysql;
+    private MySqlBaseBean db;
 
     private List<Map<String, Object>> results;
 
@@ -47,7 +47,7 @@ public class TestSuitesView implements Serializable {
         this.getParameters();
 
         try {
-            this.results = this.mysql.getTestSuiteResults(this.startTime, this.stopTime, this.numberOfEntries,
+            this.results = this.db.getSuitesResult(this.startTime, this.stopTime, this.numberOfEntries,
                     this.suiteName, this.invisibleIncluded);
             this.results.stream().forEach(row -> {
                 row.put("_EXEC_ID", StringUtils.right(row.get("SUITE_RESULT_ID") + "", 10));
@@ -134,7 +134,7 @@ public class TestSuitesView implements Serializable {
         v = map.get("suite");
         if (v != null) {
             this.suiteName = v;
-            LOG.debug("suite={}", this.suiteName);
+            LOG.warn("suite={}", this.suiteName);
         }
     }
 }
