@@ -51,7 +51,7 @@ public class SuiteResultView implements Serializable {
             }
             this.testsResult = this.db.getTestsResult(this.srid);
             this.testsResult.stream().forEach(row -> {
-                row.put("_trid", StringUtils.right(row.get("TEST_RESULT_ID") + "", 10));
+                row.put("_trid", StringUtils.right(row.get("TEST_RESULT_ID") + "", 12));
                 row.put("_class", StringUtils.substringAfterLast(row.get("TEST_CLASS") + "", "."));
             });
         } catch (NamingException | SQLException ex) {

@@ -38,7 +38,7 @@
                 <h:outputText value="#{rowIndex + 1}" />
             </p:column>
 
-            <p:column headerText="Id" width="80">
+            <p:column headerText="Id" width="82">
                 <h:outputLink value="test_result.xhtml?trid=#{row.get('TEST_RESULT_ID')}" target="_blank"
                               style="font-family: monospace" >#{row.get('_trid')}</h:outputLink>
             </p:column>
@@ -52,9 +52,10 @@
             </p:column>
 
             <ui:param name="result" value="#{row.get('EXECUTION_RESULT')}" />
-            <p:column headerText="Result" width="62">
-                <h:outputText value="#{result}" class="result-pass" rendered="#{result eq 'PASS'}"/>
-                <h:outputText value="#{result}" class="result-fail" rendered="#{result ne 'PASS'}"/>
+            <p:column headerText="Result" width="50" style="text-align: center">
+                <h:graphicImage library="img" name="pass.png" rendered="#{result =='PASS'}"/>
+                <h:graphicImage library="img" name="fail.png" rendered="#{result == 'FAIL'}"/>
+                <h:graphicImage library="img" name="skip.png" rendered="#{!(result == 'FAIL' || result == 'PASS')}"/>
             </p:column>
 
             <p:column width="68" headerText="Time">

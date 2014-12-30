@@ -78,3 +78,16 @@ Application Server
 3. Copy all jar files in https://github.com/tascape/testharness/tree/master/thr/lib/ into tomcat lib folder.
 4. Use http://report-server:6080/manager/html to deploy https://github.com/tascape/testharness/tree/master/thr/deploy/thr.war
 5. Restart tomcat.
+
+90fd61e7d330:lib wlinsong$ cp ~/git/github/testharness/thr/lib/guava-18.0.jar .
+90fd61e7d330:lib wlinsong$ cp ~/git/github/testharness/thr/lib/mysql-connector-java-5.1.30-bin.jar .
+
+server.xml
+port 5005 5009  5080 5443
+
+
+tomcat-users.xml
+
+  <role rolename="tomee-admin" />
+
+  <user username="th" password="p@ssword" roles="tomee-admin,manager-gui,manager-script" />

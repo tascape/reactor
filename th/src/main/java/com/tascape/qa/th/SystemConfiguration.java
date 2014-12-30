@@ -12,6 +12,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Properties;
 import java.util.regex.Pattern;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -48,9 +49,9 @@ public class SystemConfiguration {
 
     public static final String SYSPROP_PRODUCT_UNDER_TEST = "qa.th.product.under.test";
 
-    public static final String SYSENV_JOB_NAME = "JOB_NAME";
+    public static final String SYSPROP_JOB_NAME_CUSTOM = "JOB_NAME_CUSTOM";
 
-    public static final String SYSENV_JOB_NAME_CUSTOM = "JOB_NAME_CUSTOM";
+    public static final String SYSENV_JOB_NAME = "JOB_NAME";
 
     public static final String SYSENV_JOB_NUMBER = "BUILD_NUMBER";
 
@@ -204,11 +205,11 @@ public class SystemConfiguration {
     }
 
     public String getJobName() {
-        String value = System.getenv().get(SYSENV_JOB_NAME_CUSTOM);
+        String value = this.getProperty(SYSPROP_JOB_NAME_CUSTOM);
         if (value == null) {
             value = System.getenv().get(SYSENV_JOB_NAME);
             if (value == null) {
-                value = this.getLocalJobName();
+                value = System.getProperty("user.name") + "@" + StringUtils.substringBefore(this.getHostName(), ".");
             } else {
                 value = value.split("/")[0];
             }
