@@ -48,20 +48,13 @@
                 <h:outputText value="#{rowIndex + 1}" rendered="#{row.get('INVISIBLE_ENTRY') != 0}" style="color: darkgray" />
             </p:column>
 
-            <p:column width="82">
-                <f:facet name="header">
-                    <h:outputText value="Execution&#10;Id" escape="false" style="white-space: pre-line;" />
-                </f:facet>
-                <h:outputLink value="suite_result.xhtml?srid=#{row.get('SUITE_RESULT_ID')}" target="_blank"
-                              style="font-family: monospace" >#{row.get('_srid')}</h:outputLink>
-            </p:column>
-
             <p:column headerText="Test Suite Name">
                 <ui:param name="s" value="#{row.get('SUITE_NAME')}" />
                 <h:outputLink onclick="thr.querySuiteResults('#{s}');
                         return false;" rendered="#{empty suite}">#{s}</h:outputLink>
                 <h:outputText rendered="#{not empty suite}" value="#{s}" />
             </p:column>
+
             <p:column headerText="Job Name" width="168">
                 <nobr><h:outputText value="#{row.get('JOB_NAME')}" /></nobr>
             </p:column>
@@ -73,11 +66,21 @@
                 </f:facet>
                 <h:outputText value="#{bn}" rendered="#{bn gt 0}" />
             </p:column>
+
             <ui:param name="result" value="#{row.get('EXECUTION_RESULT')}" />
-            <p:column headerText="Result" width="50" style="text-align: center">
-                <h:graphicImage library="img" name="pass.png" rendered="#{result =='PASS'}"/>
-                <h:graphicImage library="img" name="fail.png" rendered="#{result == 'FAIL'}"/>
-                <h:graphicImage library="img" name="skip.png" rendered="#{!(result == 'FAIL' || result == 'PASS')}"/>
+            <p:column headerText="Result" width="56" style="text-align: center">
+                <h:outputLink value="suite_result.xhtml?srid=#{row.get('SUITE_RESULT_ID')}" target="_blank"
+                              style="font-family: monospace; font-size: larger" >
+                    <h:panelGroup rendered="#{result =='PASS'}">
+                        <h:graphicImage library="img" name="pass.png" /> PASS
+                    </h:panelGroup>
+                    <h:panelGroup rendered="#{result =='FAIL'}">
+                        <h:graphicImage library="img" name="fail.png" /> FAIL
+                    </h:panelGroup>
+                    <h:panelGroup rendered="#{!(result == 'FAIL' || result == 'PASS')}"> SKIP
+                        <h:graphicImage library="img" name="skip.png" />
+                    </h:panelGroup>
+                </h:outputLink>
             </p:column>
 
             <p:column width="50">

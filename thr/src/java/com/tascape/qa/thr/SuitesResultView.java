@@ -48,7 +48,7 @@ public class SuitesResultView implements Serializable {
 
         try {
             this.results = this.db.getSuitesResult(this.startTime, this.stopTime, this.numberOfEntries,
-                    this.suiteName, this.invisibleIncluded);
+                this.suiteName, this.invisibleIncluded);
             this.results.stream().forEach(row -> {
                 row.put("_srid", StringUtils.right(row.get("SUITE_RESULT_ID") + "", 12));
             });

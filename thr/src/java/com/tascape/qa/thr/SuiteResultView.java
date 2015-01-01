@@ -1,12 +1,14 @@
 package com.tascape.qa.thr;
 
 import com.tascape.qa.th.db.DbHandler.Suite_Result;
+import java.io.IOException;
 import java.io.Serializable;
 import java.sql.SQLException;
 import java.util.List;
 import java.util.Map;
 import javax.annotation.PostConstruct;
 import javax.enterprise.context.RequestScoped;
+import javax.faces.context.ExternalContext;
 import javax.faces.context.FacesContext;
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -45,16 +47,15 @@ public class SuiteResultView implements Serializable {
             this.suiteResult = this.db.getSuiteResult(this.srid);
             boolean invisible = this.suiteResult.get(Suite_Result.INVISIBLE_ENTRY.name()).equals(1);
             if (this.toggleInvisible) {
-                invisible = !invisible;
-                this.db.setSuiteResultInvisible(this.srid, invisible);
-                this.suiteResult.put(Suite_Result.INVISIBLE_ENTRY.name(), invisible ? 1 : 0);
+                this.setInvisible(!invisible);
+                return;
             }
             this.testsResult = this.db.getTestsResult(this.srid);
             this.testsResult.stream().forEach(row -> {
                 row.put("_trid", StringUtils.right(row.get("TEST_RESULT_ID") + "", 12));
                 row.put("_class", StringUtils.substringAfterLast(row.get("TEST_CLASS") + "", "."));
             });
-        } catch (NamingException | SQLException ex) {
+        } catch (NamingException | SQLException | IOException ex) {
             throw new RuntimeException(ex);
         }
     }
@@ -69,6 +70,12 @@ public class SuiteResultView implements Serializable {
 
     public String getSrid() {
         return srid;
+    }
+
+    private void setInvisible(boolean invisible) throws NamingException, SQLException, IOException {
+        this.db.setSuiteResultInvisible(this.srid, invisible);
+        ExternalContext context = FacesContext.getCurrentInstance().getExternalContext();
+        context.redirect(context.getRequestContextPath() + context.getRequestServletPath() + "?srid=" + srid);
     }
 
     private void getParameters() {
