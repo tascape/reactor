@@ -61,5 +61,7 @@ Run sample Selenium webdriver tests
   1. cd /qa
   2. java -Dqa.th.conf.file=/qa/testharness/th/conf/th.properties \
           -Dqa.th.test.suite=com.tascape.qa.example.suite.TestSuiteOne \
-          -cp testharness/th/deploy/th.jar:testharness/th/lib/jars/*:selenium-2.44.0/libs/* \
+          -cp testharness/th/deploy/th.jar:testharness/th/lib/jars/*:testharness/thx/deploy/thx.jar:testharness/thx/lib/jars/*:selenium-2.44.0/libs/* \
           com.tascape.qa.th.TestHarness
+
+* A command line system property (-D...) will override the corresponding one in configuration file th.properties.

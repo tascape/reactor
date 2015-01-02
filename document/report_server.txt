@@ -73,21 +73,20 @@ CREATE TABLE `test_result_ metric` (
 
 Application Server
 
-1. install latest Apache Tomcat at port 6080.
-2. Configure tomcat user so that you can access http://report-server:6080/manager/html.
-3. Copy all jar files in https://github.com/tascape/testharness/tree/master/thr/lib/ into tomcat lib folder.
+1. install latest Apache TomEE Plus 2.0 at port 5080.
+   (http://tomee.apache.org/download/tomee-2.0.0-snapshot.html)
+   Update port numbers used in conf/server.xml
+     8005 -> 5005
+     8080 -> 5080
+     8443 -> 5443
+     8009 -> 5009
+2. Configure tomcat user so that you can access http://report-server:5080/manager/html.
+   Update conf/tomcat-users.xml to have
+   <role rolename="tomee-admin" />
+   <user username="th" password="p@ssword" roles="tomee-admin,manager-gui,manager-script" />
+3. Copy the following jar files in https://github.com/tascape/testharness/tree/master/thr/lib/ into tomee lib folder.
+   guava-18.0.jar
+   mysql-connector-java-5.1.30-bin.jar
 4. Use http://report-server:6080/manager/html to deploy https://github.com/tascape/testharness/tree/master/thr/deploy/thr.war
-5. Restart tomcat.
-
-90fd61e7d330:lib wlinsong$ cp ~/git/github/testharness/thr/lib/guava-18.0.jar .
-90fd61e7d330:lib wlinsong$ cp ~/git/github/testharness/thr/lib/mysql-connector-java-5.1.30-bin.jar .
-
-server.xml
-port 5005 5009  5080 5443
-
-
-tomcat-users.xml
-
-  <role rolename="tomee-admin" />
-
-  <user username="th" password="p@ssword" roles="tomee-admin,manager-gui,manager-script" />
+5. Start tomee.
+   Run shell script bin/startup.sh
