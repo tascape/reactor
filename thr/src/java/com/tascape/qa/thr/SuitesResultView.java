@@ -10,7 +10,6 @@ import javax.faces.context.FacesContext;
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.naming.NamingException;
-import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -49,9 +48,6 @@ public class SuitesResultView implements Serializable {
         try {
             this.results = this.db.getSuitesResult(this.startTime, this.stopTime, this.numberOfEntries,
                 this.suiteName, this.invisibleIncluded);
-            this.results.stream().forEach(row -> {
-                row.put("_srid", StringUtils.right(row.get("SUITE_RESULT_ID") + "", 12));
-            });
         } catch (NamingException | SQLException ex) {
             throw new RuntimeException(ex);
         }

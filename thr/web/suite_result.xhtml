@@ -41,6 +41,10 @@
                 <h:outputText value="#{rowIndex + 1}" />
             </p:column>
 
+            <p:column headerText="Test Suite Name" width="168">
+                <h:outputText value="#{row.get('_suite')}" />
+            </p:column>
+
             <p:column headerText="Test Class Name" width="168">
                 <h:outputText value="#{row.get('_class')}" />
             </p:column>
@@ -50,7 +54,7 @@
             </p:column>
 
             <p:column headerText="Result" width="78">
-                <h:outputLink value="test_result.xhtml?trid=#{row.get('TEST_RESULT_ID')}" target="_blank"
+                <h:outputLink value="#{row.get('_url')}" target="_blank"
                               style="font-family: monospace; font-size: larger" >
                     <h:graphicImage library="img" name="pass.png" rendered="#{result =='PASS'}" />
                     <h:graphicImage library="img" name="fail.png" rendered="#{result =='FAIL'}" />

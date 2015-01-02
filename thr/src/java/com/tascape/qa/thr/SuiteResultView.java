@@ -52,8 +52,11 @@ public class SuiteResultView implements Serializable {
             }
             this.testsResult = this.db.getTestsResult(this.srid);
             this.testsResult.stream().forEach(row -> {
-                row.put("_trid", StringUtils.right(row.get("TEST_RESULT_ID") + "", 12));
+                row.put("_suite", StringUtils.substringAfterLast(row.get("SUITE_CLASS") + "", "."));
                 row.put("_class", StringUtils.substringAfterLast(row.get("TEST_CLASS") + "", "."));
+                String dir = (row.get("LOG_DIR") + "").replaceAll("\\\\", "/");
+                int logs = dir.indexOf("/qa/logs/");
+                row.put("_url", "http://" + row.get("TEST_STATION") + "/" + dir.substring(logs + 4) + "/log.html");
             });
         } catch (NamingException | SQLException | IOException ex) {
             throw new RuntimeException(ex);
