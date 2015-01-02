@@ -25,8 +25,8 @@
         </h:panelGrid>
 
         <h:panelGrid columns="8">
-            <h:outputText value="#{result}" class="result-pass" rendered="#{result eq 'PASS'}" style="font-size: large;"/>
-            <h:outputText value="#{result}" class="result-fail" rendered="#{result ne 'PASS'}" style="font-size: large;"/>
+            <h:outputText value="#{result}" class="result-pass" rendered="#{result == 'PASS'}" style="font-size: large;"/>
+            <h:outputText value="#{result}" class="result-fail" rendered="#{result != 'PASS'}" style="font-size: large;"/>
             <h:outputText value="@" />
             <h:outputText value="#{start}" style="font-family: monospace">
                 <f:convertDateTime type="date" pattern="EEE yyyy-MM-dd HH:mm:ss" timeZone="US/Pacific" />
@@ -35,6 +35,8 @@
 
         <p:dataTable value="#{suiteResultView.testsResult}" var="row" rowIndexVar="rowIndex" resizableColumns="true"
                      rowKey="#{row.get('TEST_RESULT_ID')}">
+            <ui:param name="result" value="#{row.get('EXECUTION_RESULT')}" />
+
             <p:column headerText="Index" width="36">
                 <h:outputText value="#{rowIndex + 1}" />
             </p:column>
@@ -47,19 +49,13 @@
                 <nobr><h:outputText value="#{row.get('TEST_METHOD')}(#{row.get('TEST_DATA')})" /></nobr>
             </p:column>
 
-            <ui:param name="result" value="#{row.get('EXECUTION_RESULT')}" />
-            <p:column headerText="Result" width="56" style="text-align: center">
+            <p:column headerText="Result" width="78">
                 <h:outputLink value="test_result.xhtml?trid=#{row.get('TEST_RESULT_ID')}" target="_blank"
                               style="font-family: monospace; font-size: larger" >
-                    <h:panelGroup rendered="#{result =='PASS'}">
-                        <h:graphicImage library="img" name="pass.png" /> PASS
-                    </h:panelGroup>
-                    <h:panelGroup rendered="#{result =='FAIL'}">
-                        <h:graphicImage library="img" name="fail.png" /> FAIL
-                    </h:panelGroup>
-                    <h:panelGroup rendered="#{!(result == 'FAIL' || result == 'PASS')}"> SKIP
-                        <h:graphicImage library="img" name="skip.png" />
-                    </h:panelGroup>
+                    <h:graphicImage library="img" name="pass.png" rendered="#{result =='PASS'}" />
+                    <h:graphicImage library="img" name="fail.png" rendered="#{result =='FAIL'}" />
+                    <h:graphicImage library="img" name="skip.png" rendered="#{!(result == 'FAIL' || result == 'PASS')}" />
+                    #{result}
                 </h:outputLink>
             </p:column>
 
@@ -86,7 +82,5 @@
             <f:param name="srid" value="#{srid}" />
             <f:param name="ti" value="#{true}" />
         </h:link>
-        <h:form id="form">
-        </h:form>
     </h:body>
 </html>

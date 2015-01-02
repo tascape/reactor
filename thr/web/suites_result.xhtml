@@ -45,7 +45,7 @@
                      rowKey="#{row.get('SUITE_RESULT_ID')}" selection="#{suitesResultView.resultsSelected}">
             <p:column headerText="Index" width="36">
                 <h:outputText value="#{rowIndex + 1}" rendered="#{row.get('INVISIBLE_ENTRY') == 0}" />
-                <h:outputText value="#{rowIndex + 1}" rendered="#{row.get('INVISIBLE_ENTRY') != 0}" style="color: darkgray" />
+                <h:outputText value="#{rowIndex + 1}" rendered="#{row.get('INVISIBLE_ENTRY') != 0}" style="color: lightgray" />
             </p:column>
 
             <p:column headerText="Test Suite Name">
@@ -68,18 +68,13 @@
             </p:column>
 
             <ui:param name="result" value="#{row.get('EXECUTION_RESULT')}" />
-            <p:column headerText="Result" width="56" style="text-align: center">
+            <p:column headerText="Result" width="78">
                 <h:outputLink value="suite_result.xhtml?srid=#{row.get('SUITE_RESULT_ID')}" target="_blank"
                               style="font-family: monospace; font-size: larger" >
-                    <h:panelGroup rendered="#{result =='PASS'}">
-                        <h:graphicImage library="img" name="pass.png" /> PASS
-                    </h:panelGroup>
-                    <h:panelGroup rendered="#{result =='FAIL'}">
-                        <h:graphicImage library="img" name="fail.png" /> FAIL
-                    </h:panelGroup>
-                    <h:panelGroup rendered="#{!(result == 'FAIL' || result == 'PASS')}"> SKIP
-                        <h:graphicImage library="img" name="skip.png" />
-                    </h:panelGroup>
+                    <h:graphicImage library="img" name="pass.png" rendered="#{result =='PASS'}" />
+                    <h:graphicImage library="img" name="fail.png" rendered="#{result =='FAIL'}" />
+                    <h:graphicImage library="img" name="skip.png" rendered="#{!(result == 'FAIL' || result == 'PASS')}" />
+                    #{result}
                 </h:outputLink>
             </p:column>
 
