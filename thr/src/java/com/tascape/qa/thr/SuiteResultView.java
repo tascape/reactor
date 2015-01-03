@@ -1,5 +1,6 @@
 package com.tascape.qa.thr;
 
+import com.sun.webkit.CursorManager;
 import com.tascape.qa.th.db.DbHandler.Suite_Result;
 import java.io.IOException;
 import java.io.Serializable;
@@ -54,9 +55,18 @@ public class SuiteResultView implements Serializable {
             this.testsResult.stream().forEach(row -> {
                 row.put("_suite", StringUtils.substringAfterLast(row.get("SUITE_CLASS") + "", "."));
                 row.put("_class", StringUtils.substringAfterLast(row.get("TEST_CLASS") + "", "."));
-                String dir = (row.get("LOG_DIR") + "").replaceAll("\\\\", "/");
+            });
+            this.testsResult.stream().filter(row -> {
+                return !(row.get("LOG_DIR") + "").isEmpty();
+            }).forEach(row -> {
+                String dir = (row.get("LOG_DIR") + "");
+                dir = dir.replaceAll("\\\\", "/");
                 int logs = dir.indexOf("/qa/logs/");
-                row.put("_url", "http://" + row.get("TEST_STATION") + "/" + dir.substring(logs + 4) + "/log.html");
+                if (logs >= 0) {
+                    row.put("_url", "http://" + row.get("TEST_STATION") + "/" + dir.substring(logs + 4) + "/log.html");
+                } else {
+                    row.put("_url", ".");
+                }
             });
         } catch (NamingException | SQLException | IOException ex) {
             throw new RuntimeException(ex);
