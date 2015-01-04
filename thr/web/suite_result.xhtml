@@ -19,12 +19,14 @@
         <ui:param name="result" value="#{suiteResultView.suiteResult.get('EXECUTION_RESULT')}" />
         <ui:param name="start" value="#{suiteResultView.suiteResult.get('START_TIME')}" />
 
-        <h:panelGrid>
+        <h:panelGrid columns="2" style="margin-bottom: 10px">
+            <h:outputLink value=".">
+                <h:graphicImage library="img" name="home.png" alt="Home" />
+            </h:outputLink>
             <h:outputText value="#{name}" style="font-size: x-large; font-variant: small-caps; font-weight: bold;" />
-            <p:spacer width="10px" />
         </h:panelGrid>
 
-        <h:panelGrid columns="8">
+        <h:panelGrid columns="3">
             <h:outputText value="#{result}" class="result-pass" rendered="#{result == 'PASS'}" style="font-size: large;"/>
             <h:outputText value="#{result}" class="result-fail" rendered="#{result != 'PASS'}" style="font-size: large;"/>
             <h:outputText value="@" />
@@ -56,9 +58,9 @@
             <p:column headerText="Result" width="78">
                 <h:outputLink value="#{row.get('_url')}" target="_blank"
                               style="font-family: monospace; font-size: larger" >
-                    <h:graphicImage library="img" name="pass.png" rendered="#{result =='PASS'}" />
-                    <h:graphicImage library="img" name="fail.png" rendered="#{result =='FAIL'}" />
-                    <h:graphicImage library="img" name="skip.png" rendered="#{!(result == 'FAIL' || result == 'PASS')}" />
+                    <h:graphicImage library="img" name="pass.png" alt="#{result}" rendered="#{result =='PASS'}" />
+                    <h:graphicImage library="img" name="fail.png" alt="#{result}" rendered="#{result =='FAIL'}" />
+                    <h:graphicImage library="img" name="skip.png" alt="#{result}" rendered="#{!(result == 'FAIL' || result == 'PASS')}" />
                     #{result}
                 </h:outputLink>
             </p:column>
