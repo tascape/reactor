@@ -41,9 +41,8 @@
             </p:selectOneMenu>
         </h:panelGrid>
 
-        <h:panelGrid columns="2" rendered="#{not empty suite}">
+        <h:panelGrid columns="1" rendered="#{not empty suite}">
             <p:commandButton onclick="thr.querySuiteResults()" value="All Test Suites" style="font-size: xx-small" />
-            <p:commandButton onclick="thr.querySuiteResultDetail('#{suite}')" value="Detail History" style="font-size: xx-small" />
         </h:panelGrid>
 
         <p:dataTable value="#{suitesResultView.results}" var="row" rowIndexVar="rowIndex" resizableColumns="true"

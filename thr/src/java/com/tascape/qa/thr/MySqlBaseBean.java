@@ -101,12 +101,41 @@ public class MySqlBaseBean implements Serializable {
             + " WHERE " + Suite_Result.SUITE_RESULT_ID.name() + " = ?;";
         try (Connection conn = this.getConnection()) {
             PreparedStatement stmt = conn.prepareStatement(sql,
-                    ResultSet.TYPE_SCROLL_SENSITIVE,
-                    ResultSet.CONCUR_UPDATABLE);
+                ResultSet.TYPE_SCROLL_SENSITIVE,
+                ResultSet.CONCUR_UPDATABLE);
             stmt.setBoolean(1, invisible);
             stmt.setString(2, srid);
             LOG.trace("{}", stmt);
             stmt.executeUpdate();
+        }
+    }
+
+    public List<Map<String, Object>> getSuiteResultDetailHistory(long startTime, long stopTime, int numberOfEntries,
+        String suiteName, boolean invisibleIncluded) throws NamingException, SQLException {
+        String sr = "SELECT " + Suite_Result.SUITE_RESULT_ID + " FROM " + TABLES.suite_result.name()
+            + " WHERE " + Suite_Result.START_TIME.name() + " > ?"
+            + " AND " + Suite_Result.STOP_TIME.name() + " < ?"
+            + " AND " + Suite_Result.SUITE_NAME.name() + " = ?";
+        if (!invisibleIncluded) {
+            sr += " AND NOT " + Suite_Result.INVISIBLE_ENTRY.name();
+        }
+        sr += " ORDER BY " + Suite_Result.START_TIME.name() + " DESC;";
+
+        String tr = "SELECT * FROM " + TABLES.test_result.name()
+            + " WHERE " + Test_Result.EXECUTION_RESULT.name()
+            + " IN (" + sr + ")"
+            + " ORDER BY " + Suite_Result.START_TIME.name() + " DESC;";
+        try (Connection conn = this.getConnection()) {
+            PreparedStatement stmt = conn.prepareStatement(tr);
+            stmt.setLong(1, startTime);
+            stmt.setLong(2, stopTime);
+            if (suiteName != null && !suiteName.isEmpty()) {
+                stmt.setString(3, suiteName);
+            }
+            LOG.trace("{}", stmt);
+            stmt.setMaxRows(numberOfEntries);
+            ResultSet rs = stmt.executeQuery();
+            return this.dumpResultSetToList(rs);
         }
     }
 
