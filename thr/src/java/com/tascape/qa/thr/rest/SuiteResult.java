@@ -16,7 +16,7 @@ import javax.ws.rs.QueryParam;
  *
  * @author wlinsong
  */
-@Path("suite_result")
+@Path("sr")
 @RequestScoped
 public class SuiteResult {
     @Context
