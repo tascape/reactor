@@ -57,7 +57,7 @@ public abstract class DbHandler {
         PRODUCT_UNDER_TEST,
     }
 
-    protected enum Test_Case {
+    public enum Test_Case {
         TEST_CASE_ID,
         SUITE_CLASS,
         TEST_CLASS,
@@ -80,7 +80,7 @@ public abstract class DbHandler {
         LOG_DIR,
     }
 
-    protected enum Test_Result_Metric {
+    public enum Test_Result_Metric {
         TEST_RESULT_METRIC_ID,
         TEST_RESULT_ID,
         METRIC_GROUP,

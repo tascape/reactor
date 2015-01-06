@@ -3,6 +3,7 @@ package com.tascape.qa.thr;
 import com.tascape.qa.th.db.DbHandler.Suite_Result;
 import com.tascape.qa.th.db.DbHandler.TABLES;
 import com.tascape.qa.th.db.DbHandler.Test_Result;
+import com.tascape.qa.th.db.DbHandler.Test_Case;
 import java.io.Serializable;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -23,6 +24,7 @@ import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Named;
 import javax.naming.NamingException;
 import javax.sql.DataSource;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -89,6 +91,21 @@ public class MySqlBaseBean implements Serializable {
         try (Connection conn = this.getConnection()) {
             PreparedStatement stmt = conn.prepareStatement(sql);
             stmt.setString(1, srid);
+            LOG.trace("{}", stmt);
+            ResultSet rs = stmt.executeQuery();
+            return this.dumpResultSetToList(rs);
+        }
+    }
+
+    public List<Map<String, Object>> getTestsResult(List<String> srids) throws NamingException, SQLException {
+        String sql = "SELECT * FROM " + TABLES.test_result.name() + " TR "
+            + "INNER JOIN " + TABLES.test_case + " TC "
+            + "ON TR.TEST_CASE_ID = TC.TEST_CASE_ID "
+            + "WHERE " + Test_Result.SUITE_RESULT.name() + " IN (" + StringUtils.join(srids, ",") + ") "
+            + "ORDER BY " + Test_Case.SUITE_CLASS.name() + "," + Test_Case.TEST_CLASS.name() + ","
+            + Test_Case.TEST_METHOD.name() + "," + Test_Case.TEST_DATA_INFO.name() + " DESC;";
+        try (Connection conn = this.getConnection()) {
+            PreparedStatement stmt = conn.prepareStatement(sql);
             LOG.trace("{}", stmt);
             ResultSet rs = stmt.executeQuery();
             return this.dumpResultSetToList(rs);
