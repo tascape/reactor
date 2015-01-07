@@ -12,103 +12,48 @@
         <title>Test Suites Result</title>
     </h:head>
     <h:body>
-        <ui:param name="suite" value="#{suitesResultView.suiteName}" />
+        <ui:param name="suite" value="#{suiteResultDetailHistoryView.suiteName}" />
 
-        <h:panelGrid columns="2" style="margin-bottom: 10px">
+        <h:panelGrid columns="3" style="margin-bottom: 10px">
             <h:outputLink value=".">
                 <h:graphicImage library="img" name="home.png" alt="Home" />
             </h:outputLink>
-            <h:outputText value="All Test Suites Result" style="font-size: x-large; font-variant: small-caps; font-weight: bold;" />
+            <h:outputText value="Suite Result Detail History" style="font-size: x-large; font-variant: small-caps; font-weight: bold;" />
+            <h:outputText value="#{suite}" style="font-size: large" />
         </h:panelGrid>
 
-        <h:panelGrid columns="8">
-            <h:outputText value="From" />
-            <p:calendar id="starttime" widgetVar="wv_start" pattern="yyyy-MM-dd HH:mm" value="#{suitesResultView.startTime}">
-                <p:ajax event="dateSelect" oncomplete="thr.querySuiteResults('#{suite}')" global="false" />
-            </p:calendar>
-            <h:outputText value="to" />
-            <p:calendar id="stoptime" widgetVar="wv_stop" pattern="yyyy-MM-dd HH:mm" value="#{suitesResultView.stopTime}">
-                <p:ajax event="dateSelect" oncomplete="thr.querySuiteResults('#{suite}')" global="false" />
-            </p:calendar>
-            <h:outputText value=", with maximum" />
-            <p:spinner id="number" widgetVar="wv_number" value="#{suitesResultView.numberOfEntries}"
-                       min="1" max="10000" size="5" onchange="thr.querySuiteResults('#{suite}')" />
-            <h:outputText value="entries," />
-            <p:selectOneMenu id="invisibleIncluded" widgetVar="wv_invisible" value="#{suitesResultView.invisibleIncluded}"
-                             onchange="thr.querySuiteResults('#{suite}')">
-                <f:selectItem id="invisibleIncluded_false" itemLabel="including no invisible entries" itemValue="false" />
-                <f:selectItem id="invisibleIncluded_true" itemLabel="including invisible entries" itemValue="true" />
-            </p:selectOneMenu>
-        </h:panelGrid>
-
-        <h:panelGrid columns="1" rendered="#{not empty suite}">
-            <p:commandButton onclick="thr.querySuiteResults()" value="All Test Suites" style="font-size: xx-small" />
-        </h:panelGrid>
-
-        <p:dataTable value="#{suitesResultView.results}" var="row" rowIndexVar="rowIndex" resizableColumns="true"
-                     rowKey="#{row.get('SUITE_RESULT_ID')}" selection="#{suitesResultView.resultsSelected}">
+        <p:dataTable value="#{suiteResultDetailHistoryView.suiteHistoryDetail}" var="row" rowIndexVar="rowIndex" resizableColumns="true">
             <p:column headerText="Index" width="36">
-                <h:outputText value="#{rowIndex + 1}" rendered="#{row.get('INVISIBLE_ENTRY') == 0}" />
-                <h:outputText value="#{rowIndex + 1}" rendered="#{row.get('INVISIBLE_ENTRY') != 0}" style="color: lightgray" />
+                <h:outputText value="#{rowIndex + 1}" />
             </p:column>
 
-            <p:column headerText="Test Suite Name">
-                <ui:param name="s" value="#{row.get('SUITE_NAME')}" />
-                <h:outputLink onclick="thr.querySuiteResults('#{s}');
-                        return false;" rendered="#{empty suite}">#{s}</h:outputLink>
-                <h:outputText rendered="#{not empty suite}" value="#{s}" />
+            <p:column headerText="Test Case" width="268">
+                <ui:param name="tc" value="#{row.get('TEST_CASE')}" />
+                <h:outputLabel value="#{tc.get('_TEST_CLASS')}" title="#{tc.get('TEST_CLASS')}" />
+                <h:outputText value=" / " />
+                <h:outputText value="#{tc.get('TEST_METHOD')}" />
+                <h:outputText value="(" />
+                <h:outputText value="#{tc.get('TEST_DATA')}" />
+                <h:outputText value=")" />
             </p:column>
 
-            <p:column headerText="Job Name" width="168">
-                <nobr><h:outputText value="#{row.get('JOB_NAME')}" /></nobr>
-            </p:column>
-
-            <ui:param name="bn" value="#{row.get('JOB_BUILD_NUMBER')}" />
-            <p:column width="40">
+            <p:columns value="#{suiteResultDetailHistoryView.suitesResult}" var="suiteResult" width="108">
+                <ui:param name="srid" value="#{suiteResult.get('SUITE_RESULT_ID')}" />
+                <ui:param name="result" value="#{row.get(srid).get('EXECUTION_RESULT')}" />
                 <f:facet name="header">
-                    <h:outputText value="Build&#10;#" escape="false" style="white-space: pre-line;" />
+                    <h:outputText value="#{mySqlBaseBean.convertToDate(suiteResult.get('START_TIME'))}"
+                                  style="font-family: monospace; white-space: pre-line;">
+                        <f:convertDateTime type="date" pattern="yyyy-MM-dd&#10;HH:mm:ss" timeZone="US/Pacific" />
+                    </h:outputText>
                 </f:facet>
-                <h:outputText value="#{bn}" rendered="#{bn gt 0}" />
-            </p:column>
 
-            <ui:param name="result" value="#{row.get('EXECUTION_RESULT')}" />
-            <p:column headerText="Result" width="78">
-                <h:outputLink value="suite_result.xhtml?srid=#{row.get('SUITE_RESULT_ID')}" target="_blank"
-                              style="font-family: monospace; font-size: larger" >
+                <h:outputLink value="#{row.get(srid).get('_url')}" target="_blank">
                     <h:graphicImage library="img" name="pass.png" alt="#{result}" rendered="#{result =='PASS'}" />
                     <h:graphicImage library="img" name="fail.png" alt="#{result}" rendered="#{result =='FAIL'}" />
                     <h:graphicImage library="img" name="skip.png" alt="#{result}" rendered="#{!(result == 'FAIL' || result == 'PASS')}" />
                     #{result}
                 </h:outputLink>
-            </p:column>
-
-            <p:column width="50">
-                <f:facet name="header">
-                    <h:outputText value="# of&#10;Tests" escape="false" style="white-space: pre-line;" />
-                </f:facet>
-                <h:outputText value="#{row.get('NUMBER_OF_TESTS')}" style="float: right" />
-            </p:column>
-
-            <p:column width="50">
-                <f:facet name="header">
-                    <h:outputText value="# of&#10;Failed" escape="false" style="white-space: pre-line;" />
-                </f:facet>
-                <h:outputText value="#{row.get('NUMBER_OF_FAILURE')}" style="float: right" />
-            </p:column>
-
-            <p:column width="68" headerText="Time">
-                <h:outputText value="#{(row.get('STOP_TIME') - row.get('START_TIME'))/1000.0}" style="font-family: monospace; float: right" >
-                    <f:convertNumber pattern="#0.000 S" />
-                </h:outputText>
-            </p:column>
-
-            <p:column headerText="Start Time" width="166">
-                <nobr>
-                    <h:outputText value="#{mySqlBaseBean.convertToDate(row.get('START_TIME'))}" style="font-family: monospace">
-                        <f:convertDateTime type="date" pattern="EEE yyyy-MM-dd HH:mm:ss" timeZone="US/Pacific" />
-                    </h:outputText>
-                </nobr>
-            </p:column>
+            </p:columns>
         </p:dataTable>
     </h:body>
 </html>

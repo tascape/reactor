@@ -56,8 +56,7 @@
             </p:column>
 
             <p:column headerText="Result" width="78">
-                <h:outputLink value="#{row.get('_url')}" target="_blank"
-                              style="font-family: monospace; font-size: larger" >
+                <h:outputLink value="#{row.get('_url')}" target="_blank">
                     <h:graphicImage library="img" name="pass.png" alt="#{result}" rendered="#{result =='PASS'}" />
                     <h:graphicImage library="img" name="fail.png" alt="#{result}" rendered="#{result =='FAIL'}" />
                     <h:graphicImage library="img" name="skip.png" alt="#{result}" rendered="#{!(result == 'FAIL' || result == 'PASS')}" />

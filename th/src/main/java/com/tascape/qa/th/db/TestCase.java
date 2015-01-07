@@ -1,6 +1,8 @@
 package com.tascape.qa.th.db;
 
+import com.tascape.qa.th.db.DbHandler.Test_Case;
 import com.tascape.qa.th.test.Priority;
+import java.util.Map;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -11,6 +13,8 @@ import org.slf4j.LoggerFactory;
  */
 public class TestCase {
     private static final Logger LOG = LoggerFactory.getLogger(TestCase.class);
+
+    private int id = 0;
 
     private String suiteClass = "";
 
@@ -34,6 +38,15 @@ public class TestCase {
         this.testData = tc.getTestData() + "";
         this.testIssues = tc.getTestIssues() + "";
         this.priority = tc.getPriority();
+    }
+
+    public TestCase(Map<String, Object> row) {
+        this.id = (int) row.get(Test_Case.TEST_CASE_ID.name());
+        this.suiteClass = row.get(Test_Case.SUITE_CLASS.name()).toString();
+        this.testClass = row.get(Test_Case.TEST_CLASS.name()).toString();
+        this.testMethod = row.get(Test_Case.TEST_METHOD.name()).toString();
+        this.testDataInfo = row.get(Test_Case.TEST_DATA_INFO.name()).toString();
+        this.testData = row.get(Test_Case.TEST_DATA.name()).toString();
     }
 
     public TestCase() {
@@ -85,9 +98,9 @@ public class TestCase {
 
     public String formatForLogPath() {
         return String.format("%s.%s.%s.%s",
-            StringUtils.substringAfterLast(this.suiteClass, "."),
-            StringUtils.substringAfterLast(this.testClass, "."), this.testMethod,
-            this.testDataInfo.isEmpty() ? "" : StringUtils.substringAfterLast(this.testDataInfo, "#"));
+                StringUtils.substringAfterLast(this.suiteClass, "."),
+                StringUtils.substringAfterLast(this.testClass, "."), this.testMethod,
+                this.testDataInfo.isEmpty() ? "" : StringUtils.substringAfterLast(this.testDataInfo, "#"));
     }
 
     public String getTestIssues() {
@@ -104,5 +117,23 @@ public class TestCase {
 
     public void setPriority(int priority) {
         this.priority = priority;
+    }
+
+    public int getId() {
+        return id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
+    }
+
+    public boolean equals(TestCase testCase) {
+        if (this.id == 0 || testCase.getId() == 0) {
+            return this.suiteClass.equals(testCase.getSuiteClass())
+                    && this.testClass.equals(testCase.getTestClass())
+                    && this.testMethod.equals(testCase.getTestMethod())
+                    && this.testDataInfo.equals(testCase.getTestDataInfo());
+        }
+        return this.id == testCase.getId();
     }
 }

@@ -41,10 +41,10 @@ public class MySqlBaseBean implements Serializable {
     private DataSource ds;
 
     public List<Map<String, Object>> getSuitesResult(long startTime, long stopTime, int numberOfEntries,
-        String suiteName, boolean invisibleIncluded) throws NamingException, SQLException {
+            String suiteName, boolean invisibleIncluded) throws NamingException, SQLException {
         String sql = "SELECT * FROM " + TABLES.suite_result.name()
-            + " WHERE " + Suite_Result.START_TIME.name() + " > ?"
-            + " AND " + Suite_Result.STOP_TIME.name() + " < ?";
+                + " WHERE " + Suite_Result.START_TIME.name() + " > ?"
+                + " AND " + Suite_Result.STOP_TIME.name() + " < ?";
         if (suiteName != null && !suiteName.isEmpty()) {
             sql += " AND " + Suite_Result.SUITE_NAME.name() + " = ?";
         }
@@ -68,7 +68,7 @@ public class MySqlBaseBean implements Serializable {
 
     public Map<String, Object> getSuiteResult(String srid) throws NamingException, SQLException {
         String sql = "SELECT * FROM " + TABLES.suite_result.name()
-            + " WHERE " + Suite_Result.SUITE_RESULT_ID.name() + " = ?;";
+                + " WHERE " + Suite_Result.SUITE_RESULT_ID.name() + " = ?;";
         try (Connection conn = this.getConnection()) {
             PreparedStatement stmt = conn.prepareStatement(sql);
             stmt.setString(1, srid);
@@ -84,10 +84,10 @@ public class MySqlBaseBean implements Serializable {
 
     public List<Map<String, Object>> getTestsResult(String srid) throws NamingException, SQLException {
         String sql = "SELECT * FROM " + TABLES.test_result.name() + " TR "
-            + "INNER JOIN " + TABLES.test_case + " TC "
-            + "ON TR.TEST_CASE_ID = TC.TEST_CASE_ID "
-            + "WHERE " + Test_Result.SUITE_RESULT.name() + " = ? "
-            + "ORDER BY " + Test_Result.START_TIME.name() + " DESC;";
+                + "INNER JOIN " + TABLES.test_case + " TC "
+                + "ON TR.TEST_CASE_ID = TC.TEST_CASE_ID "
+                + "WHERE " + Test_Result.SUITE_RESULT.name() + " = ? "
+                + "ORDER BY " + Test_Result.START_TIME.name() + " DESC;";
         try (Connection conn = this.getConnection()) {
             PreparedStatement stmt = conn.prepareStatement(sql);
             stmt.setString(1, srid);
@@ -99,11 +99,11 @@ public class MySqlBaseBean implements Serializable {
 
     public List<Map<String, Object>> getTestsResult(List<String> srids) throws NamingException, SQLException {
         String sql = "SELECT * FROM " + TABLES.test_result.name() + " TR "
-            + "INNER JOIN " + TABLES.test_case + " TC "
-            + "ON TR.TEST_CASE_ID = TC.TEST_CASE_ID "
-            + "WHERE " + Test_Result.SUITE_RESULT.name() + " IN (" + StringUtils.join(srids, ",") + ") "
-            + "ORDER BY " + Test_Case.SUITE_CLASS.name() + "," + Test_Case.TEST_CLASS.name() + ","
-            + Test_Case.TEST_METHOD.name() + "," + Test_Case.TEST_DATA_INFO.name() + " DESC;";
+                + "INNER JOIN " + TABLES.test_case + " TC "
+                + "ON TR.TEST_CASE_ID = TC.TEST_CASE_ID "
+                + "WHERE " + Test_Result.SUITE_RESULT.name() + " IN (" + StringUtils.join(srids, ",") + ") "
+                + "ORDER BY " + Test_Case.SUITE_CLASS.name() + "," + Test_Case.TEST_CLASS.name() + ","
+                + Test_Case.TEST_METHOD.name() + "," + Test_Case.TEST_DATA_INFO.name() + " DESC;";
         try (Connection conn = this.getConnection()) {
             PreparedStatement stmt = conn.prepareStatement(sql);
             LOG.trace("{}", stmt);
@@ -114,12 +114,12 @@ public class MySqlBaseBean implements Serializable {
 
     public void setSuiteResultInvisible(String srid, boolean invisible) throws NamingException, SQLException {
         String sql = "UPDATE " + TABLES.suite_result.name()
-            + " SET " + Suite_Result.INVISIBLE_ENTRY.name() + " = ?"
-            + " WHERE " + Suite_Result.SUITE_RESULT_ID.name() + " = ?;";
+                + " SET " + Suite_Result.INVISIBLE_ENTRY.name() + " = ?"
+                + " WHERE " + Suite_Result.SUITE_RESULT_ID.name() + " = ?;";
         try (Connection conn = this.getConnection()) {
             PreparedStatement stmt = conn.prepareStatement(sql,
-                ResultSet.TYPE_SCROLL_SENSITIVE,
-                ResultSet.CONCUR_UPDATABLE);
+                    ResultSet.TYPE_SCROLL_SENSITIVE,
+                    ResultSet.CONCUR_UPDATABLE);
             stmt.setBoolean(1, invisible);
             stmt.setString(2, srid);
             LOG.trace("{}", stmt);
@@ -128,20 +128,20 @@ public class MySqlBaseBean implements Serializable {
     }
 
     public List<Map<String, Object>> getSuiteResultDetailHistory(long startTime, long stopTime, int numberOfEntries,
-        String suiteName, boolean invisibleIncluded) throws NamingException, SQLException {
+            String suiteName, boolean invisibleIncluded) throws NamingException, SQLException {
         String sr = "SELECT " + Suite_Result.SUITE_RESULT_ID + " FROM " + TABLES.suite_result.name()
-            + " WHERE " + Suite_Result.START_TIME.name() + " > ?"
-            + " AND " + Suite_Result.STOP_TIME.name() + " < ?"
-            + " AND " + Suite_Result.SUITE_NAME.name() + " = ?";
+                + " WHERE " + Suite_Result.START_TIME.name() + " > ?"
+                + " AND " + Suite_Result.STOP_TIME.name() + " < ?"
+                + " AND " + Suite_Result.SUITE_NAME.name() + " = ?";
         if (!invisibleIncluded) {
             sr += " AND NOT " + Suite_Result.INVISIBLE_ENTRY.name();
         }
         sr += " ORDER BY " + Suite_Result.START_TIME.name() + " DESC;";
 
         String tr = "SELECT * FROM " + TABLES.test_result.name()
-            + " WHERE " + Test_Result.EXECUTION_RESULT.name()
-            + " IN (" + sr + ")"
-            + " ORDER BY " + Suite_Result.START_TIME.name() + " DESC;";
+                + " WHERE " + Test_Result.EXECUTION_RESULT.name()
+                + " IN (" + sr + ")"
+                + " ORDER BY " + Suite_Result.START_TIME.name() + " DESC;";
         try (Connection conn = this.getConnection()) {
             PreparedStatement stmt = conn.prepareStatement(tr);
             stmt.setLong(1, startTime);
@@ -173,6 +173,17 @@ public class MySqlBaseBean implements Serializable {
 
     public Date convertToDate(long time) {
         return new Date(time);
+    }
+
+    public static void setLogUrl(Map<String, Object> row) {
+        String dir = row.get("LOG_DIR").toString();
+        dir = dir.replaceAll("\\\\", "/");
+        int logs = dir.indexOf("/qa/logs/");
+        if (logs >= 0) {
+            row.put("_url", "http://" + row.get("TEST_STATION") + "/" + dir.substring(logs + 4) + "/log.html");
+        } else {
+            row.put("_url", ".");
+        }
     }
 
     public static long getMillis(String time) {

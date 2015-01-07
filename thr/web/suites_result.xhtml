@@ -18,7 +18,7 @@
             <h:outputLink value=".">
                 <h:graphicImage library="img" name="home.png" alt="Home" />
             </h:outputLink>
-            <h:outputText value="All Test Suites Result" style="font-size: x-large; font-variant: small-caps; font-weight: bold;" />
+            <h:outputText value="Test Suites Result" style="font-size: x-large; font-variant: small-caps; font-weight: bold;" />
         </h:panelGrid>
 
         <h:panelGrid columns="8">
@@ -56,7 +56,7 @@
             <p:column headerText="Test Suite Name">
                 <ui:param name="s" value="#{row.get('SUITE_NAME')}" />
                 <h:outputLink onclick="thr.querySuiteResults('#{s}');
-                        return false;" rendered="#{empty suite}">#{s}</h:outputLink>
+                    return false;" rendered="#{empty suite}">#{s}</h:outputLink>
                 <h:outputText rendered="#{not empty suite}" value="#{s}" />
             </p:column>
 
@@ -74,8 +74,7 @@
 
             <ui:param name="result" value="#{row.get('EXECUTION_RESULT')}" />
             <p:column headerText="Result" width="78">
-                <h:outputLink value="suite_result.xhtml?srid=#{row.get('SUITE_RESULT_ID')}" target="_blank"
-                              style="font-family: monospace; font-size: larger" >
+                <h:outputLink value="suite_result.xhtml?srid=#{row.get('SUITE_RESULT_ID')}" target="_blank">
                     <h:graphicImage library="img" name="pass.png" alt="#{result}" rendered="#{result =='PASS'}" />
                     <h:graphicImage library="img" name="fail.png" alt="#{result}" rendered="#{result =='FAIL'}" />
                     <h:graphicImage library="img" name="skip.png" alt="#{result}" rendered="#{!(result == 'FAIL' || result == 'PASS')}" />
