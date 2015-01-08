@@ -112,10 +112,12 @@ public abstract class AbstractSuite {
         Field fClasses = ClassLoader.class.getDeclaredField("classes");
         ClassLoader cl = AbstractSuite.class.getClassLoader();
         fClasses.setAccessible(true);
-        List<Class> classes = (List<Class>) fClasses.get(cl);
+
+        @SuppressWarnings("unchecked")
+        List<Class<?>> classes = (List<Class<?>>) fClasses.get(cl);
         String suiteClassName = "";
         String stop = AbstractSuite.class.getName() + "$1";
-        for (Class c : classes) {
+        for (Class<?> c : classes) {
             String className = c.getName();
             if (className.equals(stop)) {
                 break;

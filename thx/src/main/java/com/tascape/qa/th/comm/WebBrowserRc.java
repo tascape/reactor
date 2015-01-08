@@ -1,7 +1,6 @@
 package com.tascape.qa.th.comm;
 
 import com.thoughtworks.selenium.DefaultSelenium;
-import com.thoughtworks.selenium.Selenium;
 import org.openqa.selenium.server.SeleniumServer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -11,7 +10,8 @@ import org.slf4j.LoggerFactory;
  *
  * @author wlinsong
  */
-public abstract class WebBrowserRc extends EntityCommunication implements Selenium {
+@SuppressWarnings("deprecation")
+public abstract class WebBrowserRc extends EntityCommunication implements com.thoughtworks.selenium.Selenium {
     private static final Logger LOG = LoggerFactory.getLogger(WebBrowserRc.class);
 
     protected int port = 4444;

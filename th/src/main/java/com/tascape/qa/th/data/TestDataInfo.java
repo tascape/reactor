@@ -54,7 +54,7 @@ public class TestDataInfo {
             throw new IOException("Cannot parse test data info string " + infoString);
         }
 
-        this.klass = (Class<? extends TestData>) Class.forName(m.group(1));
+        this.klass = Class.forName(m.group(1)).asSubclass(TestData.class);
         this.method = m.group(2);
         this.parameter = m.group(3);
         this.index = Integer.parseInt(m.group(4));

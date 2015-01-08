@@ -20,7 +20,7 @@ import org.slf4j.LoggerFactory;
  *
  * @author linsong wang
  */
-public abstract class WebPage extends LoadableComponent {
+public abstract class WebPage extends LoadableComponent<WebPage> {
     private static final Logger LOG = LoggerFactory.getLogger(WebPage.class);
 
     protected WebBrowser webBrowser;
@@ -34,7 +34,7 @@ public abstract class WebPage extends LoadableComponent {
     private static final Table<Class<? extends WebPage>, EntityDriver, WebPage> PAGES = HashBasedTable.create();
 
     public static synchronized <T extends WebPage> T getPage(Class<T> pageClass, EntityDriver entityDriver)
-        throws EntityCommunicationException {
+            throws EntityCommunicationException {
         WebPage pageLoaded = PAGES.get(pageClass, entityDriver);
         if (pageLoaded != null) {
             return pageClass.cast(pageLoaded);
