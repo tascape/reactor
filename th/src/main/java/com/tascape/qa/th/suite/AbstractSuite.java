@@ -1,8 +1,10 @@
 package com.tascape.qa.th.suite;
 
 import com.tascape.qa.th.SystemConfiguration;
+import com.tascape.qa.th.TestHarness;
 import com.tascape.qa.th.driver.EntityDriver;
 import com.tascape.qa.th.test.AbstractTest;
+import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -104,4 +106,23 @@ public abstract class AbstractSuite {
     protected abstract void setUpEnvironment() throws Exception;
 
     protected abstract void tearDownEnvironment();
+
+    public static void main(String[] args) throws Exception {
+        SystemConfiguration sysConfig = SystemConfiguration.getInstance();
+        Field fClasses = ClassLoader.class.getDeclaredField("classes");
+        ClassLoader cl = AbstractSuite.class.getClassLoader();
+        fClasses.setAccessible(true);
+        List<Class> classes = (List<Class>) fClasses.get(cl);
+        String suiteClassName = "";
+        String stop = AbstractSuite.class.getName() + "$1";
+        for (Class c : classes) {
+            String className = c.getName();
+            if (className.equals(stop)) {
+                break;
+            }
+            suiteClassName = className;
+        }
+        sysConfig.setTestSuite(suiteClassName);
+        TestHarness.main(args);
+    }
 }

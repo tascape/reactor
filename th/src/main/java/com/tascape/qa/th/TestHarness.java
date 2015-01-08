@@ -15,8 +15,10 @@ public class TestHarness {
         int exitCode = 0;
         try {
             SystemConfiguration config = SystemConfiguration.getInstance();
+            config.listAppProperties();
+
             Utils.cleanDirectory(config.getLogPath().toFile().getAbsolutePath(), 240,
-                SystemConfiguration.CONSTANT_LOG_KEEP_ALIVE_PREFIX);
+                    SystemConfiguration.CONSTANT_LOG_KEEP_ALIVE_PREFIX);
 
             String suiteClass = config.getTestSuite();
             Pattern testClassRegex = config.getTestClassRegex();

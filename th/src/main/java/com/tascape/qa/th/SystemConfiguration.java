@@ -20,7 +20,7 @@ import org.slf4j.LoggerFactory;
  *
  * @author linsong wang
  */
-public class SystemConfiguration {
+public final class SystemConfiguration {
     private static final Logger LOG = LoggerFactory.getLogger(SystemConfiguration.class);
 
     public static final String CONSTANT_LOG_KEEP_ALIVE_PREFIX = "thlka_";
@@ -90,8 +90,6 @@ public class SystemConfiguration {
             LOG.warn("There is no execution id specified, using local new UUID: {}", execId);
             this.properties.setProperty(SYSPROP_EXECUTION_ID, execId);
         }
-
-        this.listAppProperties();
     }
 
     public String getProperty(String name) {
@@ -157,9 +155,13 @@ public class SystemConfiguration {
         String suite = this.getProperty(SYSPROP_TEST_SUITE);
         if (suite == null || suite.isEmpty()) {
             throw new RuntimeException("There is no test suite class name specified (system property "
-                + SYSPROP_TEST_SUITE + ")");
+                    + SYSPROP_TEST_SUITE + ")");
         }
         return suite;
+    }
+
+    public void setTestSuite(String suiteClassName) {
+        this.properties.setProperty(SYSPROP_TEST_SUITE, suiteClassName);
     }
 
     public Pattern getTestClassRegex() {
@@ -232,6 +234,15 @@ public class SystemConfiguration {
         return value == null ? "#" : value;
     }
 
+    public void listAppProperties() {
+        LOG.debug("Application properties");
+        List<String> keys = new ArrayList<>(this.properties.stringPropertyNames());
+        Collections.sort(keys);
+        keys.stream().forEach((key) -> {
+            LOG.debug(String.format("%50s : %s", key, this.properties.getProperty(key)));
+        });
+    }
+
     private void listSysProperties() {
         List<String> keys = new ArrayList<>(System.getProperties().stringPropertyNames());
         Collections.sort(keys);
@@ -246,18 +257,5 @@ public class SystemConfiguration {
         for (String key : keys) {
             LOG.debug(String.format("%50s : %s", key, System.getenv().get(key)));
         }
-    }
-
-    private void listAppProperties() {
-        LOG.debug("Application properties");
-        List<String> keys = new ArrayList<>(this.properties.stringPropertyNames());
-        Collections.sort(keys);
-        keys.stream().forEach((key) -> {
-            LOG.debug(String.format("%50s : %s", key, this.properties.getProperty(key)));
-        });
-    }
-
-    private String getLocalJobName() {
-        return this.getHostName();
     }
 }
