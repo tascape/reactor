@@ -247,9 +247,7 @@ public class UiObjectStub implements IUiObject {
      */
     @Override
     public boolean click() throws UiObjectNotFoundException {
-        System.out.println("click");
         try {
-            System.out.println(this.uiObject.getText());
             return this.uiObject.click();
         } catch (com.android.uiautomator.core.UiObjectNotFoundException ex) {
             throw new UiObjectNotFoundException(ex);
@@ -970,7 +968,7 @@ public class UiObjectStub implements IUiObject {
         if (selector.get(UiSelector.SELECTOR_START_TEXT) != null) {
             s = s.textStartsWith((String) selector.get(UiSelector.SELECTOR_START_TEXT));
         }
-        System.out.println(s);
+//        System.out.println(s);
         return s;
     }
 }

@@ -3,7 +3,6 @@ package com.tascape.qa.th.comm;
 import com.android.uiautomator.stub.IUiDevice;
 import com.android.uiautomator.stub.IUiObject;
 import com.tascape.qa.th.SystemConfiguration;
-import com.tascape.qa.th.suite.AndroidUiAutomatorSuite;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
@@ -25,11 +24,20 @@ import org.slf4j.LoggerFactory;
  * @author linsong wang
  */
 public class AndroidUiAutomatorDevice {
-    private static final Logger LOG = LoggerFactory.getLogger(AndroidUiAutomatorSuite.class);
+    private static final Logger LOG = LoggerFactory.getLogger(AndroidUiAutomatorDevice.class);
 
     public static final String SYSPROP_ADB_EXECUTABLE = "qa.comm.ADB_EXECUTABLE";
 
-    public static final String SYSPROP_UI_RMI_SERVER = "qa.comm.UI_RMI_SERVER";
+    public static final String SYSPROP_UIAUTOMATOR_RMI_SERVER = "qa.comm.UIAUTOMATOR_RMI_SERVER";
+
+    public static final String UIAUTOMATOR_RMI_SERVER = "uiautomator_rmi_server.jar";
+
+    static {
+        LOG.debug("Please specify where adb executable is by setting system property {}={}",
+                SYSPROP_ADB_EXECUTABLE, "/path/to/your/sdk/platform-tools/adb");
+        LOG.debug("Please specify where uiautomator RMI server jar is by setting system property {}={}",
+                SYSPROP_UIAUTOMATOR_RMI_SERVER, "/path/to/your/" + UIAUTOMATOR_RMI_SERVER);
+    }
 
     private final String serial;
 
@@ -43,8 +51,8 @@ public class AndroidUiAutomatorDevice {
 
     private final String adb = SystemConfiguration.getInstance().getProperty(SYSPROP_ADB_EXECUTABLE, "adb");
 
-    private final String uiRmiServer = SystemConfiguration.getInstance().getProperty(SYSPROP_UI_RMI_SERVER,
-        "ui_rmi_server.jar");
+    private final String uiRmiServer = SystemConfiguration.getInstance().getProperty(SYSPROP_UIAUTOMATOR_RMI_SERVER,
+            UIAUTOMATOR_RMI_SERVER);
 
     public AndroidUiAutomatorDevice(int port) throws IOException, InterruptedException {
         this("", "", port);
@@ -93,9 +101,9 @@ public class AndroidUiAutomatorDevice {
         cmdLine.addArgument("shell");
         cmdLine.addArgument("uiautomator");
         cmdLine.addArgument("runtest");
-        cmdLine.addArgument("ui_rmi_server.jar");
+        cmdLine.addArgument(UIAUTOMATOR_RMI_SERVER);
         cmdLine.addArgument("-c");
-        cmdLine.addArgument("com.android.uiautomator.stub.UiRmiServer");
+        cmdLine.addArgument("com.android.uiautomator.stub.UiAutomatorRmiServer");
         executor.setStreamHandler(new StreamHandler());
         executor.execute(cmdLine, new ResultHandler());
 
@@ -121,7 +129,6 @@ public class AndroidUiAutomatorDevice {
     }
 
     private class StreamHandler implements ExecuteStreamHandler {
-
         @Override
         public void setProcessInputStream(OutputStream out) throws IOException {
             LOG.debug("setProcessInputStream");
@@ -154,7 +161,6 @@ public class AndroidUiAutomatorDevice {
     }
 
     private class ResultHandler implements ExecuteResultHandler {
-
         @Override
         public void onProcessComplete(int i) {
             LOG.debug("{}", i);

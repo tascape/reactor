@@ -97,12 +97,18 @@ public final class SystemConfiguration {
     }
 
     public String getProperty(String name, String defaultValue) {
-        return this.properties.getProperty(name, defaultValue);
+        String v = this.properties.getProperty(name);
+        if (v == null) {
+            LOG.debug("System property '{}' is not defined, default value '{}' will be used", name, defaultValue);
+            return defaultValue;
+        }
+        return v;
     }
 
     public int getIntProperty(String name, int defaultValue) {
         String v = this.getProperty(name);
         if (v == null) {
+            LOG.debug("System property '{}' is not defined, default value '{}' will be used", name, defaultValue);
             return defaultValue;
         }
         return Integer.parseInt(v);
@@ -111,6 +117,7 @@ public final class SystemConfiguration {
     public boolean getBooleanProperty(String name, boolean defaultValue) {
         String v = this.getProperty(name);
         if (v == null) {
+            LOG.debug("System property '{}' is not defined, default value '{}' will be used", name, defaultValue);
             return defaultValue;
         }
         return Boolean.parseBoolean(v);

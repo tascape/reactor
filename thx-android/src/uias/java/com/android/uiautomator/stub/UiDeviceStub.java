@@ -208,7 +208,6 @@ public class UiDeviceStub implements IUiDevice {
     @Override
     public void runWatchers() {
         this.uiDevice.runWatchers();
-
     }
 
     @Override
@@ -259,7 +258,6 @@ public class UiDeviceStub implements IUiDevice {
         for (int i = 0; i < segments.length; i++) {
             aSegments[i] = new android.graphics.Point(segments[i].x, segments[i].y);
         }
-        System.out.println(aSegments[0].x);
         return this.uiDevice.swipe(aSegments, segmentSteps);
     }
 
