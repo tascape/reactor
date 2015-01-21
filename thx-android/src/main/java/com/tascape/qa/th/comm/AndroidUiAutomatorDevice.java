@@ -1,6 +1,7 @@
 package com.tascape.qa.th.comm;
 
 import com.android.uiautomator.stub.IUiDevice;
+import com.android.uiautomator.stub.IUiObject;
 import java.io.IOException;
 import net.sf.lipermi.handler.CallHandler;
 import net.sf.lipermi.net.Client;
@@ -10,15 +11,22 @@ import net.sf.lipermi.net.Client;
  * @author linsong wang
  */
 public class AndroidUiAutomatorDevice {
-    private final IUiDevice device;
+    private final IUiDevice uiDeviceStub;
 
-    public AndroidUiAutomatorDevice(int port) throws IOException {
+    private final IUiObject uiObjectStub;
+
+    public AndroidUiAutomatorDevice(String serial, int port) throws IOException {
         CallHandler callHandler = new CallHandler();
         Client client = new Client("localhost", port, callHandler);
-        this.device = IUiDevice.class.cast(client.getGlobal(IUiDevice.class));
+        this.uiDeviceStub = IUiDevice.class.cast(client.getGlobal(IUiDevice.class));
+        this.uiObjectStub = IUiObject.class.cast(client.getGlobal(IUiObject.class));
     }
 
-    public IUiDevice getDevice() {
-        return device;
+    public IUiDevice getUiDeviceStub() {
+        return uiDeviceStub;
+    }
+
+    public IUiObject getUiObjectStub() {
+        return uiObjectStub;
     }
 }

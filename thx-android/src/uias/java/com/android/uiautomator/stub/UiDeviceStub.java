@@ -1,11 +1,11 @@
 package com.android.uiautomator.stub;
 
-import java.io.File;
-
 import android.os.RemoteException;
+import java.io.File;
 
 import com.android.uiautomator.core.UiDevice;
 import com.android.uiautomator.core.UiWatcher;
+import net.sf.lipermi.exception.LipeRMIException;
 
 /**
  *
@@ -33,8 +33,12 @@ public class UiDeviceStub implements IUiDevice {
     }
 
     @Override
-    public void freezeRotation() throws RemoteException {
-        this.uiDevice.freezeRotation();
+    public void freezeRotation() throws LipeRMIException {
+        try {
+            this.uiDevice.freezeRotation();
+        } catch (RemoteException ex) {
+            throw new LipeRMIException(ex);
+        }
     }
 
     @Override
@@ -104,8 +108,12 @@ public class UiDeviceStub implements IUiDevice {
     }
 
     @Override
-    public boolean isScreenOn() throws RemoteException {
-        return this.uiDevice.isScreenOn();
+    public boolean isScreenOn() throws LipeRMIException {
+        try {
+            return this.uiDevice.isScreenOn();
+        } catch (RemoteException ex) {
+            throw new LipeRMIException(ex);
+        }
     }
 
     @Override
@@ -169,8 +177,12 @@ public class UiDeviceStub implements IUiDevice {
     }
 
     @Override
-    public boolean pressRecentApps() throws RemoteException {
-        return this.uiDevice.pressRecentApps();
+    public boolean pressRecentApps() throws LipeRMIException {
+        try {
+            return this.uiDevice.pressRecentApps();
+        } catch (RemoteException ex) {
+            throw new LipeRMIException(ex);
+        }
     }
 
     @Override
@@ -178,7 +190,7 @@ public class UiDeviceStub implements IUiDevice {
         return this.uiDevice.pressSearch();
     }
 
-    @Override
+//    @Override
     public void registerWatcher(String name, UiWatcher watcher) {
         this.uiDevice.registerWatcher(name, watcher);
     }
@@ -200,24 +212,40 @@ public class UiDeviceStub implements IUiDevice {
     }
 
     @Override
-    public void setOrientationLeft() throws RemoteException {
-        this.uiDevice.setOrientationLeft();
+    public void setOrientationLeft() throws LipeRMIException {
+        try {
+            this.uiDevice.setOrientationLeft();
+        } catch (RemoteException ex) {
+            throw new LipeRMIException(ex);
+        }
     }
 
     @Override
-    public void setOrientationNatural() throws RemoteException {
-        this.uiDevice.setOrientationNatural();
+    public void setOrientationNatural() throws LipeRMIException {
+        try {
+            this.uiDevice.setOrientationNatural();
+        } catch (RemoteException ex) {
+            throw new LipeRMIException(ex);
+        }
     }
 
     @Override
-    public void setOrientationRight() throws RemoteException {
-        this.uiDevice.setOrientationRight();
+    public void setOrientationRight() throws LipeRMIException {
+        try {
+            this.uiDevice.setOrientationRight();
+        } catch (RemoteException ex) {
+            throw new LipeRMIException(ex);
+        }
 
     }
 
     @Override
-    public void sleep() throws RemoteException {
-        this.uiDevice.sleep();
+    public void sleep() throws LipeRMIException {
+        try {
+            this.uiDevice.sleep();
+        } catch (RemoteException ex) {
+            throw new LipeRMIException(ex);
+        }
     }
 
     @Override
@@ -246,8 +274,12 @@ public class UiDeviceStub implements IUiDevice {
     }
 
     @Override
-    public void unfreezeRotation() throws RemoteException {
-        this.uiDevice.unfreezeRotation();
+    public void unfreezeRotation() throws LipeRMIException {
+        try {
+            this.uiDevice.unfreezeRotation();
+        } catch (RemoteException ex) {
+            throw new LipeRMIException(ex);
+        }
     }
 
     @Override
@@ -266,7 +298,11 @@ public class UiDeviceStub implements IUiDevice {
     }
 
     @Override
-    public void wakeUp() throws RemoteException {
-        this.uiDevice.wakeUp();
+    public void wakeUp() throws LipeRMIException {
+        try {
+            this.uiDevice.wakeUp();
+        } catch (RemoteException ex) {
+            throw new LipeRMIException(ex);
+        }
     }
 }

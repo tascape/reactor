@@ -50,8 +50,7 @@ public class CallHandler {
 
     private final Map<RemoteInstance, Object> exportedObjects = new HashMap<>();
 
-    @SuppressWarnings("unchecked") //$NON-NLS-1$
-    public void registerGlobal(Class cInterface, Object objImplementation) throws LipeRMIException {
+    public void registerGlobal(Class<?> cInterface, Object objImplementation) throws LipeRMIException {
         exportObject(cInterface, objImplementation, null);
     }
 
@@ -62,8 +61,7 @@ public class CallHandler {
         exportObject(cInterface, exportedObject, instanceId);
     }
 
-    @SuppressWarnings("unchecked") //$NON-NLS-1$
-    private void exportObject(Class cInterface, Object objImplementation, String instanceId) throws LipeRMIException {
+    private void exportObject(Class<?> cInterface, Object objImplementation, String instanceId) throws LipeRMIException {
         if (!cInterface.isAssignableFrom(objImplementation.getClass())) {
             throw new LipeRMIException(String.format("Class %s is not assignable from %s", objImplementation.getClass()
                     .getName(), cInterface.getName())); //$NON-NLS-1$

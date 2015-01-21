@@ -1,10 +1,8 @@
 package com.android.uiautomator.stub;
 
 import java.io.Serializable;
-
-import android.os.RemoteException;
-import com.android.uiautomator.core.UiWatcher;
 import java.io.File;
+import net.sf.lipermi.exception.LipeRMIException;
 
 /**
  *
@@ -42,9 +40,9 @@ public interface IUiDevice extends Serializable {
      * Disables the sensors and freezes the device rotation at its current
      * rotation state.
      *
-     * @throws RemoteException
+     * @throws LipeRMIException
      */
-    void freezeRotation() throws RemoteException;
+    void freezeRotation() throws LipeRMIException;
 
     /**
      * Retrieves the last activity to report accessibility events.
@@ -148,6 +146,8 @@ public interface IUiDevice extends Serializable {
      *
      * See {@link #registerWatcher(String, UiWatcher)} See
      * {@link #hasWatcherTriggered(String)}
+     *
+     * @return
      */
     boolean hasAnyWatcherTriggered();
 
@@ -178,9 +178,9 @@ public interface IUiDevice extends Serializable {
      *
      * @return true if the screen is ON else false
      *
-     * @throws RemoteException
+     * @throws LipeRMIException
      */
-    boolean isScreenOn() throws RemoteException;
+    boolean isScreenOn() throws LipeRMIException;
 
     /**
      * Simulates a short press on the BACK button.
@@ -283,9 +283,9 @@ public interface IUiDevice extends Serializable {
      *
      * @return true if successful, else return false
      *
-     * @throws RemoteException
+     * @throws LipeRMIException
      */
-    boolean pressRecentApps() throws RemoteException;
+    boolean pressRecentApps() throws LipeRMIException;
 
     /**
      * Simulates a short press on the SEARCH button.
@@ -304,8 +304,7 @@ public interface IUiDevice extends Serializable {
      * @param watcher
      *                {@link UiWatcher}
      */
-    void registerWatcher(String name, UiWatcher watcher);
-
+//    void registerWatcher(String name, UiWatcher watcher);
     /**
      * Removes a previously registered {@link UiWatcher}.
      *
@@ -313,8 +312,6 @@ public interface IUiDevice extends Serializable {
      *
      * @param name
      *             used to register the UiWatcher
-     *
-     * @throws UiAutomationException
      */
     void removeWatcher(String name);
 
@@ -339,9 +336,9 @@ public interface IUiDevice extends Serializable {
      * If you want to un-freeze the rotation and re-enable the sensors see
      * {@link #unfreezeRotation()}.
      *
-     * @throws RemoteException
+     * @throws LipeRMIException
      */
-    void setOrientationLeft() throws RemoteException;
+    void setOrientationLeft() throws LipeRMIException;
 
     /**
      * Simulates orienting the device into its natural orientation and also
@@ -350,9 +347,9 @@ public interface IUiDevice extends Serializable {
      * If you want to un-freeze the rotation and re-enable the sensors see
      * {@link #unfreezeRotation()}.
      *
-     * @throws RemoteException
+     * @throws LipeRMIException
      */
-    void setOrientationNatural() throws RemoteException;
+    void setOrientationNatural() throws LipeRMIException;
 
     /**
      * Simulates orienting the device to the right and also freezes rotation by
@@ -361,17 +358,17 @@ public interface IUiDevice extends Serializable {
      * If you want to un-freeze the rotation and re-enable the sensors see
      * {@link #unfreezeRotation()}.
      *
-     * @throws RemoteException
+     * @throws LipeRMIException
      */
-    void setOrientationRight() throws RemoteException;
+    void setOrientationRight() throws LipeRMIException;
 
     /**
      * This method simply presses the power button if the screen is ON else it
      * does nothing if the screen is already OFF.
      *
-     * @throws RemoteException
+     * @throws LipeRMIException
      */
-    void sleep() throws RemoteException;
+    void sleep() throws LipeRMIException;
 
     /**
      * Performs a swipe from one coordinate to another using the number of steps
@@ -438,9 +435,9 @@ public interface IUiDevice extends Serializable {
      * execution, it is best to keep the device frozen in a specific orientation
      * until the test case execution has completed.
      *
-     * @throws RemoteException
+     * @throws LipeRMIException
      */
-    void unfreezeRotation() throws RemoteException;
+    void unfreezeRotation() throws LipeRMIException;
 
     /**
      * Waits for the current application to idle. Default wait timeout is 10
@@ -480,8 +477,7 @@ public interface IUiDevice extends Serializable {
      * If the screen was OFF and it just got turned ON, this method will insert
      * a 500ms delay to allow the device time to wake up and accept input.
      *
-     * @throws RemoteException
+     * @throws LipeRMIException
      */
-    void wakeUp() throws RemoteException;
-
+    void wakeUp() throws LipeRMIException;
 }

@@ -1,18 +1,14 @@
 package com.android.uiautomator.stub;
 
-import android.view.MotionEvent;
-import android.view.MotionEvent.PointerCoords;
-import com.android.uiautomator.core.UiObject;
-import com.android.uiautomator.core.UiObjectNotFoundException;
-import com.android.uiautomator.core.UiScrollable;
-import com.android.uiautomator.core.UiSelector;
 import java.io.Serializable;
 
 /**
  *
- * @author wlinsong
+ * @author linsong wang
  */
 public interface IUiObject extends Serializable {
+
+    void useSelector(UiSelector selector);
 
     /**
      * Clears the existing text contents in an editable field.
@@ -111,8 +107,7 @@ public interface IUiObject extends Serializable {
      * @throws UiObjectNotFoundException
      * @since API Level 18
      */
-    boolean dragTo(UiObject destObj, int steps) throws UiObjectNotFoundException;
-
+//    boolean dragTo(UiObject destObj, int steps) throws UiObjectNotFoundException;
     /**
      * Drags this object to arbitrary coordinates.
      * The number of steps specified in your input parameter can influence the
@@ -163,8 +158,7 @@ public interface IUiObject extends Serializable {
      *
      * @since API Level 16
      */
-    UiObject getChild(UiSelector selector) throws UiObjectNotFoundException;
-
+//    UiObject getChild(UiSelector selector) throws UiObjectNotFoundException;
     /**
      * Counts the child views immediately under the present UiObject.
      *
@@ -206,8 +200,7 @@ public interface IUiObject extends Serializable {
      * @throws UiObjectNotFoundException
      * @since API Level 16
      */
-    UiObject getFromParent(UiSelector selector) throws UiObjectNotFoundException;
-
+//    UiObject getFromParent(UiSelector selector) throws UiObjectNotFoundException;
     /**
      * Reads the view's <code>package</code> property
      *
@@ -217,16 +210,6 @@ public interface IUiObject extends Serializable {
      * @since API Level 16
      */
     String getPackageName() throws UiObjectNotFoundException;
-
-    /**
-     * Debugging helper. A test can dump the properties of a selector as a string
-     * to its logs if needed. <code>getSelector().toString();</code>
-     *
-     * @return {@link UiSelector}
-     *
-     * @since API Level 16
-     */
-    UiSelector getSelector();
 
     /**
      * Reads the <code>text</code> property of the UI element
@@ -398,7 +381,7 @@ public interface IUiObject extends Serializable {
      *
      * @since API Level 18
      */
-    boolean performMultiPointerGesture(MotionEvent.PointerCoords[]... touches);
+    boolean performMultiPointerGesture(PointerCoords[]... touches);
 
     /**
      * Generates a two-pointer gesture with arbitrary starting and ending points.
@@ -593,5 +576,4 @@ public interface IUiObject extends Serializable {
      * @since API Level 16
      */
     boolean waitUntilGone(long timeout);
-
 }
