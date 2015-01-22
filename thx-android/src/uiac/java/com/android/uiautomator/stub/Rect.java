@@ -1,5 +1,6 @@
 package com.android.uiautomator.stub;
 
+import java.io.Serializable;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -12,7 +13,7 @@ import java.util.regex.Pattern;
  *
  * @author linsong wang
  */
-public class Rect {
+public class Rect implements Serializable {
     private static final long serialVersionUID = -873349586878L;
 
     private static final Pattern FLATTENED_PATTERN = Pattern.compile("(-?\\d+) (-?\\d+) (-?\\d+) (-?\\d+)");

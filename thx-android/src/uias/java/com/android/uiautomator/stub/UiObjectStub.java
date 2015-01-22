@@ -15,6 +15,27 @@ public class UiObjectStub implements IUiObject {
 
     private UiObject uiObject;
 
+    private UiObjectNotFoundException uiObjectNotFoundException;
+
+    @Override
+    public void clearUiObjectNotFoundException() {
+        this.uiObjectNotFoundException = null;
+    }
+
+    @Override
+    public UiObjectNotFoundException getUiObjectNotFoundException() {
+        try {
+            return uiObjectNotFoundException;
+        } finally {
+            this.clearUiObjectNotFoundException();
+        }
+    }
+
+    @Override
+    public boolean hasUiObjectNotFoundException() {
+        return this.uiObjectNotFoundException != null;
+    }
+
     @Override
     public void useSelector(UiSelector selector) {
         com.android.uiautomator.core.UiSelector uiSelector = UiObjectStub.convert(selector);
@@ -28,16 +49,15 @@ public class UiObjectStub implements IUiObject {
      *
      * @return a new UiObject representing the child view
      *
-     * @throws com.android.uiautomator.stub.UiObjectNotFoundException
-     *
      * @since API Level 16
      */
-    public UiObject getChild(com.android.uiautomator.core.UiSelector selector) throws UiObjectNotFoundException {
+    public UiObject getChild(com.android.uiautomator.core.UiSelector selector) {
         try {
             return this.uiObject.getChild(selector);
         } catch (com.android.uiautomator.core.UiObjectNotFoundException ex) {
-            throw new UiObjectNotFoundException(ex);
+            this.setUiObjectNotFoundException(ex);
         }
+        return null;
     }
 
     /**
@@ -48,15 +68,15 @@ public class UiObjectStub implements IUiObject {
      *
      * @return a new UiObject representing the matched view
      *
-     * @throws UiObjectNotFoundException
      * @since API Level 16
      */
-    public UiObject getFromParent(com.android.uiautomator.core.UiSelector selector) throws UiObjectNotFoundException {
+    public UiObject getFromParent(com.android.uiautomator.core.UiSelector selector) {
         try {
             return this.uiObject.getFromParent(selector);
         } catch (com.android.uiautomator.core.UiObjectNotFoundException ex) {
-            throw new UiObjectNotFoundException(ex);
+            this.setUiObjectNotFoundException(ex);
         }
+        return null;
     }
 
     /**
@@ -64,16 +84,16 @@ public class UiObjectStub implements IUiObject {
      *
      * @return the count of child views.
      *
-     * @throws UiObjectNotFoundException
      * @since API Level 16
      */
     @Override
-    public int getChildCount() throws UiObjectNotFoundException {
+    public int getChildCount() {
         try {
             return this.uiObject.getChildCount();
         } catch (com.android.uiautomator.core.UiObjectNotFoundException ex) {
-            throw new UiObjectNotFoundException(ex);
+            this.setUiObjectNotFoundException(ex);
         }
+        return -1;
     }
 
     /**
@@ -87,15 +107,15 @@ public class UiObjectStub implements IUiObject {
      *
      * @return true if successful
      *
-     * @throws UiObjectNotFoundException
      * @since API Level 18
      */
-    public boolean dragTo(UiObject destObj, int steps) throws UiObjectNotFoundException {
+    public boolean dragTo(UiObject destObj, int steps) {
         try {
             return this.uiObject.dragTo(destObj, steps);
         } catch (com.android.uiautomator.core.UiObjectNotFoundException ex) {
-            throw new UiObjectNotFoundException(ex);
+            this.setUiObjectNotFoundException(ex);
         }
+        return false;
     }
 
     /**
@@ -110,16 +130,16 @@ public class UiObjectStub implements IUiObject {
      *
      * @return true if successful
      *
-     * @throws UiObjectNotFoundException
      * @since API Level 18
      */
     @Override
-    public boolean dragTo(int destX, int destY, int steps) throws UiObjectNotFoundException {
+    public boolean dragTo(int destX, int destY, int steps) {
         try {
             return this.uiObject.dragTo(destX, destY, steps);
         } catch (com.android.uiautomator.core.UiObjectNotFoundException ex) {
-            throw new UiObjectNotFoundException(ex);
+            this.setUiObjectNotFoundException(ex);
         }
+        return false;
     }
 
     /**
@@ -137,16 +157,16 @@ public class UiObjectStub implements IUiObject {
      *
      * @return true of successful
      *
-     * @throws UiObjectNotFoundException
      * @since API Level 16
      */
     @Override
-    public boolean swipeUp(int steps) throws UiObjectNotFoundException {
+    public boolean swipeUp(int steps) {
         try {
             return this.uiObject.swipeUp(steps);
         } catch (com.android.uiautomator.core.UiObjectNotFoundException ex) {
-            throw new UiObjectNotFoundException(ex);
+            this.setUiObjectNotFoundException(ex);
         }
+        return false;
     }
 
     /**
@@ -166,16 +186,16 @@ public class UiObjectStub implements IUiObject {
      *
      * @return true if successful
      *
-     * @throws UiObjectNotFoundException
      * @since API Level 16
      */
     @Override
-    public boolean swipeDown(int steps) throws UiObjectNotFoundException {
+    public boolean swipeDown(int steps) {
         try {
             return this.uiObject.swipeDown(steps);
         } catch (com.android.uiautomator.core.UiObjectNotFoundException ex) {
-            throw new UiObjectNotFoundException(ex);
+            this.setUiObjectNotFoundException(ex);
         }
+        return false;
     }
 
     /**
@@ -195,16 +215,16 @@ public class UiObjectStub implements IUiObject {
      *
      * @return true if successful
      *
-     * @throws UiObjectNotFoundException
      * @since API Level 16
      */
     @Override
-    public boolean swipeLeft(int steps) throws UiObjectNotFoundException {
+    public boolean swipeLeft(int steps) {
         try {
             return this.uiObject.swipeLeft(steps);
         } catch (com.android.uiautomator.core.UiObjectNotFoundException ex) {
-            throw new UiObjectNotFoundException(ex);
+            this.setUiObjectNotFoundException(ex);
         }
+        return false;
     }
 
     /**
@@ -224,34 +244,34 @@ public class UiObjectStub implements IUiObject {
      *
      * @return true if successful
      *
-     * @throws UiObjectNotFoundException
      * @since API Level 16
      */
     @Override
-    public boolean swipeRight(int steps) throws UiObjectNotFoundException {
+    public boolean swipeRight(int steps) {
         try {
             return this.uiObject.swipeRight(steps);
         } catch (com.android.uiautomator.core.UiObjectNotFoundException ex) {
-            throw new UiObjectNotFoundException(ex);
+            this.setUiObjectNotFoundException(ex);
         }
+        return false;
     }
 
     /**
      * Performs a click at the center of the visible bounds of the UI element represented
      * by this UiObject.
      *
-     * @return true id successful else false
+     * @return true if successful else false
      *
-     * @throws UiObjectNotFoundException
      * @since API Level 16
      */
     @Override
-    public boolean click() throws UiObjectNotFoundException {
+    public boolean click() {
         try {
             return this.uiObject.click();
         } catch (com.android.uiautomator.core.UiObjectNotFoundException ex) {
-            throw new UiObjectNotFoundException(ex);
+            this.setUiObjectNotFoundException(ex);
         }
+        return false;
     }
 
     /**
@@ -261,16 +281,16 @@ public class UiObjectStub implements IUiObject {
      *
      * @return true if the event was triggered, else false
      *
-     * @throws UiObjectNotFoundException
      * @since API Level 16
      */
     @Override
-    public boolean clickAndWaitForNewWindow() throws UiObjectNotFoundException {
+    public boolean clickAndWaitForNewWindow() {
         try {
             return this.uiObject.clickAndWaitForNewWindow();
         } catch (com.android.uiautomator.core.UiObjectNotFoundException ex) {
-            throw new UiObjectNotFoundException(ex);
+            this.setUiObjectNotFoundException(ex);
         }
+        return false;
     }
 
     /**
@@ -287,16 +307,16 @@ public class UiObjectStub implements IUiObject {
      *
      * @return true if the event was triggered, else false
      *
-     * @throws UiObjectNotFoundException
      * @since API Level 16
      */
     @Override
-    public boolean clickAndWaitForNewWindow(long timeout) throws UiObjectNotFoundException {
+    public boolean clickAndWaitForNewWindow(long timeout) {
         try {
             return this.uiObject.clickAndWaitForNewWindow(timeout);
         } catch (com.android.uiautomator.core.UiObjectNotFoundException ex) {
-            throw new UiObjectNotFoundException(ex);
+            this.setUiObjectNotFoundException(ex);
         }
+        return false;
     }
 
     /**
@@ -304,16 +324,16 @@ public class UiObjectStub implements IUiObject {
      *
      * @return true on success
      *
-     * @throws UiObjectNotFoundException
      * @since API Level 16
      */
     @Override
-    public boolean clickTopLeft() throws UiObjectNotFoundException {
+    public boolean clickTopLeft() {
         try {
             return this.uiObject.clickTopLeft();
         } catch (com.android.uiautomator.core.UiObjectNotFoundException ex) {
-            throw new UiObjectNotFoundException(ex);
+            this.setUiObjectNotFoundException(ex);
         }
+        return false;
     }
 
     /**
@@ -321,16 +341,16 @@ public class UiObjectStub implements IUiObject {
      *
      * @return true if operation was successful
      *
-     * @throws UiObjectNotFoundException
      * @since API Level 16
      */
     @Override
-    public boolean longClickBottomRight() throws UiObjectNotFoundException {
+    public boolean longClickBottomRight() {
         try {
             return this.uiObject.longClickBottomRight();
         } catch (com.android.uiautomator.core.UiObjectNotFoundException ex) {
-            throw new UiObjectNotFoundException(ex);
+            this.setUiObjectNotFoundException(ex);
         }
+        return false;
     }
 
     /**
@@ -338,16 +358,16 @@ public class UiObjectStub implements IUiObject {
      *
      * @return true on success
      *
-     * @throws UiObjectNotFoundException
      * @since API Level 16
      */
     @Override
-    public boolean clickBottomRight() throws UiObjectNotFoundException {
+    public boolean clickBottomRight() {
         try {
             return this.uiObject.clickBottomRight();
         } catch (com.android.uiautomator.core.UiObjectNotFoundException ex) {
-            throw new UiObjectNotFoundException(ex);
+            this.setUiObjectNotFoundException(ex);
         }
+        return false;
     }
 
     /**
@@ -355,16 +375,16 @@ public class UiObjectStub implements IUiObject {
      *
      * @return true if operation was successful
      *
-     * @throws UiObjectNotFoundException
      * @since API Level 16
      */
     @Override
-    public boolean longClick() throws UiObjectNotFoundException {
+    public boolean longClick() {
         try {
             return this.uiObject.longClick();
         } catch (com.android.uiautomator.core.UiObjectNotFoundException ex) {
-            throw new UiObjectNotFoundException(ex);
+            this.setUiObjectNotFoundException(ex);
         }
+        return false;
     }
 
     /**
@@ -372,16 +392,16 @@ public class UiObjectStub implements IUiObject {
      *
      * @return true if operation was successful
      *
-     * @throws UiObjectNotFoundException
      * @since API Level 16
      */
     @Override
-    public boolean longClickTopLeft() throws UiObjectNotFoundException {
+    public boolean longClickTopLeft() {
         try {
             return this.uiObject.longClickTopLeft();
         } catch (com.android.uiautomator.core.UiObjectNotFoundException ex) {
-            throw new UiObjectNotFoundException(ex);
+            this.setUiObjectNotFoundException(ex);
         }
+        return false;
     }
 
     /**
@@ -389,16 +409,16 @@ public class UiObjectStub implements IUiObject {
      *
      * @return text value of the current node represented by this UiObject
      *
-     * @throws UiObjectNotFoundException if no match could be found
      * @since API Level 16
      */
     @Override
-    public String getText() throws UiObjectNotFoundException {
+    public String getText() {
         try {
             return this.uiObject.getText();
         } catch (com.android.uiautomator.core.UiObjectNotFoundException ex) {
-            throw new UiObjectNotFoundException(ex);
+            this.setUiObjectNotFoundException(ex);
         }
+        return null;
     }
 
     /**
@@ -406,16 +426,16 @@ public class UiObjectStub implements IUiObject {
      *
      * @return class name of the current node represented by this UiObject
      *
-     * @throws UiObjectNotFoundException if no match was found
      * @since API Level 18
      */
     @Override
-    public String getClassName() throws UiObjectNotFoundException {
+    public String getClassName() {
         try {
             return this.uiObject.getClassName();
         } catch (com.android.uiautomator.core.UiObjectNotFoundException ex) {
-            throw new UiObjectNotFoundException(ex);
+            this.setUiObjectNotFoundException(ex);
         }
+        return null;
     }
 
     /**
@@ -423,16 +443,16 @@ public class UiObjectStub implements IUiObject {
      *
      * @return value of node attribute "content_desc"
      *
-     * @throws UiObjectNotFoundException
      * @since API Level 16
      */
     @Override
-    public String getContentDescription() throws UiObjectNotFoundException {
+    public String getContentDescription() {
         try {
             return this.uiObject.getContentDescription();
         } catch (com.android.uiautomator.core.UiObjectNotFoundException ex) {
-            throw new UiObjectNotFoundException(ex);
+            this.setUiObjectNotFoundException(ex);
         }
+        return null;
     }
 
     /**
@@ -451,16 +471,16 @@ public class UiObjectStub implements IUiObject {
      *
      * @return true if operation is successful
      *
-     * @throws UiObjectNotFoundException
      * @since API Level 16
      */
     @Override
-    public boolean setText(String text) throws UiObjectNotFoundException {
+    public boolean setText(String text) {
         try {
             return this.uiObject.setText(text);
         } catch (com.android.uiautomator.core.UiObjectNotFoundException ex) {
-            throw new UiObjectNotFoundException(ex);
+            this.setUiObjectNotFoundException(ex);
         }
+        return false;
     }
 
     /**
@@ -479,15 +499,14 @@ public class UiObjectStub implements IUiObject {
      * if the text contains separators such as spaces, slashes, at symbol etc.
      * Also, not all editable fields support the long-press functionality.
      *
-     * @throws UiObjectNotFoundException
      * @since API Level 16
      */
     @Override
-    public void clearTextField() throws UiObjectNotFoundException {
+    public void clearTextField() {
         try {
             this.uiObject.clearTextField();
         } catch (com.android.uiautomator.core.UiObjectNotFoundException ex) {
-            throw new UiObjectNotFoundException(ex);
+            this.setUiObjectNotFoundException(ex);
         }
     }
 
@@ -496,17 +515,16 @@ public class UiObjectStub implements IUiObject {
      *
      * @return true if it is else false
      *
-     * @throws com.android.uiautomator.stub.UiObjectNotFoundException
-     *
      * @since API Level 16
      */
     @Override
-    public boolean isChecked() throws UiObjectNotFoundException {
+    public boolean isChecked() {
         try {
             return this.uiObject.isChecked();
         } catch (com.android.uiautomator.core.UiObjectNotFoundException ex) {
-            throw new UiObjectNotFoundException(ex);
+            this.setUiObjectNotFoundException(ex);
         }
+        return false;
     }
 
     /**
@@ -514,16 +532,16 @@ public class UiObjectStub implements IUiObject {
      *
      * @return true if it is else false
      *
-     * @throws UiObjectNotFoundException
      * @since API Level 16
      */
     @Override
-    public boolean isSelected() throws UiObjectNotFoundException {
+    public boolean isSelected() {
         try {
             return this.uiObject.isSelected();
         } catch (com.android.uiautomator.core.UiObjectNotFoundException ex) {
-            throw new UiObjectNotFoundException(ex);
+            this.setUiObjectNotFoundException(ex);
         }
+        return false;
     }
 
     /**
@@ -531,16 +549,16 @@ public class UiObjectStub implements IUiObject {
      *
      * @return true if it is else false
      *
-     * @throws UiObjectNotFoundException
      * @since API Level 16
      */
     @Override
-    public boolean isCheckable() throws UiObjectNotFoundException {
+    public boolean isCheckable() {
         try {
             return this.uiObject.isCheckable();
         } catch (com.android.uiautomator.core.UiObjectNotFoundException ex) {
-            throw new UiObjectNotFoundException(ex);
+            this.setUiObjectNotFoundException(ex);
         }
+        return false;
     }
 
     /**
@@ -548,16 +566,16 @@ public class UiObjectStub implements IUiObject {
      *
      * @return true if it is else false
      *
-     * @throws UiObjectNotFoundException
      * @since API Level 16
      */
     @Override
-    public boolean isEnabled() throws UiObjectNotFoundException {
+    public boolean isEnabled() {
         try {
             return this.uiObject.isEnabled();
         } catch (com.android.uiautomator.core.UiObjectNotFoundException ex) {
-            throw new UiObjectNotFoundException(ex);
+            this.setUiObjectNotFoundException(ex);
         }
+        return false;
     }
 
     /**
@@ -565,16 +583,16 @@ public class UiObjectStub implements IUiObject {
      *
      * @return true if it is else false
      *
-     * @throws UiObjectNotFoundException
      * @since API Level 16
      */
     @Override
-    public boolean isClickable() throws UiObjectNotFoundException {
+    public boolean isClickable() {
         try {
             return this.uiObject.isClickable();
         } catch (com.android.uiautomator.core.UiObjectNotFoundException ex) {
-            throw new UiObjectNotFoundException(ex);
+            this.setUiObjectNotFoundException(ex);
         }
+        return false;
     }
 
     /**
@@ -582,16 +600,16 @@ public class UiObjectStub implements IUiObject {
      *
      * @return true if it is else false
      *
-     * @throws UiObjectNotFoundException
      * @since API Level 16
      */
     @Override
-    public boolean isFocused() throws UiObjectNotFoundException {
+    public boolean isFocused() {
         try {
             return this.uiObject.isFocused();
         } catch (com.android.uiautomator.core.UiObjectNotFoundException ex) {
-            throw new UiObjectNotFoundException(ex);
+            this.setUiObjectNotFoundException(ex);
         }
+        return false;
     }
 
     /**
@@ -599,16 +617,16 @@ public class UiObjectStub implements IUiObject {
      *
      * @return true if it is else false
      *
-     * @throws UiObjectNotFoundException
      * @since API Level 16
      */
     @Override
-    public boolean isFocusable() throws UiObjectNotFoundException {
+    public boolean isFocusable() {
         try {
             return this.uiObject.isFocusable();
         } catch (com.android.uiautomator.core.UiObjectNotFoundException ex) {
-            throw new UiObjectNotFoundException(ex);
+            this.setUiObjectNotFoundException(ex);
         }
+        return false;
     }
 
     /**
@@ -616,16 +634,16 @@ public class UiObjectStub implements IUiObject {
      *
      * @return true if it is else false
      *
-     * @throws UiObjectNotFoundException
      * @since API Level 16
      */
     @Override
-    public boolean isScrollable() throws UiObjectNotFoundException {
+    public boolean isScrollable() {
         try {
             return this.uiObject.isScrollable();
         } catch (com.android.uiautomator.core.UiObjectNotFoundException ex) {
-            throw new UiObjectNotFoundException(ex);
+            this.setUiObjectNotFoundException(ex);
         }
+        return false;
     }
 
     /**
@@ -633,16 +651,16 @@ public class UiObjectStub implements IUiObject {
      *
      * @return true if it is else false
      *
-     * @throws UiObjectNotFoundException
      * @since API Level 16
      */
     @Override
-    public boolean isLongClickable() throws UiObjectNotFoundException {
+    public boolean isLongClickable() {
         try {
             return this.uiObject.isLongClickable();
         } catch (com.android.uiautomator.core.UiObjectNotFoundException ex) {
-            throw new UiObjectNotFoundException(ex);
+            this.setUiObjectNotFoundException(ex);
         }
+        return false;
     }
 
     /**
@@ -650,16 +668,16 @@ public class UiObjectStub implements IUiObject {
      *
      * @return true if it is else false
      *
-     * @throws UiObjectNotFoundException
      * @since API Level 16
      */
     @Override
-    public String getPackageName() throws UiObjectNotFoundException {
+    public String getPackageName() {
         try {
             return this.uiObject.getPackageName();
         } catch (com.android.uiautomator.core.UiObjectNotFoundException ex) {
-            throw new UiObjectNotFoundException(ex);
+            this.setUiObjectNotFoundException(ex);
         }
+        return null;
     }
 
     /**
@@ -670,18 +688,18 @@ public class UiObjectStub implements IUiObject {
      *
      * @return Rect
      *
-     * @throws UiObjectNotFoundException
      * @see {@link #getBounds()}
      * @since API Level 17
      */
     @Override
-    public Rect getVisibleBounds() throws UiObjectNotFoundException {
+    public Rect getVisibleBounds() {
         try {
             android.graphics.Rect rect = this.uiObject.getVisibleBounds();
             return new Rect(rect.left, rect.top, rect.right, rect.bottom);
         } catch (com.android.uiautomator.core.UiObjectNotFoundException ex) {
-            throw new UiObjectNotFoundException(ex);
+            this.setUiObjectNotFoundException(ex);
         }
+        return null;
     }
 
     /**
@@ -689,17 +707,17 @@ public class UiObjectStub implements IUiObject {
      *
      * @return Rect
      *
-     * @throws UiObjectNotFoundException
      * @since API Level 16
      */
     @Override
-    public Rect getBounds() throws UiObjectNotFoundException {
+    public Rect getBounds() {
         try {
             android.graphics.Rect rect = this.uiObject.getBounds();
             return new Rect(rect.left, rect.top, rect.right, rect.bottom);
         } catch (com.android.uiautomator.core.UiObjectNotFoundException ex) {
-            throw new UiObjectNotFoundException(ex);
+            this.setUiObjectNotFoundException(ex);
         }
+        return null;
     }
 
     /**
@@ -774,16 +792,16 @@ public class UiObjectStub implements IUiObject {
      * @return <code>true</code> if all touch events for this gesture are injected successfully,
      *         <code>false</code> otherwise
      *
-     * @throws UiObjectNotFoundException
      * @since API Level 18
      */
     @Override
-    public boolean pinchOut(int percent, int steps) throws UiObjectNotFoundException {
+    public boolean pinchOut(int percent, int steps) {
         try {
             return this.uiObject.pinchOut(percent, steps);
         } catch (com.android.uiautomator.core.UiObjectNotFoundException ex) {
-            throw new UiObjectNotFoundException(ex);
+            this.setUiObjectNotFoundException(ex);
         }
+        return false;
     }
 
     /**
@@ -797,16 +815,16 @@ public class UiObjectStub implements IUiObject {
      * @return <code>true</code> if all touch events for this gesture are injected successfully,
      *         <code>false</code> otherwise
      *
-     * @throws UiObjectNotFoundException
      * @since API Level 18
      */
     @Override
-    public boolean pinchIn(int percent, int steps) throws UiObjectNotFoundException {
+    public boolean pinchIn(int percent, int steps) {
         try {
             return this.uiObject.pinchIn(percent, steps);
         } catch (com.android.uiautomator.core.UiObjectNotFoundException ex) {
-            throw new UiObjectNotFoundException(ex);
+            this.setUiObjectNotFoundException(ex);
         }
+        return false;
     }
 
     /**
@@ -968,7 +986,10 @@ public class UiObjectStub implements IUiObject {
         if (selector.get(UiSelector.SELECTOR_START_TEXT) != null) {
             s = s.textStartsWith((String) selector.get(UiSelector.SELECTOR_START_TEXT));
         }
-//        System.out.println(s);
         return s;
+    }
+
+    private void setUiObjectNotFoundException(com.android.uiautomator.core.UiObjectNotFoundException ex) {
+        this.uiObjectNotFoundException = new UiObjectNotFoundException(ex);
     }
 }

@@ -3,6 +3,7 @@ package com.tascape.qa.th.comm;
 import com.android.uiautomator.stub.IUiDevice;
 import com.android.uiautomator.stub.IUiObject;
 import com.android.uiautomator.stub.Point;
+import com.android.uiautomator.stub.Rect;
 import com.android.uiautomator.stub.UiSelector;
 import java.io.IOException;
 import org.slf4j.Logger;
@@ -47,17 +48,24 @@ public class UiAuotmatorRmiDemoTests {
 
     public void testDemo2() throws Exception {
         while (true) {
+            for (String app : new String[]{"Apps", "Shop", "Books", "Music", "Games"}) {
+                uiDeviceStub.pressHome();
+                uiDeviceStub.waitForIdle();
+                LOG.debug(app);
+                uiObjectStub.useSelector(new UiSelector().text(app));
+                Rect rect = uiObjectStub.getBounds();
+                LOG.debug("{}", rect);
+                uiObjectStub.click();
+            }
+
             uiDeviceStub.pressHome();
             uiDeviceStub.waitForIdle();
-            uiDeviceStub.pressMenu();
-            uiDeviceStub.pressHome();
-            uiDeviceStub.waitForIdle();
-            uiDeviceStub.pressRecentApps();
-            uiDeviceStub.pressHome();
-            uiDeviceStub.waitForIdle();
-            UiSelector selector = new UiSelector().text("Apps");
-            uiObjectStub.useSelector(selector);
+            LOG.debug("Book");
+            uiObjectStub.useSelector(new UiSelector().text("Book"));
             uiObjectStub.click();
+            LOG.debug("hasUiObjectNotFoundException = {}", uiObjectStub.hasUiObjectNotFoundException());
+            LOG.debug("Exception!", uiObjectStub.getUiObjectNotFoundException());
+            LOG.debug("hasUiObjectNotFoundException = {}", uiObjectStub.hasUiObjectNotFoundException());
         }
     }
 

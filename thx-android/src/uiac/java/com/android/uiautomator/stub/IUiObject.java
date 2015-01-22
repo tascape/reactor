@@ -1,5 +1,7 @@
 package com.android.uiautomator.stub;
 
+import com.android.uiautomator.core.UiObject;
+import com.android.uiautomator.core.UiScrollable;
 import java.io.Serializable;
 
 /**
@@ -26,21 +28,19 @@ public interface IUiObject extends Serializable {
      * if the text contains separators such as spaces, slashes, at symbol etc.
      * Also, not all editable fields support the long-press functionality.
      *
-     * @throws UiObjectNotFoundException
      * @since API Level 16
      */
-    void clearTextField() throws UiObjectNotFoundException;
+    void clearTextField();
 
     /**
      * Performs a click at the center of the visible bounds of the UI element represented
      * by this UiObject.
      *
-     * @return true id successful else false
+     * @return true if successful else false
      *
-     * @throws UiObjectNotFoundException
      * @since API Level 16
      */
-    boolean click() throws UiObjectNotFoundException;
+    boolean click();
 
     /**
      * Waits for window transitions that would typically take longer than the
@@ -49,10 +49,9 @@ public interface IUiObject extends Serializable {
      *
      * @return true if the event was triggered, else false
      *
-     * @throws UiObjectNotFoundException
      * @since API Level 16
      */
-    boolean clickAndWaitForNewWindow() throws UiObjectNotFoundException;
+    boolean clickAndWaitForNewWindow();
 
     /**
      * Performs a click at the center of the visible bounds of the UI element represented
@@ -68,30 +67,27 @@ public interface IUiObject extends Serializable {
      *
      * @return true if the event was triggered, else false
      *
-     * @throws UiObjectNotFoundException
      * @since API Level 16
      */
-    boolean clickAndWaitForNewWindow(long timeout) throws UiObjectNotFoundException;
+    boolean clickAndWaitForNewWindow(long timeout);
 
     /**
      * Clicks the bottom and right corner of the UI element
      *
      * @return true on success
      *
-     * @throws UiObjectNotFoundException
      * @since API Level 16
      */
-    boolean clickBottomRight() throws UiObjectNotFoundException;
+    boolean clickBottomRight();
 
     /**
      * Clicks the top and left corner of the UI element
      *
      * @return true on success
      *
-     * @throws UiObjectNotFoundException
      * @since API Level 16
      */
-    boolean clickTopLeft() throws UiObjectNotFoundException;
+    boolean clickTopLeft();
 
     /**
      * Drags this object to a destination UiObject.
@@ -107,7 +103,7 @@ public interface IUiObject extends Serializable {
      * @throws UiObjectNotFoundException
      * @since API Level 18
      */
-//    boolean dragTo(UiObject destObj, int steps) throws UiObjectNotFoundException;
+//    boolean dragTo(UiObject destObj, int steps);
     /**
      * Drags this object to arbitrary coordinates.
      * The number of steps specified in your input parameter can influence the
@@ -120,10 +116,9 @@ public interface IUiObject extends Serializable {
      *
      * @return true if successful
      *
-     * @throws UiObjectNotFoundException
      * @since API Level 18
      */
-    boolean dragTo(int destX, int destY, int steps) throws UiObjectNotFoundException;
+    boolean dragTo(int destX, int destY, int steps);
 
     /**
      * Check if view exists.
@@ -144,10 +139,9 @@ public interface IUiObject extends Serializable {
      *
      * @return Rect
      *
-     * @throws UiObjectNotFoundException
      * @since API Level 16
      */
-    Rect getBounds() throws UiObjectNotFoundException;
+    Rect getBounds();
 
     /**
      * Creates a new UiObject for a child view that is under the present UiObject.
@@ -158,36 +152,33 @@ public interface IUiObject extends Serializable {
      *
      * @since API Level 16
      */
-//    UiObject getChild(UiSelector selector) throws UiObjectNotFoundException;
+//    UiObject getChild(UiSelector selector);
     /**
      * Counts the child views immediately under the present UiObject.
      *
      * @return the count of child views.
      *
-     * @throws UiObjectNotFoundException
      * @since API Level 16
      */
-    int getChildCount() throws UiObjectNotFoundException;
+    int getChildCount();
 
     /**
      * Retrieves the <code>className</code> property of the UI element.
      *
      * @return class name of the current node represented by this UiObject
      *
-     * @throws UiObjectNotFoundException if no match was found
      * @since API Level 18
      */
-    String getClassName() throws UiObjectNotFoundException;
+    String getClassName();
 
     /**
      * Reads the <code>content_desc</code> property of the UI element
      *
      * @return value of node attribute "content_desc"
      *
-     * @throws UiObjectNotFoundException
      * @since API Level 16
      */
-    String getContentDescription() throws UiObjectNotFoundException;
+    String getContentDescription();
 
     /**
      * Creates a new UiObject for a sibling view or a child of the sibling view,
@@ -200,26 +191,24 @@ public interface IUiObject extends Serializable {
      * @throws UiObjectNotFoundException
      * @since API Level 16
      */
-//    UiObject getFromParent(UiSelector selector) throws UiObjectNotFoundException;
+//    UiObject getFromParent(UiSelector selector);
     /**
      * Reads the view's <code>package</code> property
      *
      * @return true if it is else false
      *
-     * @throws UiObjectNotFoundException
      * @since API Level 16
      */
-    String getPackageName() throws UiObjectNotFoundException;
+    String getPackageName();
 
     /**
      * Reads the <code>text</code> property of the UI element
      *
      * @return text value of the current node represented by this UiObject
      *
-     * @throws UiObjectNotFoundException if no match could be found
      * @since API Level 16
      */
-    String getText() throws UiObjectNotFoundException;
+    String getText();
 
     /**
      * Returns the visible bounds of the view.
@@ -229,132 +218,118 @@ public interface IUiObject extends Serializable {
      *
      * @return Rect
      *
-     * @throws UiObjectNotFoundException
      * @see {@link #getBounds()}
      * @since API Level 17
      */
-    Rect getVisibleBounds() throws UiObjectNotFoundException;
+    Rect getVisibleBounds();
 
     /**
      * Checks if the UI element's <code>checkable</code> property is currently true.
      *
      * @return true if it is else false
      *
-     * @throws UiObjectNotFoundException
      * @since API Level 16
      */
-    boolean isCheckable() throws UiObjectNotFoundException;
+    boolean isCheckable();
 
     /**
      * Check if the UI element's <code>checked</code> property is currently true
      *
      * @return true if it is else false
      *
-     * @throws com.android.uiautomator.core.UiObjectNotFoundException
-     *
      * @since API Level 16
      */
-    boolean isChecked() throws UiObjectNotFoundException;
+    boolean isChecked();
 
     /**
      * Checks if the UI element's <code>clickable</code> property is currently true.
      *
      * @return true if it is else false
      *
-     * @throws UiObjectNotFoundException
      * @since API Level 16
      */
-    boolean isClickable() throws UiObjectNotFoundException;
+    boolean isClickable();
 
     /**
      * Checks if the UI element's <code>enabled</code> property is currently true.
      *
      * @return true if it is else false
      *
-     * @throws UiObjectNotFoundException
      * @since API Level 16
      */
-    boolean isEnabled() throws UiObjectNotFoundException;
+    boolean isEnabled();
 
     /**
      * Check if the UI element's <code>focusable</code> property is currently true.
      *
      * @return true if it is else false
      *
-     * @throws UiObjectNotFoundException
      * @since API Level 16
      */
-    boolean isFocusable() throws UiObjectNotFoundException;
+    boolean isFocusable();
 
     /**
      * Check if the UI element's <code>focused</code> property is currently true
      *
      * @return true if it is else false
      *
-     * @throws UiObjectNotFoundException
      * @since API Level 16
      */
-    boolean isFocused() throws UiObjectNotFoundException;
+    boolean isFocused();
 
     /**
      * Check if the view's <code>long-clickable</code> property is currently true
      *
      * @return true if it is else false
      *
-     * @throws UiObjectNotFoundException
      * @since API Level 16
      */
-    boolean isLongClickable() throws UiObjectNotFoundException;
+    boolean isLongClickable();
 
     /**
      * Check if the view's <code>scrollable</code> property is currently true
      *
      * @return true if it is else false
      *
-     * @throws UiObjectNotFoundException
      * @since API Level 16
      */
-    boolean isScrollable() throws UiObjectNotFoundException;
+    boolean isScrollable();
 
     /**
      * Checks if the UI element's <code>selected</code> property is currently true.
      *
      * @return true if it is else false
      *
-     * @throws UiObjectNotFoundException
      * @since API Level 16
      */
-    boolean isSelected() throws UiObjectNotFoundException;
+    boolean isSelected();
 
     /**
      * Long clicks the center of the visible bounds of the UI element
      *
      * @return true if operation was successful
      *
-     * @throws UiObjectNotFoundException
      * @since API Level 16
      */
-    boolean longClick() throws UiObjectNotFoundException;
+    boolean longClick();
 
     /**
      * Long clicks bottom and right corner of the UI element
      *
      * @return true if operation was successful
      *
-     * @throws UiObjectNotFoundException
      * @since API Level 16
      */
-    boolean longClickBottomRight() throws UiObjectNotFoundException;
+    boolean longClickBottomRight();
 
     /**
      * Long clicks on the top and left corner of the UI element
      *
      * @return true if operation was successful
      *
-     * @throws UiObjectNotFoundException
      * @since API Level 16
      */
-    boolean longClickTopLeft() throws UiObjectNotFoundException;
+    boolean longClickTopLeft();
 
     /**
      * Performs a multi-touch gesture. You must specify touch coordinates for
@@ -411,10 +386,9 @@ public interface IUiObject extends Serializable {
      * @return <code>true</code> if all touch events for this gesture are injected successfully,
      *         <code>false</code> otherwise
      *
-     * @throws UiObjectNotFoundException
      * @since API Level 18
      */
-    boolean pinchIn(int percent, int steps) throws UiObjectNotFoundException;
+    boolean pinchIn(int percent, int steps);
 
     /**
      * Performs a two-pointer gesture, where each pointer moves diagonally
@@ -428,10 +402,9 @@ public interface IUiObject extends Serializable {
      * @return <code>true</code> if all touch events for this gesture are injected successfully,
      *         <code>false</code> otherwise
      *
-     * @throws UiObjectNotFoundException
      * @since API Level 18
      */
-    boolean pinchOut(int percent, int steps) throws UiObjectNotFoundException;
+    boolean pinchOut(int percent, int steps);
 
     /**
      * Sets the text in an editable field, after clearing the field's content.
@@ -449,10 +422,9 @@ public interface IUiObject extends Serializable {
      *
      * @return true if operation is successful
      *
-     * @throws UiObjectNotFoundException
      * @since API Level 16
      */
-    boolean setText(String text) throws UiObjectNotFoundException;
+    boolean setText(String text);
 
     /**
      * Performs the swipe down action on the UiObject.
@@ -471,10 +443,9 @@ public interface IUiObject extends Serializable {
      *
      * @return true if successful
      *
-     * @throws UiObjectNotFoundException
      * @since API Level 16
      */
-    boolean swipeDown(int steps) throws UiObjectNotFoundException;
+    boolean swipeDown(int steps);
 
     /**
      * Performs the swipe left action on the UiObject.
@@ -493,10 +464,9 @@ public interface IUiObject extends Serializable {
      *
      * @return true if successful
      *
-     * @throws UiObjectNotFoundException
      * @since API Level 16
      */
-    boolean swipeLeft(int steps) throws UiObjectNotFoundException;
+    boolean swipeLeft(int steps);
 
     /**
      * Performs the swipe right action on the UiObject.
@@ -515,10 +485,9 @@ public interface IUiObject extends Serializable {
      *
      * @return true if successful
      *
-     * @throws UiObjectNotFoundException
      * @since API Level 16
      */
-    boolean swipeRight(int steps) throws UiObjectNotFoundException;
+    boolean swipeRight(int steps);
 
     /**
      * Performs the swipe up action on the UiObject.
@@ -535,10 +504,9 @@ public interface IUiObject extends Serializable {
      *
      * @return true of successful
      *
-     * @throws UiObjectNotFoundException
      * @since API Level 16
      */
-    boolean swipeUp(int steps) throws UiObjectNotFoundException;
+    boolean swipeUp(int steps);
 
     /**
      * Waits a specified length of time for a view to become visible.
@@ -576,4 +544,23 @@ public interface IUiObject extends Serializable {
      * @since API Level 16
      */
     boolean waitUntilGone(long timeout);
+
+    /**
+     * Clears the existing UiObjectNotFoundException (set to null).
+     */
+    void clearUiObjectNotFoundException();
+
+    /**
+     * Gets and clears the existing UiObjectNotFoundException.
+     *
+     * @return
+     */
+    UiObjectNotFoundException getUiObjectNotFoundException();
+
+    /**
+     * Checks if there is existing UiObjectNotFoundException (not null).
+     *
+     * @return
+     */
+    boolean hasUiObjectNotFoundException();
 }

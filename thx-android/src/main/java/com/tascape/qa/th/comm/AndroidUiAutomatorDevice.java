@@ -136,7 +136,12 @@ public class AndroidUiAutomatorDevice {
 
         @Override
         public void setProcessErrorStream(InputStream in) throws IOException {
-            LOG.debug("setProcessErrorStream");
+            BufferedReader bis = new BufferedReader(new InputStreamReader(in));
+            String line = "";
+            while (line != null) {
+                line = bis.readLine();
+                LOG.debug("ERROR: {}", line);
+            }
         }
 
         @Override
