@@ -13,7 +13,7 @@ import net.sf.lipermi.exception.LipeRMIException;
  */
 public class UiDeviceStub implements IUiDevice {
 
-    private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 389088542361L;
 
     private final UiDevice uiDevice = UiDevice.getInstance();
 
@@ -302,5 +302,86 @@ public class UiDeviceStub implements IUiDevice {
         } catch (RemoteException ex) {
             throw new LipeRMIException(ex);
         }
+    }
+
+    public static com.android.uiautomator.core.UiSelector convert(UiSelector selector) {
+        com.android.uiautomator.core.UiSelector s = new com.android.uiautomator.core.UiSelector();
+        if (selector.get(UiSelector.SELECTOR_CHECKABLE) != null) {
+            s = s.checkable((boolean) selector.get(UiSelector.SELECTOR_CHECKABLE));
+        }
+        if (selector.get(UiSelector.SELECTOR_CHECKED) != null) {
+            s = s.checked((boolean) selector.get(UiSelector.SELECTOR_CHECKED));
+        }
+        if (selector.get(UiSelector.SELECTOR_CLASS) != null) {
+            s = s.className((String) selector.get(UiSelector.SELECTOR_CLASS));
+        }
+        if (selector.get(UiSelector.SELECTOR_CLASS_REGEX) != null) {
+            s = s.classNameMatches((String) selector.get(UiSelector.SELECTOR_CLASS_REGEX));
+        }
+
+        if (selector.get(UiSelector.SELECTOR_CLICKABLE) != null) {
+            s = s.clickable((boolean) selector.get(UiSelector.SELECTOR_CLICKABLE));
+        }
+        if (selector.get(UiSelector.SELECTOR_DESCRIPTION) != null) {
+            s = s.description((String) selector.get(UiSelector.SELECTOR_DESCRIPTION));
+        }
+        if (selector.get(UiSelector.SELECTOR_CONTAINS_TEXT) != null) {
+            s = s.descriptionContains((String) selector.get(UiSelector.SELECTOR_CONTAINS_TEXT));
+        }
+        if (selector.get(UiSelector.SELECTOR_DESCRIPTION_REGEX) != null) {
+            s = s.descriptionMatches((String) selector.get(UiSelector.SELECTOR_DESCRIPTION_REGEX));
+        }
+        if (selector.get(UiSelector.SELECTOR_START_TEXT) != null) {
+            s = s.descriptionStartsWith((String) selector.get(UiSelector.SELECTOR_START_TEXT));
+        }
+        if (selector.get(UiSelector.SELECTOR_ENABLED) != null) {
+            s = s.enabled((boolean) selector.get(UiSelector.SELECTOR_ENABLED));
+        }
+        if (selector.get(UiSelector.SELECTOR_FOCUSABLE) != null) {
+            s = s.focusable((boolean) selector.get(UiSelector.SELECTOR_FOCUSABLE));
+        }
+        if (selector.get(UiSelector.SELECTOR_FOCUSED) != null) {
+            s = s.focused((boolean) selector.get(UiSelector.SELECTOR_FOCUSED));
+        }
+        if (selector.get(UiSelector.SELECTOR_INDEX) != null) {
+            s = s.index((int) selector.get(UiSelector.SELECTOR_INDEX));
+        }
+        if (selector.get(UiSelector.SELECTOR_INSTANCE) != null) {
+            s = s.instance((int) selector.get(UiSelector.SELECTOR_INSTANCE));
+        }
+        if (selector.get(UiSelector.SELECTOR_LONG_CLICKABLE) != null) {
+            s = s.longClickable((boolean) selector.get(UiSelector.SELECTOR_LONG_CLICKABLE));
+        }
+        if (selector.get(UiSelector.SELECTOR_PACKAGE_NAME) != null) {
+            s = s.packageName((String) selector.get(UiSelector.SELECTOR_PACKAGE_NAME));
+        }
+        if (selector.get(UiSelector.SELECTOR_PACKAGE_NAME_REGEX) != null) {
+            s = s.packageNameMatches((String) selector.get(UiSelector.SELECTOR_PACKAGE_NAME_REGEX));
+        }
+        if (selector.get(UiSelector.SELECTOR_RESOURCE_ID) != null) {
+            s = s.resourceId((String) selector.get(UiSelector.SELECTOR_RESOURCE_ID));
+        }
+        if (selector.get(UiSelector.SELECTOR_RESOURCE_ID_REGEX) != null) {
+            s = s.resourceIdMatches((String) selector.get(UiSelector.SELECTOR_RESOURCE_ID_REGEX));
+        }
+        if (selector.get(UiSelector.SELECTOR_SCROLLABLE) != null) {
+            s = s.scrollable((boolean) selector.get(UiSelector.SELECTOR_SCROLLABLE));
+        }
+        if (selector.get(UiSelector.SELECTOR_SELECTED) != null) {
+            s = s.selected((boolean) selector.get(UiSelector.SELECTOR_SELECTED));
+        }
+        if (selector.get(UiSelector.SELECTOR_TEXT) != null) {
+            s = s.text((String) selector.get(UiSelector.SELECTOR_TEXT));
+        }
+        if (selector.get(UiSelector.SELECTOR_CONTAINS_TEXT) != null) {
+            s = s.textContains((String) selector.get(UiSelector.SELECTOR_CONTAINS_TEXT));
+        }
+        if (selector.get(UiSelector.SELECTOR_TEXT_REGEX) != null) {
+            s = s.textMatches((String) selector.get(UiSelector.SELECTOR_TEXT_REGEX));
+        }
+        if (selector.get(UiSelector.SELECTOR_START_TEXT) != null) {
+            s = s.textStartsWith((String) selector.get(UiSelector.SELECTOR_START_TEXT));
+        }
+        return s;
     }
 }

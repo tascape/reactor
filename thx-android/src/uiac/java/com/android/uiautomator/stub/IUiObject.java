@@ -10,7 +10,26 @@ import java.io.Serializable;
  */
 public interface IUiObject extends Serializable {
 
-    void useSelector(UiSelector selector);
+    /**
+     * Clears the existing UiObjectNotFoundException (set to null).
+     */
+    void clearUiObjectNotFoundException();
+
+    /**
+     * Gets and clears the existing UiObjectNotFoundException.
+     *
+     * @return
+     */
+    UiObjectNotFoundException getUiObjectNotFoundException();
+
+    /**
+     * Checks if there is existing UiObjectNotFoundException (not null).
+     *
+     * @return
+     */
+    boolean hasUiObjectNotFoundException();
+
+    void useUiObjectSelector(UiSelector selector);
 
     /**
      * Clears the existing text contents in an editable field.
@@ -90,7 +109,7 @@ public interface IUiObject extends Serializable {
     boolean clickTopLeft();
 
     /**
-     * Drags this object to a destination UiObject.
+     * Drags this object to a destination UiObject. (not supported yet)
      * The number of steps specified in your input parameter can influence the
      * drag speed, and varying speeds may impact the results. Consider
      * evaluating different speeds when using this method in your tests.
@@ -100,10 +119,10 @@ public interface IUiObject extends Serializable {
      *
      * @return true if successful
      *
-     * @throws UiObjectNotFoundException
      * @since API Level 18
      */
-//    boolean dragTo(UiObject destObj, int steps);
+    boolean dragTo(IUiObject destObj, int steps);
+
     /**
      * Drags this object to arbitrary coordinates.
      * The number of steps specified in your input parameter can influence the
@@ -148,11 +167,12 @@ public interface IUiObject extends Serializable {
      *
      * @param selector for child view to match
      *
-     * @return a new UiObject representing the child view
+     * @return
      *
      * @since API Level 16
      */
-//    UiObject getChild(UiSelector selector);
+    boolean selectChild(UiSelector selector);
+
     /**
      * Counts the child views immediately under the present UiObject.
      *
@@ -185,13 +205,12 @@ public interface IUiObject extends Serializable {
      * relative to the present UiObject.
      *
      * @param selector for a sibling view or children of the sibling view
+     * @return 
      *
-     * @return a new UiObject representing the matched view
-     *
-     * @throws UiObjectNotFoundException
      * @since API Level 16
      */
-//    UiObject getFromParent(UiSelector selector);
+    boolean selectFromParent(UiSelector selector);
+
     /**
      * Reads the view's <code>package</code> property
      *
@@ -545,22 +564,4 @@ public interface IUiObject extends Serializable {
      */
     boolean waitUntilGone(long timeout);
 
-    /**
-     * Clears the existing UiObjectNotFoundException (set to null).
-     */
-    void clearUiObjectNotFoundException();
-
-    /**
-     * Gets and clears the existing UiObjectNotFoundException.
-     *
-     * @return
-     */
-    UiObjectNotFoundException getUiObjectNotFoundException();
-
-    /**
-     * Checks if there is existing UiObjectNotFoundException (not null).
-     *
-     * @return
-     */
-    boolean hasUiObjectNotFoundException();
 }

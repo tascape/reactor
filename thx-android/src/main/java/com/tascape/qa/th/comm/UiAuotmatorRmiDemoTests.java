@@ -50,18 +50,21 @@ public class UiAuotmatorRmiDemoTests {
         while (true) {
             for (String app : new String[]{"Apps", "Shop", "Books", "Music", "Games"}) {
                 uiDeviceStub.pressHome();
-                uiDeviceStub.waitForIdle();
                 LOG.debug(app);
-                uiObjectStub.useSelector(new UiSelector().text(app));
+                uiObjectStub.useUiObjectSelector(new UiSelector().text(app));
                 Rect rect = uiObjectStub.getBounds();
                 LOG.debug("{}", rect);
+                uiObjectStub.swipeLeft(10);
+                uiObjectStub.swipeRight(10);
                 uiObjectStub.click();
+                uiDeviceStub.waitForIdle();
+                Thread.sleep(5000);
             }
 
             uiDeviceStub.pressHome();
             uiDeviceStub.waitForIdle();
             LOG.debug("Book");
-            uiObjectStub.useSelector(new UiSelector().text("Book"));
+            uiObjectStub.useUiObjectSelector(new UiSelector().text("Book"));
             uiObjectStub.click();
             LOG.debug("hasUiObjectNotFoundException = {}", uiObjectStub.hasUiObjectNotFoundException());
             LOG.debug("Exception!", uiObjectStub.getUiObjectNotFoundException());
