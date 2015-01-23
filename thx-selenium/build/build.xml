@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<project name="th-selenium" default="deploy" basedir="..">
+    <description>Build the project of testharness selenium extention </description>
+    
+    <property name="src.dir" location="src/main/java"/>
+    <property name="bin.dir" location="bin"/>
+    <property name="lib.dir" location="lib/jars"/>
+    <property name="deploy.dir"  location="deploy"/>
+   
+    <target name="compile">
+        <mkdir dir="${bin.dir}" />
+        <mkdir dir="${bin.dir}/classes" />
+        <javac includeantruntime="false" debug="true" destdir="${bin.dir}/classes" encoding="UTF-8">
+            <compilerarg value="-Xlint"/>
+            <src path="${src.dir}" />
+            <classpath>
+                <fileset dir="${basedir}/../th/deploy" includes="*.jar" />
+                <fileset dir="${lib.dir}" includes="**/*.jar" />
+                <fileset dir="${basedir}/../th/lib/jars" includes="**/*.jar" />
+            </classpath>
+        </javac>
+    </target>
+
+    <target name="jar" depends="compile">
+        <jar destfile="${deploy.dir}/thx-selenium.jar">
+            <fileset dir="${bin.dir}/classes" />
+        </jar>
+    </target>
+
+    <target name="deploy" depends="jar">
+    </target>
+    
+    <target name="clean">
+        <delete dir="${deploy.dir}" />
+        <delete dir="${bin.dir}/classes" />
+        <delete dir="${bin.dir}" />
+    </target>
+</project>
