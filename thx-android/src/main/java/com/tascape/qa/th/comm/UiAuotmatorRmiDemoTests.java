@@ -1,7 +1,9 @@
 package com.tascape.qa.th.comm;
 
+import com.android.uiautomator.stub.IUiCollection;
 import com.android.uiautomator.stub.IUiDevice;
 import com.android.uiautomator.stub.IUiObject;
+import com.android.uiautomator.stub.IUiScrollable;
 import com.android.uiautomator.stub.Point;
 import com.android.uiautomator.stub.Rect;
 import com.android.uiautomator.stub.UiSelector;
@@ -20,7 +22,7 @@ public class UiAuotmatorRmiDemoTests {
 
     static {
         try {
-            uiad = new AndroidUiAutomatorDevice(8998);
+            uiad = new AndroidUiAutomatorDevice(IUiDevice.RMI_PORT);
         } catch (IOException | InterruptedException ex) {
             throw new RuntimeException(ex);
         }
@@ -29,6 +31,10 @@ public class UiAuotmatorRmiDemoTests {
     private final IUiDevice uiDeviceStub = uiad.getUiDeviceStub();
 
     private final IUiObject uiObjectStub = uiad.getUiObjectStub();
+
+    private final IUiCollection uiCollection = uiad.getUiCollectionStub();
+
+    private final IUiScrollable uiScrollable = uiad.getUiScrollableStub();
 
     public void testDemo1() throws Exception {
         uiDeviceStub.pressHome();
@@ -47,34 +53,36 @@ public class UiAuotmatorRmiDemoTests {
     }
 
     public void testDemo2() throws Exception {
-        while (true) {
-            for (String app : new String[]{"Apps", "Shop", "Books", "Music", "Games"}) {
-                uiDeviceStub.pressHome();
-                LOG.debug(app);
-                uiObjectStub.useUiObjectSelector(new UiSelector().text(app));
-                Rect rect = uiObjectStub.getBounds();
-                LOG.debug("{}", rect);
-                uiObjectStub.swipeLeft(10);
-                uiObjectStub.swipeRight(10);
-                uiObjectStub.click();
-                uiDeviceStub.waitForIdle();
-                Thread.sleep(5000);
-            }
-
+        for (String app : new String[]{"Apps", "Shop", "Books", "Music", "Games"}) {
             uiDeviceStub.pressHome();
-            uiDeviceStub.waitForIdle();
-            LOG.debug("Book");
-            uiObjectStub.useUiObjectSelector(new UiSelector().text("Book"));
+            LOG.debug(app);
+            uiObjectStub.useUiObjectSelector(new UiSelector().text(app));
+            Rect rect = uiObjectStub.getBounds();
+            LOG.debug("{}", rect);
+            uiObjectStub.swipeLeft(10);
+            uiObjectStub.swipeRight(10);
             uiObjectStub.click();
-            LOG.debug("hasUiObjectNotFoundException = {}", uiObjectStub.hasUiObjectNotFoundException());
-            LOG.debug("Exception!", uiObjectStub.getUiObjectNotFoundException());
-            LOG.debug("hasUiObjectNotFoundException = {}", uiObjectStub.hasUiObjectNotFoundException());
+            uiDeviceStub.waitForIdle();
+            Thread.sleep(5000);
         }
+
+        uiDeviceStub.pressHome();
+        uiDeviceStub.waitForIdle();
+        LOG.debug("Book");
+        uiObjectStub.useUiObjectSelector(new UiSelector().text("Book"));
+        uiObjectStub.click();
+        LOG.debug("hasUiObjectNotFoundException = {}", uiObjectStub.hasUiObjectNotFoundException());
+        LOG.debug("Exception!", uiObjectStub.getUiObjectNotFoundException());
+        LOG.debug("hasUiObjectNotFoundException = {}", uiObjectStub.hasUiObjectNotFoundException());
+    }
+
+    public void testDemo3() throws Exception {
     }
 
     public static void main(String[] args) throws Exception {
         UiAuotmatorRmiDemoTests t = new UiAuotmatorRmiDemoTests();
         t.testDemo1();
         t.testDemo2();
+        t.testDemo3();
     }
 }

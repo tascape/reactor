@@ -1,7 +1,9 @@
 package com.tascape.qa.th.comm;
 
+import com.android.uiautomator.stub.IUiCollection;
 import com.android.uiautomator.stub.IUiDevice;
 import com.android.uiautomator.stub.IUiObject;
+import com.android.uiautomator.stub.IUiScrollable;
 import com.tascape.qa.th.SystemConfiguration;
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -34,9 +36,9 @@ public class AndroidUiAutomatorDevice {
 
     static {
         LOG.debug("Please specify where adb executable is by setting system property {}={}",
-                SYSPROP_ADB_EXECUTABLE, "/path/to/your/sdk/platform-tools/adb");
+            SYSPROP_ADB_EXECUTABLE, "/path/to/your/sdk/platform-tools/adb");
         LOG.debug("Please specify where uiautomator RMI server jar is by setting system property {}={}",
-                SYSPROP_UIAUTOMATOR_RMI_SERVER, "/path/to/your/" + UIAUTOMATOR_RMI_SERVER);
+            SYSPROP_UIAUTOMATOR_RMI_SERVER, "/path/to/your/" + UIAUTOMATOR_RMI_SERVER);
     }
 
     private final String serial;
@@ -49,10 +51,14 @@ public class AndroidUiAutomatorDevice {
 
     private final IUiObject uiObjectStub;
 
+    private final IUiCollection uiCollectionStub;
+
+    private final IUiScrollable uiScrollableStub;
+
     private final String adb = SystemConfiguration.getInstance().getProperty(SYSPROP_ADB_EXECUTABLE, "adb");
 
     private final String uiRmiServer = SystemConfiguration.getInstance().getProperty(SYSPROP_UIAUTOMATOR_RMI_SERVER,
-            UIAUTOMATOR_RMI_SERVER);
+        UIAUTOMATOR_RMI_SERVER);
 
     public AndroidUiAutomatorDevice(int port) throws IOException, InterruptedException {
         this("", "", port);
@@ -73,6 +79,9 @@ public class AndroidUiAutomatorDevice {
         Client client = new Client(this.ip, this.port, callHandler);
         this.uiDeviceStub = IUiDevice.class.cast(client.getGlobal(IUiDevice.class));
         this.uiObjectStub = IUiObject.class.cast(client.getGlobal(IUiObject.class));
+        this.uiCollectionStub = IUiCollection.class.cast(client.getGlobal(IUiCollection.class));
+        this.uiScrollableStub = IUiScrollable.class.cast(client.getGlobal(IUiScrollable.class));
+
         LOG.debug("Device of serial '{}' is at {}:{}", this.serial, this.ip, this.port);
         LOG.debug("Device product name '{}'", this.uiDeviceStub.getProductName());
     }
@@ -83,6 +92,14 @@ public class AndroidUiAutomatorDevice {
 
     public IUiObject getUiObjectStub() {
         return uiObjectStub;
+    }
+
+    public IUiCollection getUiCollectionStub() {
+        return uiCollectionStub;
+    }
+
+    public IUiScrollable getUiScrollableStub() {
+        return uiScrollableStub;
     }
 
     private void setupUiAutomatorRmiServer() throws IOException, InterruptedException {
@@ -118,7 +135,7 @@ public class AndroidUiAutomatorDevice {
         }
         cmdLine.addArgument("forward");
         cmdLine.addArgument("tcp:" + this.port);
-        cmdLine.addArgument("tcp:8998");
+        cmdLine.addArgument("tcp:" + IUiDevice.RMI_PORT);
         LOG.debug("{}", cmdLine.toString());
 
         Executor executor = new DefaultExecutor();

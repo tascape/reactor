@@ -10,6 +10,8 @@ import net.sf.lipermi.exception.LipeRMIException;
  */
 public interface IUiDevice extends Serializable {
 
+    int RMI_PORT = 8998;
+
     /**
      * Clears the text from the last UI traversal event. See
      * {@link #getLastTraversedText()}.
