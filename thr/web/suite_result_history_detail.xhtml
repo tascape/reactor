@@ -50,7 +50,7 @@
                 <h:outputLink value="#{row.get(srid).get('_url')}" target="_blank">
                     <h:graphicImage library="img" name="pass.png" alt="#{result}" rendered="#{result =='PASS'}" />
                     <h:graphicImage library="img" name="fail.png" alt="#{result}" rendered="#{result =='FAIL'}" />
-                    <h:graphicImage library="img" name="skip.png" alt="#{result}" rendered="#{!(result == 'FAIL' || result == 'PASS')}" />
+                    <h:graphicImage library="img" name="skip.png" alt="#{result}" rendered="#{!(result == 'FAIL' || result == 'PASS' || result == null)}" />
                     #{result}
                 </h:outputLink>
             </p:columns>
