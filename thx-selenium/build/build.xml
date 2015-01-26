@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<project name="th" default="deploy" basedir="..">
-    <description>Build the project of th extentions and examples</description>
+<project name="th-selenium" default="deploy" basedir="..">
+    <description>Build the project of testharness selenium extention </description>
     
     <property name="src.dir" location="src/main/java"/>
     <property name="bin.dir" location="bin"/>
@@ -23,7 +23,7 @@
     </target>
 
     <target name="jar" depends="compile">
-        <jar destfile="${deploy.dir}/thx.jar">
+        <jar destfile="${deploy.dir}/thx-selenium.jar">
             <fileset dir="${bin.dir}/classes" />
         </jar>
     </target>

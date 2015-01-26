@@ -19,12 +19,10 @@ import net.sf.lipermi.net.Server;
 public class UiAutomatorRmiServer extends UiAutomatorTestCase {
     private static final CallHandler callHandler = new CallHandler();
 
-    public static final int RMI_PORT = 8998;
-
     static {
+        Server server = new Server();
         try {
-            Server server = new Server();
-            server.bind(RMI_PORT, callHandler);
+            server.bind(IUiDevice.UIAUTOMATOR_RMI_PORT, callHandler);
 
             callHandler.registerGlobal(IUiDevice.class, new UiDeviceStub());
             callHandler.registerGlobal(IUiObject.class, new UiObjectStub());

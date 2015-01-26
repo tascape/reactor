@@ -22,7 +22,7 @@ public class UiAuotmatorRmiDemoTests {
 
     static {
         try {
-            uiad = new AndroidUiAutomatorDevice(8998);
+            uiad = new AndroidUiAutomatorDevice(IUiDevice.UIAUTOMATOR_RMI_PORT);
         } catch (IOException | InterruptedException ex) {
             throw new RuntimeException(ex);
         }

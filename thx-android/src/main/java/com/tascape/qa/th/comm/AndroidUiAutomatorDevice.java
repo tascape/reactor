@@ -57,8 +57,7 @@ public class AndroidUiAutomatorDevice {
 
     private final IUiScrollable uiScrollableStub;
 
-    private final String adb = SystemConfiguration.getInstance().getProperty(SYSPROP_ADB_EXECUTABLE,
-            "/Users/wlinsong/bin/adb");
+    private final String adb = SystemConfiguration.getInstance().getProperty(SYSPROP_ADB_EXECUTABLE, "adb");
 
     private final String uiRmiServer = SystemConfiguration.getInstance().getProperty(SYSPROP_UIAUTOMATOR_RMI_SERVER,
             UIAUTOMATOR_RMI_SERVER);
@@ -143,7 +142,7 @@ public class AndroidUiAutomatorDevice {
         }
         cmdLine.addArgument("forward");
         cmdLine.addArgument("tcp:" + this.port);
-        cmdLine.addArgument("tcp:8998");
+        cmdLine.addArgument("tcp:" + IUiDevice.UIAUTOMATOR_RMI_PORT);
         LOG.debug("{}", cmdLine.toString());
 
         Executor executor = new DefaultExecutor();
