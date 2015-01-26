@@ -82,6 +82,15 @@ public class CallHandler {
 
     public RemoteReturn delegateCall(RemoteCall remoteCall) throws LipeRMIException, SecurityException,
             NoSuchMethodException, IllegalArgumentException, IllegalAccessException {
+        // linsong - try to call methods in a parent class
+        String remoteInstanceClassName = remoteCall.getRemoteInstance().getClassName();
+        String remoteMethodId = remoteCall.getMethodId().trim();
+        int i = remoteMethodId.indexOf(" ");
+        int j = remoteMethodId.indexOf("(");
+        int k = remoteMethodId.lastIndexOf(".", j);
+        remoteMethodId = remoteMethodId.substring(0, i + 1) + remoteInstanceClassName
+                + remoteMethodId.substring(k);
+
         Object implementator = exportedObjects.get(remoteCall.getRemoteInstance());
         if (implementator == null) {
             throw new LipeRMIException(String.format("Class %s doesn't have implementation", remoteCall
@@ -91,17 +100,34 @@ public class CallHandler {
 
         Method implementationMethod = null;
 
-        for (Method method : implementator.getClass().getMethods()) {
-            String implementationMethodId = method.toString();
-            implementationMethodId = implementationMethodId.replace(implementator.getClass().getName(), remoteCall
-                    .getRemoteInstance().getClassName());
-
-            if (implementationMethodId.endsWith(remoteCall.getMethodId())) {
-                implementationMethod = method;
-                break;
+//        for (Method method : implementator.getClass().getMethods()) {
+//            String implementationMethodId = method.toString();
+//            implementationMethodId = implementationMethodId.replace(implementator.getClass().getName(), remoteCall
+//                    .getRemoteInstance().getClassName());
+//
+//            if (implementationMethodId.endsWith(remoteCall.getMethodId())) {
+//                implementationMethod = method;
+//                break;
+//            }
+//        }
+        Class<?> klass = implementator.getClass();
+        do {
+            boolean found = false;
+            for (Method method : klass.getMethods()) {
+                String implementationMethodId = method.toString();
+                implementationMethodId = implementationMethodId.replace(klass.getName(), remoteInstanceClassName);
+                if (implementationMethodId.endsWith(remoteMethodId)) {
+                    implementationMethod = method;
+                    found = true;
+                    break;
+                }
             }
-        }
-
+            if (found) {
+                break;
+            } else {
+                klass = klass.getSuperclass();
+            }
+        } while (!klass.equals(Object.class));
         if (implementationMethod == null) {
             throw new NoSuchMethodException(remoteCall.getMethodId());
         }
