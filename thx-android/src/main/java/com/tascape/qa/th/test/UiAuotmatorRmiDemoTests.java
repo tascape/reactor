@@ -1,4 +1,4 @@
-package com.tascape.qa.th.comm;
+package com.tascape.qa.th.test;
 
 import com.android.uiautomator.stub.IUiCollection;
 import com.android.uiautomator.stub.IUiDevice;
@@ -7,6 +7,7 @@ import com.android.uiautomator.stub.IUiScrollable;
 import com.android.uiautomator.stub.Point;
 import com.android.uiautomator.stub.Rect;
 import com.android.uiautomator.stub.UiSelector;
+import com.tascape.qa.th.driver.AndroidUiAutomatorDevice;
 import java.io.IOException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -53,22 +54,29 @@ public class UiAuotmatorRmiDemoTests {
     }
 
     public void testUiObject() throws Exception {
+        uiDeviceStub.pressHome();
+        uiDeviceStub.waitForIdle();
+
         for (String app : new String[]{"Apps", "Shop", "Books", "Music", "Games"}) {
-            uiDeviceStub.pressHome();
             LOG.debug(app);
-            uiObjectStub.useUiObjectSelector(new UiSelector().text(app));
-            Rect rect = uiObjectStub.getBounds();
+            this.uiDeviceStub.pressHome();
+            this.uiObjectStub.useUiObjectSelector(
+                    new UiSelector().resourceId("com.amazon.kindle.otter:id/library_selector_layout"));
+            this.uiObjectStub.swipeRight(100);
+            this.uiObjectStub.useUiObjectSelector(new UiSelector().text(app));
+            Rect rect = this.uiObjectStub.getBounds();
             LOG.debug("{}", rect);
-            uiObjectStub.swipeLeft(10);
-            uiObjectStub.swipeRight(10);
-            uiObjectStub.click();
-            uiDeviceStub.waitForIdle();
+            this.uiObjectStub.swipeLeft(10);
+            this.uiObjectStub.swipeRight(10);
+            this.uiObjectStub.click();
+            this.uiDeviceStub.waitForIdle();
         }
     }
 
-    public void testUiObject2() throws Exception {
+    public void testUiObjectNegative() throws Exception {
         uiDeviceStub.pressHome();
         uiDeviceStub.waitForIdle();
+
         LOG.debug("Book");
         uiObjectStub.useUiObjectSelector(new UiSelector().text("Book"));
         uiObjectStub.click();
@@ -94,17 +102,56 @@ public class UiAuotmatorRmiDemoTests {
         }
     }
 
-    public static void main(String[] args) throws Exception {
+    public void testUiCollection2() throws Exception {
+        uiDeviceStub.pressHome();
+        uiDeviceStub.waitForIdle();
+
+        this.uiCollectionStub.useUiCollectionSelector(new UiSelector().resourceId(
+                "com.amazon.kindle.otter:id/library_selector_layout"));
+        this.uiCollectionStub.swipeLeft(100);
+
+        int n = this.uiCollectionStub.getChildCount(new UiSelector().className("android.widget.Button"));
+        LOG.debug("buttons {}", n);
+        for (int i = 0; i < n; i++) {
+            uiDeviceStub.pressHome();
+            this.uiCollectionStub.selectChildByInstance(new UiSelector().className("android.widget.Button"), i);
+            LOG.debug("text {}, rect {}", this.uiCollectionStub.getText(), this.uiCollectionStub.getBounds());
+            this.uiCollectionStub.click();
+            uiDeviceStub.waitForIdle();
+        }
+    }
+
+    public void testUiScrollable() throws Exception {
+        uiDeviceStub.pressHome();
+        uiDeviceStub.waitForIdle();
+        this.uiCollectionStub.useUiCollectionSelector(new UiSelector().resourceId(
+                "com.amazon.kindle.otter:id/library_selector_layout"));
+        this.uiCollectionStub.swipeRight(100);
+
+        this.uiObjectStub.useUiObjectSelector(new UiSelector().text("Books"));
+        this.uiObjectStub.click();
+        this.uiScrollableStub.useUiScrollableSelector(new UiSelector().scrollable(true));
+        this.uiScrollableStub.scrollToBeginning(100);
+        this.uiScrollableStub.scrollForward(100);
+        this.uiObjectStub.useUiObjectSelector(new UiSelector().descriptionStartsWith("The Blind Side"));
+        this.uiObjectStub.click();
+        this.uiDeviceStub.waitForIdle();
+    }
+
+    public static void main(String[] args) {
         try {
             while (true) {
                 UiAuotmatorRmiDemoTests t = new UiAuotmatorRmiDemoTests();
                 t.testUiDevice();
                 t.testUiObject();
-                t.testUiObject2();
+                t.testUiObjectNegative();
                 t.testUiCollection();
+                t.testUiCollection2();
+                t.testUiScrollable();
             }
+        } catch (Exception ex) {
+            LOG.error("", ex);
         } finally {
-            uiad.disconnect();
             System.exit(0);
         }
     }

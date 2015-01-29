@@ -1,5 +1,6 @@
 package com.android.uiautomator.stub;
 
+import com.android.uiautomator.core.UiObjectNotFoundException;
 import com.android.uiautomator.core.UiScrollable;
 
 /**
@@ -10,12 +11,13 @@ public class UiScrollableStub extends UiCollectionStub implements IUiScrollable 
 
     private static final long serialVersionUID = -8087456666495L;
 
-    private UiScrollable uiScrollable;
+    protected UiScrollable uiScrollable;
 
     @Override
     public void useUiScrollableSelector(UiSelector selector) {
         com.android.uiautomator.core.UiSelector uiSelector = UiDeviceStub.convert(selector);
         this.uiScrollable = new UiScrollable(uiSelector);
+        super.useUiCollectionSelector(selector);
     }
 
     @Override
@@ -35,31 +37,73 @@ public class UiScrollableStub extends UiCollectionStub implements IUiScrollable 
 
     @Override
     public boolean selectChildByDescription(UiSelector childPattern, String text) {
+        com.android.uiautomator.core.UiSelector selector = UiDeviceStub.convert(childPattern);
+        try {
+            this.uiObject = this.uiScrollable.getChildByDescription(selector, text);
+            return true;
+        } catch (UiObjectNotFoundException ex) {
+            this.setUiObjectNotFoundException(ex);
+        }
         return false;
     }
 
     @Override
     public boolean selectChildByDescription(UiSelector childPattern, String text, boolean allowScrollSearch) {
+        com.android.uiautomator.core.UiSelector selector = UiDeviceStub.convert(childPattern);
+        try {
+            this.uiObject = this.uiScrollable.getChildByDescription(selector, text, allowScrollSearch);
+            return true;
+        } catch (UiObjectNotFoundException ex) {
+            this.setUiObjectNotFoundException(ex);
+        }
         return false;
     }
 
     @Override
     public boolean selectChildByInstance(UiSelector childPattern, int instance) {
+        com.android.uiautomator.core.UiSelector selector = UiDeviceStub.convert(childPattern);
+        try {
+            this.uiObject = this.uiScrollable.getChildByInstance(selector, instance);
+            return true;
+        } catch (UiObjectNotFoundException ex) {
+            this.setUiObjectNotFoundException(ex);
+        }
         return false;
     }
 
     @Override
     public boolean selectChildByText(UiSelector childPattern, String text) {
+        com.android.uiautomator.core.UiSelector selector = UiDeviceStub.convert(childPattern);
+        System.out.println(selector);
+        try {
+            this.uiObject = this.uiScrollable.getChildByText(selector, text);
+            System.out.println(this.uiObject);
+            return true;
+        } catch (UiObjectNotFoundException ex) {
+            this.setUiObjectNotFoundException(ex);
+        }
         return false;
     }
 
     @Override
     public boolean selectChildByText(UiSelector childPattern, String text, boolean allowScrollSearch) {
+        com.android.uiautomator.core.UiSelector selector = UiDeviceStub.convert(childPattern);
+        try {
+            this.uiObject = this.uiScrollable.getChildByText(selector, text, allowScrollSearch);
+            return true;
+        } catch (UiObjectNotFoundException ex) {
+            this.setUiObjectNotFoundException(ex);
+        }
         return false;
     }
 
     @Override
     public boolean scrollDescriptionIntoView(String text) {
+        try {
+            return this.uiScrollable.scrollDescriptionIntoView(text);
+        } catch (com.android.uiautomator.core.UiObjectNotFoundException ex) {
+            this.setUiObjectNotFoundException(ex);
+        }
         return false;
     }
 
@@ -75,11 +119,17 @@ public class UiScrollableStub extends UiCollectionStub implements IUiScrollable 
 
     @Override
     public boolean scrollTextIntoView(String text) {
+        try {
+            return this.uiScrollable.scrollTextIntoView(text);
+        } catch (com.android.uiautomator.core.UiObjectNotFoundException ex) {
+            this.setUiObjectNotFoundException(ex);
+        }
         return false;
     }
 
     @Override
     public void setMaxSearchSwipes(int swipes) {
+        this.uiScrollable.setMaxSearchSwipes(swipes);
     }
 
     @Override

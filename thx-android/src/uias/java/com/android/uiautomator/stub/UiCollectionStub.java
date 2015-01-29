@@ -15,6 +15,7 @@ public class UiCollectionStub extends UiObjectStub implements IUiCollection {
     public void useUiCollectionSelector(UiSelector selector) {
         com.android.uiautomator.core.UiSelector uiSelector = UiDeviceStub.convert(selector);
         this.uiCollection = new UiCollection(uiSelector);
+        super.useUiObjectSelector(selector);
     }
 
     @Override

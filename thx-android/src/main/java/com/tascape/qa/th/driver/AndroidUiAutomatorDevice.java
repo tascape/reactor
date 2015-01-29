@@ -1,4 +1,4 @@
-package com.tascape.qa.th.comm;
+package com.tascape.qa.th.driver;
 
 import com.android.uiautomator.stub.IUiCollection;
 import com.android.uiautomator.stub.IUiDevice;
@@ -10,6 +10,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
+import java.util.HashMap;
+import java.util.Map;
 import net.sf.lipermi.handler.CallHandler;
 import net.sf.lipermi.net.Client;
 import org.apache.commons.exec.CommandLine;
@@ -25,7 +27,7 @@ import org.slf4j.LoggerFactory;
  *
  * @author linsong wang
  */
-public class AndroidUiAutomatorDevice {
+public class AndroidUiAutomatorDevice extends EntityDriver {
     private static final Logger LOG = LoggerFactory.getLogger(AndroidUiAutomatorDevice.class);
 
     public static final String SYSPROP_ADB_EXECUTABLE = "qa.comm.ADB_EXECUTABLE";
@@ -41,11 +43,11 @@ public class AndroidUiAutomatorDevice {
                 SYSPROP_UIAUTOMATOR_RMI_SERVER, "/path/to/your/" + UIAUTOMATOR_RMI_SERVER);
     }
 
-    private final String serial;
+    private String serial = "";
 
-    private final String ip;
+    private String ip = "localhost";
 
-    private final int port;
+    private int port = IUiDevice.UIAUTOMATOR_RMI_PORT;
 
     private final Client client;
 
@@ -61,6 +63,8 @@ public class AndroidUiAutomatorDevice {
 
     private final String uiRmiServer = SystemConfiguration.getInstance().getProperty(SYSPROP_UIAUTOMATOR_RMI_SERVER,
             UIAUTOMATOR_RMI_SERVER);
+
+    private final Map<String, AndroidUiAutomatorDevice> devices = new HashMap<>();
 
     public AndroidUiAutomatorDevice(int port) throws IOException, InterruptedException {
         this("", "", port);
@@ -87,10 +91,14 @@ public class AndroidUiAutomatorDevice {
         LOG.debug("Device product name '{}'", this.uiDeviceStub.getProductName());
     }
 
-    public void disconnect() throws IOException {
-        if (this.client != null) {
-            this.client.close();
-        }
+    @Override
+    public String getName() {
+        return AndroidUiAutomatorDevice.class.getSimpleName();
+    }
+
+    @Override
+    public void reset() {
+        throw new UnsupportedOperationException();
     }
 
     public IUiDevice getUiDeviceStub() {
@@ -111,6 +119,10 @@ public class AndroidUiAutomatorDevice {
 
     private void setupUiAutomatorRmiServer() throws IOException, InterruptedException {
         CommandLine cmdLine = new CommandLine(adb);
+        if (!this.serial.isEmpty()) {
+            cmdLine.addArgument("-s");
+            cmdLine.addArgument(this.serial);
+        }
         cmdLine.addArgument("push");
         cmdLine.addArgument(uiRmiServer);
         cmdLine.addArgument("/data/local/tmp/");
@@ -122,6 +134,10 @@ public class AndroidUiAutomatorDevice {
         }
 
         cmdLine = new CommandLine(adb);
+        if (!this.serial.isEmpty()) {
+            cmdLine.addArgument("-s");
+            cmdLine.addArgument(this.serial);
+        }
         cmdLine.addArgument("shell");
         cmdLine.addArgument("uiautomator");
         cmdLine.addArgument("runtest");

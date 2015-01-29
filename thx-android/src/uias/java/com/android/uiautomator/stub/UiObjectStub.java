@@ -446,6 +446,7 @@ public class UiObjectStub implements IUiObject {
     }
 
     protected void setUiObjectNotFoundException(com.android.uiautomator.core.UiObjectNotFoundException ex) {
+        ex.printStackTrace();
         this.uiObjectNotFoundException = new UiObjectNotFoundException(ex);
     }
 
