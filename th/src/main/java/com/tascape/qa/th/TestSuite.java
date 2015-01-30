@@ -20,8 +20,9 @@ import org.slf4j.LoggerFactory;
 /**
  *
  * @author linsong wang
+ * @param <T>
  */
-public class TestSuite {
+public class TestSuite<T extends AbstractTest> {
     private static final Logger LOG = LoggerFactory.getLogger(TestSuite.class);
 
     private String name;
@@ -37,7 +38,8 @@ public class TestSuite {
             this.name = suiteClass;
         }
         suite.setUpTestClasses();
-        for (Class<? extends AbstractTest> clazz : suite.getTestClasses()) {
+        for (Object o : suite.getTestClasses()) {
+            Class<T> clazz = (Class<T>) o;
             for (Method method : this.getTestMethods(clazz)) {
                 TestCase tc = new TestCase();
                 tc.setSuiteClass(suiteClass);
@@ -126,7 +128,7 @@ public class TestSuite {
         return tcs;
     }
 
-    private List<Method> getTestMethods(Class<? extends AbstractTest> testClass) {
+    private List<Method> getTestMethods(Class<T> testClass) {
         List<Method> methods = new ArrayList<>();
         for (Method m : testClass.getDeclaredMethods()) {
             if (m.getAnnotation(Test.class) != null) {

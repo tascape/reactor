@@ -3,6 +3,7 @@ package com.tascape.qa.th.suite;
 import com.tascape.qa.th.SystemConfiguration;
 import com.tascape.qa.th.TestHarness;
 import com.tascape.qa.th.driver.EntityDriver;
+import com.tascape.qa.th.driver.PoolableEntityDriver;
 import com.tascape.qa.th.test.AbstractTest;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
@@ -19,32 +20,34 @@ import org.slf4j.LoggerFactory;
 /**
  *
  * @author linsong wang
+ * @param <T>
+ * @param <D>
  */
-public abstract class AbstractSuite {
+public abstract class AbstractSuite<T extends AbstractTest, D extends EntityDriver> {
     private static final Logger LOG = LoggerFactory.getLogger(AbstractSuite.class);
 
-    private static final ThreadLocal<Map<String, Map<String, EntityDriver>>> ENVIRONMENTS
-            = new ThreadLocal<Map<String, Map<String, EntityDriver>>>() {
+    private static final ThreadLocal<Map<String, Map<String, ? extends EntityDriver>>> ENVIRONMENTS
+            = new ThreadLocal<Map<String, Map<String, ? extends EntityDriver>>>() {
                 @Override
-                protected Map<String, Map<String, EntityDriver>> initialValue() {
+                protected Map<String, Map<String, ? extends EntityDriver>> initialValue() {
                     return new HashMap<>();
                 }
             };
 
-    public static void putEnvionment(String suiteClass, Map<String, EntityDriver> drivers) {
+    public static void putEnvionment(String suiteClass, Map<String, ? extends EntityDriver> drivers) {
         ENVIRONMENTS.get().put(suiteClass, drivers);
     }
 
-    public static Map<String, EntityDriver> getEnvionment(String suiteClass) {
-        Map<String, EntityDriver> drivers = ENVIRONMENTS.get().get(suiteClass);
+    public static Map<String, ? extends EntityDriver> getEnvionment(String suiteClass) {
+        Map<String, ? extends EntityDriver> drivers = ENVIRONMENTS.get().get(suiteClass);
         return drivers;
     }
 
     private static final Set<AbstractSuite> SUITES = new HashSet<>();
 
-    private final List<Class<? extends AbstractTest>> testClasses = new ArrayList<>();
+    private final List<Class<T>> testClasses = new ArrayList<>();
 
-    protected Map<String, EntityDriver> suiteEnvironment = new HashMap<>();
+    protected Map<String, D> suiteEnvironment = new HashMap<>();
 
     private final SystemConfiguration config = SystemConfiguration.getInstance();
 
@@ -57,7 +60,7 @@ public abstract class AbstractSuite {
     }
 
     public void setUp() throws Exception {
-        Map<String, EntityDriver> env = AbstractSuite.getEnvionment(this.getClass().getName());
+        Map<String, ?> env = AbstractSuite.getEnvionment(this.getClass().getName());
         if (env == null || env.isEmpty()) {
             this.setUpEnvironment();
             AbstractSuite.putEnvionment(this.getClass().getName(), this.suiteEnvironment);
@@ -65,7 +68,7 @@ public abstract class AbstractSuite {
     }
 
     public void runByClass() throws Exception {
-        for (Class<? extends AbstractTest> clazz : this.testClasses) {
+        for (Class<T> clazz : this.testClasses) {
             JUnitCore core = new JUnitCore();
             core.run(Request.classWithoutSuiteMethod(clazz));
         }
@@ -75,17 +78,30 @@ public abstract class AbstractSuite {
         this.tearDownEnvironment();
     }
 
-    public List<Class<? extends AbstractTest>> getTestClasses() {
+    public List<Class<T>> getTestClasses() {
         return testClasses;
     }
 
-    protected <T extends EntityDriver> void putDirver(Class<? extends AbstractTest> testClazz, String name, T driver) {
+    protected void putDirver(Class<T> testClazz, String name, D driver) {
         String key = testClazz.getName() + "." + name;
         LOG.debug("Putting runtime driver {}={} into suite test environment", key, driver);
-        this.suiteEnvironment.put(key, driver);
+        D d = this.suiteEnvironment.get(key);
+        if (d == null) {
+            this.suiteEnvironment.put(key, driver);
+            return;
+        }
+        if (driver.equals(d)) {
+            LOG.warn("Tried to add the same driver again: {}={}", key, driver);
+            return;
+        }
+        if (d instanceof PoolableEntityDriver && driver instanceof PoolableEntityDriver) {
+            PoolableEntityDriver.class.cast(d).next(PoolableEntityDriver.class.cast(driver));
+            return;
+        }
+        throw new UnsupportedOperationException("Cannot add non-poolable driver with the same key " + key);
     }
 
-    protected void addTestClass(Class<? extends AbstractTest> clazz) {
+    protected void addTestClass(Class<T> clazz) {
         this.testClasses.add(clazz);
     }
 
@@ -107,6 +123,13 @@ public abstract class AbstractSuite {
 
     protected abstract void tearDownEnvironment();
 
+    /**
+     * This is used to launch TestHarness from within individual test suite classes.
+     *
+     * @param args
+     *
+     * @throws Exception
+     */
     public static void main(String[] args) throws Exception {
         SystemConfiguration sysConfig = SystemConfiguration.getInstance();
         Field fClasses = ClassLoader.class.getDeclaredField("classes");

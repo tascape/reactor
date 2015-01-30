@@ -62,8 +62,8 @@ public class TestRunnerJUnit4 extends AbstractTestRunner implements Callable<Tes
         if (suiteClass == null || suiteClass.isEmpty()) {
             return;
         }
-        Map<String, EntityDriver> drivers = AbstractSuite.getEnvionment(suiteClass);
-        if (drivers == null) {
+        Map<String, ? extends EntityDriver> env = AbstractSuite.getEnvionment(suiteClass);
+        if (env == null) {
             AbstractSuite abstractSuite = AbstractSuite.class.cast(Class.forName(suiteClass).newInstance());
             abstractSuite.setUp();
             AbstractSuite.addSuite(abstractSuite);
@@ -82,8 +82,8 @@ public class TestRunnerJUnit4 extends AbstractTestRunner implements Callable<Tes
 
         TestCase tc = this.tcr.getTestCase();
         Path testLogPath = sysConfig.getLogPath().resolve(this.execId)
-            .resolve(tc.formatForLogPath() + "." + System.currentTimeMillis() + "."
-                + Thread.currentThread().getName());
+                .resolve(tc.formatForLogPath() + "." + System.currentTimeMillis() + "."
+                        + Thread.currentThread().getName());
 
         LOG.info("Creating test case execution log directory {}", testLogPath);
         if (!testLogPath.toFile().mkdirs()) {
