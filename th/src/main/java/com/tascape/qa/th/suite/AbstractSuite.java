@@ -20,34 +20,32 @@ import org.slf4j.LoggerFactory;
 /**
  *
  * @author linsong wang
- * @param <T>
- * @param <D>
  */
-public abstract class AbstractSuite<T extends AbstractTest, D extends EntityDriver> {
+public abstract class AbstractSuite {
     private static final Logger LOG = LoggerFactory.getLogger(AbstractSuite.class);
 
-    private static final ThreadLocal<Map<String, Map<String, ? extends EntityDriver>>> ENVIRONMENTS
-            = new ThreadLocal<Map<String, Map<String, ? extends EntityDriver>>>() {
-                @Override
-                protected Map<String, Map<String, ? extends EntityDriver>> initialValue() {
-                    return new HashMap<>();
-                }
-            };
+    private static final ThreadLocal<Map<String, Map<String, EntityDriver>>> ENVIRONMENTS
+        = new ThreadLocal<Map<String, Map<String, EntityDriver>>>() {
+            @Override
+            protected Map<String, Map<String, EntityDriver>> initialValue() {
+                return new HashMap<>();
+            }
+        };
 
-    public static void putEnvionment(String suiteClass, Map<String, ? extends EntityDriver> drivers) {
+    public static void putEnvionment(String suiteClass, Map<String, EntityDriver> drivers) {
         ENVIRONMENTS.get().put(suiteClass, drivers);
     }
 
-    public static Map<String, ? extends EntityDriver> getEnvionment(String suiteClass) {
-        Map<String, ? extends EntityDriver> drivers = ENVIRONMENTS.get().get(suiteClass);
+    public static Map<String, EntityDriver> getEnvionment(String suiteClass) {
+        Map<String, EntityDriver> drivers = ENVIRONMENTS.get().get(suiteClass);
         return drivers;
     }
 
     private static final Set<AbstractSuite> SUITES = new HashSet<>();
 
-    private final List<Class<T>> testClasses = new ArrayList<>();
+    private final List<Class<? extends AbstractTest>> testClasses = new ArrayList<>();
 
-    protected Map<String, D> suiteEnvironment = new HashMap<>();
+    protected Map<String, EntityDriver> suiteEnvironment = new HashMap<>();
 
     private final SystemConfiguration config = SystemConfiguration.getInstance();
 
@@ -60,7 +58,7 @@ public abstract class AbstractSuite<T extends AbstractTest, D extends EntityDriv
     }
 
     public void setUp() throws Exception {
-        Map<String, ?> env = AbstractSuite.getEnvionment(this.getClass().getName());
+        Map<String, EntityDriver> env = AbstractSuite.getEnvionment(this.getClass().getName());
         if (env == null || env.isEmpty()) {
             this.setUpEnvironment();
             AbstractSuite.putEnvionment(this.getClass().getName(), this.suiteEnvironment);
@@ -68,7 +66,7 @@ public abstract class AbstractSuite<T extends AbstractTest, D extends EntityDriv
     }
 
     public void runByClass() throws Exception {
-        for (Class<T> clazz : this.testClasses) {
+        for (Class<? extends AbstractTest> clazz : this.testClasses) {
             JUnitCore core = new JUnitCore();
             core.run(Request.classWithoutSuiteMethod(clazz));
         }
@@ -78,14 +76,14 @@ public abstract class AbstractSuite<T extends AbstractTest, D extends EntityDriv
         this.tearDownEnvironment();
     }
 
-    public List<Class<T>> getTestClasses() {
+    public List<Class<? extends AbstractTest>> getTestClasses() {
         return testClasses;
     }
 
-    protected void putDirver(Class<T> testClazz, String name, D driver) {
+    protected <T extends AbstractTest> void putDirver(Class<T> testClazz, String name, EntityDriver driver) {
         String key = testClazz.getName() + "." + name;
         LOG.debug("Putting runtime driver {}={} into suite test environment", key, driver);
-        D d = this.suiteEnvironment.get(key);
+        EntityDriver d = this.suiteEnvironment.get(key);
         if (d == null) {
             this.suiteEnvironment.put(key, driver);
             return;
@@ -101,7 +99,7 @@ public abstract class AbstractSuite<T extends AbstractTest, D extends EntityDriv
         throw new UnsupportedOperationException("Cannot add non-poolable driver with the same key " + key);
     }
 
-    protected void addTestClass(Class<T> clazz) {
+    protected <T extends AbstractTest> void addTestClass(Class<T> clazz) {
         this.testClasses.add(clazz);
     }
 

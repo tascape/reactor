@@ -15,16 +15,15 @@ import org.slf4j.LoggerFactory;
 /**
  *
  * @author linsong wang
- * @param <T>
  */
-public abstract class EntityDriver <T extends AbstractTest> {
+public abstract class EntityDriver {
     private static final Logger LOG = LoggerFactory.getLogger(EntityDriver.class);
 
     protected static final SystemConfiguration SYS_CONFIG = SystemConfiguration.getInstance();
 
     private EntityCommunication entityCommunication;
 
-    private T test;
+    private AbstractTest test;
 
     public Path getLogPath() {
         if (this.test == null) {
@@ -41,7 +40,7 @@ public abstract class EntityDriver <T extends AbstractTest> {
         this.entityCommunication = entityCommunication;
     }
 
-    public void setTest(T test) {
+    public void setTest(AbstractTest test) {
         this.test = test;
         if (this.entityCommunication != null) {
             this.entityCommunication.setDriver(this);
@@ -49,7 +48,7 @@ public abstract class EntityDriver <T extends AbstractTest> {
         }
     }
 
-    protected T getTest() {
+    protected AbstractTest getTest() {
         return test;
     }
 

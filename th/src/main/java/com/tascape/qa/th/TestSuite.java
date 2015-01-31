@@ -20,9 +20,8 @@ import org.slf4j.LoggerFactory;
 /**
  *
  * @author linsong wang
- * @param <T>
  */
-public class TestSuite<T extends AbstractTest> {
+public class TestSuite {
     private static final Logger LOG = LoggerFactory.getLogger(TestSuite.class);
 
     private String name;
@@ -30,7 +29,7 @@ public class TestSuite<T extends AbstractTest> {
     private List<TestCase> tests = new ArrayList<>();
 
     public TestSuite(String suiteClass, Pattern testClassRegex, Pattern testMethodRegex, int priority)
-            throws Exception {
+        throws Exception {
         LOG.info("Find test cases in target test suite");
         AbstractSuite suite = AbstractSuite.class.cast(Class.forName(suiteClass).newInstance());
         this.name = suite.getName();
@@ -38,8 +37,7 @@ public class TestSuite<T extends AbstractTest> {
             this.name = suiteClass;
         }
         suite.setUpTestClasses();
-        for (Object o : suite.getTestClasses()) {
-            Class<T> clazz = (Class<T>) o;
+        for (Class<? extends AbstractTest> clazz : suite.getTestClasses()) {
             for (Method method : this.getTestMethods(clazz)) {
                 TestCase tc = new TestCase();
                 tc.setSuiteClass(suiteClass);
@@ -106,7 +104,7 @@ public class TestSuite<T extends AbstractTest> {
                     tcs.add(tc);
                 } else {
                     LOG.trace("Calling class {}, method {}, with parameters {}", tdp.klass(), tdp.method(),
-                            tdp.parameter());
+                        tdp.parameter());
                     TestData[] data = AbstractTestData.getTestData(tdp.klass(), tdp.method(), tdp.parameter());
                     LOG.debug("{} is a data-driven test case, test data size is {}", tc, data.length);
                     int length = (data.length + "").length();
@@ -128,7 +126,7 @@ public class TestSuite<T extends AbstractTest> {
         return tcs;
     }
 
-    private List<Method> getTestMethods(Class<T> testClass) {
+    private <T extends AbstractTest> List<Method> getTestMethods(Class<T> testClass) {
         List<Method> methods = new ArrayList<>();
         for (Method m : testClass.getDeclaredMethods()) {
             if (m.getAnnotation(Test.class) != null) {

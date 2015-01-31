@@ -9,16 +9,14 @@ import java.nio.file.Paths;
 /**
  *
  * @author linsong wang
- * @param <T>
- * @param <D>
  */
-public abstract class EntityCommunication<T extends AbstractTest, D extends EntityDriver> {
+public abstract class EntityCommunication {
 
     protected static final SystemConfiguration SYSCONFIG = SystemConfiguration.getInstance();
 
-    private D driver;
+    private EntityDriver driver;
 
-    private T test;
+    private AbstractTest test;
 
     protected static final SystemConfiguration SYS_CONFIG = SystemConfiguration.getInstance();
 
@@ -26,19 +24,19 @@ public abstract class EntityCommunication<T extends AbstractTest, D extends Enti
 
     public abstract void disconnect() throws Exception;
 
-    public D getDriver() {
+    public EntityDriver getDriver() {
         return driver;
     }
 
-    public void setDriver(D driver) {
+    public void setDriver(EntityDriver driver) {
         this.driver = driver;
     }
 
-    public void setTest(T test) {
+    public void setTest(AbstractTest test) {
         this.test = test;
     }
 
-    public T getTest() {
+    public AbstractTest getTest() {
         return test;
     }
 

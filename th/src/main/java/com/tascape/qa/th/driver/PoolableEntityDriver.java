@@ -1,39 +1,30 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package com.tascape.qa.th.driver;
 
-import com.tascape.qa.th.test.AbstractTest;
 import java.util.Properties;
 
 /**
  *
- * @author wlinsong
- * @param <T>
- * @param <D>
+ * @author linsong wang
  */
-public abstract class PoolableEntityDriver<T extends AbstractTest, D extends PoolableEntityDriver>
-        extends EntityDriver<T> {
+public abstract class PoolableEntityDriver extends EntityDriver {
 
-    private D driver;
+    private PoolableEntityDriver driver;
 
     private boolean bIdle = true;
 
-    public D next() {
+    public PoolableEntityDriver next() {
         return this.driver;
     }
 
-    public void next(D entityDriver) {
+    public void next(PoolableEntityDriver entityDriver) {
         this.driver = entityDriver;
     }
 
-    public D next(Properties properties) {
+    public PoolableEntityDriver next(Properties properties) {
         PoolableEntityDriver d = this;
         while (d != null) {
             if (d.matches(properties) && d.idle()) {
-                return (D) d;
+                return d;
             } else {
                 d = d.next();
             }

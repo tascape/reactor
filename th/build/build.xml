@@ -17,7 +17,7 @@
             <compilerarg value="-Xlint"/>
             <src path="${src.dir}/main/java" />
             <classpath>
-                <fileset dir="${lib.dir}" includes="**/*.jar" />
+                <fileset dir="${lib.dir}/compile" includes="**/*.jar" />
             </classpath>
         </javac>
     </target>
