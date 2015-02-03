@@ -7,8 +7,8 @@ import com.android.uiautomator.stub.IUiScrollable;
 import com.android.uiautomator.stub.Point;
 import com.android.uiautomator.stub.Rect;
 import com.android.uiautomator.stub.UiSelector;
+import com.tascape.qa.th.comm.Adb;
 import com.tascape.qa.th.driver.AndroidUiAutomatorDevice;
-import java.io.IOException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -19,23 +19,27 @@ import org.slf4j.LoggerFactory;
 public class UiAuotmatorRmiDemoTests {
     private static final Logger LOG = LoggerFactory.getLogger(UiAuotmatorRmiDemoTests.class);
 
-    private static AndroidUiAutomatorDevice uiad;
+    private AndroidUiAutomatorDevice uiad;
 
-    static {
-        try {
-            uiad = new AndroidUiAutomatorDevice(IUiDevice.UIAUTOMATOR_RMI_PORT);
-        } catch (IOException | InterruptedException ex) {
-            throw new RuntimeException(ex);
-        }
+    private IUiDevice uiDeviceStub;
+
+    private IUiObject uiObjectStub;
+
+    private IUiCollection uiCollectionStub;
+
+    private IUiScrollable uiScrollableStub;
+
+    public void setup() throws Exception {
+        Adb adb = new Adb();
+        uiad = new AndroidUiAutomatorDevice(IUiDevice.UIAUTOMATOR_RMI_PORT);
+        uiad.setAdb(adb);
+        uiad.init();
+
+        uiDeviceStub = uiad.getUiDeviceStub();
+        uiObjectStub = uiad.getUiObjectStub();
+        uiCollectionStub = uiad.getUiCollectionStub();
+        uiScrollableStub = uiad.getUiScrollableStub();
     }
-
-    private final IUiDevice uiDeviceStub = uiad.getUiDeviceStub();
-
-    private final IUiObject uiObjectStub = uiad.getUiObjectStub();
-
-    private final IUiCollection uiCollectionStub = uiad.getUiCollectionStub();
-
-    private final IUiScrollable uiScrollableStub = uiad.getUiScrollableStub();
 
     public void testUiDevice() throws Exception {
         uiDeviceStub.pressHome();
@@ -142,6 +146,7 @@ public class UiAuotmatorRmiDemoTests {
         try {
             while (true) {
                 UiAuotmatorRmiDemoTests t = new UiAuotmatorRmiDemoTests();
+                t.setup();
                 t.testUiDevice();
                 t.testUiObject();
                 t.testUiObjectNegative();
