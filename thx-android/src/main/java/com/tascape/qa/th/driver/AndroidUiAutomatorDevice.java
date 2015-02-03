@@ -26,10 +26,10 @@ public class AndroidUiAutomatorDevice extends AndroidAdbDevice {
 
     static {
         LOG.debug("Please specify where uiautomator RMI server jar is by setting system property {}={}",
-                SYSPROP_UIAUTOMATOR_RMI_SERVER, "/path/to/your/" + UIAUTOMATOR_RMI_SERVER);
+            SYSPROP_UIAUTOMATOR_RMI_SERVER, "/path/to/your/" + UIAUTOMATOR_RMI_SERVER);
     }
 
-    private String ip = "localhost";
+    private final String ip = "localhost";
 
     private int port = IUiDevice.UIAUTOMATOR_RMI_PORT;
 
@@ -44,7 +44,7 @@ public class AndroidUiAutomatorDevice extends AndroidAdbDevice {
     private IUiScrollable uiScrollableStub;
 
     private final String uiRmiServer = SystemConfiguration.getInstance().getProperty(SYSPROP_UIAUTOMATOR_RMI_SERVER,
-            UIAUTOMATOR_RMI_SERVER);
+        UIAUTOMATOR_RMI_SERVER);
 
     public AndroidUiAutomatorDevice(int port) throws IOException, InterruptedException {
         this.port = port;
@@ -107,7 +107,7 @@ public class AndroidUiAutomatorDevice extends AndroidAdbDevice {
         cmdLine.add(UIAUTOMATOR_RMI_SERVER);
         cmdLine.add("-c");
         cmdLine.add("com.android.uiautomator.stub.UiAutomatorRmiServer");
-        this.adb.adb0(cmdLine);
+        this.adb.adbAsync(cmdLine);
 
         Thread.sleep(5000);
     }

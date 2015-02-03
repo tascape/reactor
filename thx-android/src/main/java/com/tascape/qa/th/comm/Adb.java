@@ -28,12 +28,29 @@ public class Adb extends EntityCommunication {
 
     static {
         LOG.debug("Please specify where adb executable is by setting system property {}={}",
-                SYSPROP_ADB_EXECUTABLE, "/path/to/your/sdk/platform-tools/adb");
+            SYSPROP_ADB_EXECUTABLE, "/path/to/your/sdk/platform-tools/adb");
     }
 
-    private final String adb = SystemConfiguration.getInstance().getProperty(SYSPROP_ADB_EXECUTABLE, "adb");
+    private final static String ADB = SystemConfiguration.getInstance().getProperty(SYSPROP_ADB_EXECUTABLE, "adb");
 
     private String serial = "";
+
+    public static void reset() throws IOException {
+        CommandLine cmdLine = new CommandLine(ADB);
+        cmdLine.addArgument("kill-server");
+        LOG.debug("{}", cmdLine.toString());
+        Executor executor = new DefaultExecutor();
+        if (executor.execute(cmdLine) != 0) {
+            throw new IOException(cmdLine + " failed");
+        }
+        cmdLine = new CommandLine(ADB);
+        cmdLine.addArgument("devices");
+        LOG.debug("{}", cmdLine.toString());
+        executor = new DefaultExecutor();
+        if (executor.execute(cmdLine) != 0) {
+            throw new IOException(cmdLine + " failed");
+        }
+    }
 
     public Adb() {
         this("");
@@ -53,7 +70,7 @@ public class Adb extends EntityCommunication {
     }
 
     public int adb(final List<String> arguments) throws IOException {
-        CommandLine cmdLine = new CommandLine(adb);
+        CommandLine cmdLine = new CommandLine(ADB);
         if (!this.serial.isEmpty()) {
             cmdLine.addArgument("-s");
             cmdLine.addArgument(serial);
@@ -67,8 +84,8 @@ public class Adb extends EntityCommunication {
         return exitValue;
     }
 
-    public void adb0(final List<String> arguments) throws IOException {
-        CommandLine cmdLine = new CommandLine(adb);
+    public void adbAsync(final List<String> arguments) throws IOException {
+        CommandLine cmdLine = new CommandLine(ADB);
         if (!this.serial.isEmpty()) {
             cmdLine.addArgument("-s");
             cmdLine.addArgument(serial);
@@ -130,5 +147,9 @@ public class Adb extends EntityCommunication {
         public void stop() throws IOException {
             LOG.debug("stop");
         }
+    }
+
+    public static void main(String[] args) throws IOException {
+        Adb.reset();
     }
 }
