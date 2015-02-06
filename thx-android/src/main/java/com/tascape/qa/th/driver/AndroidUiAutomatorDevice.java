@@ -26,7 +26,7 @@ public class AndroidUiAutomatorDevice extends AndroidAdbDevice {
 
     static {
         LOG.debug("Please specify where uiautomator RMI server jar is by setting system property {}={}",
-            SYSPROP_UIAUTOMATOR_RMI_SERVER, "/path/to/your/" + UIAUTOMATOR_RMI_SERVER);
+                SYSPROP_UIAUTOMATOR_RMI_SERVER, "/path/to/your/" + UIAUTOMATOR_RMI_SERVER);
     }
 
     private final String ip = "localhost";
@@ -44,7 +44,7 @@ public class AndroidUiAutomatorDevice extends AndroidAdbDevice {
     private IUiScrollable uiScrollableStub;
 
     private final String uiRmiServer = SystemConfiguration.getInstance().getProperty(SYSPROP_UIAUTOMATOR_RMI_SERVER,
-        UIAUTOMATOR_RMI_SERVER);
+            UIAUTOMATOR_RMI_SERVER);
 
     public AndroidUiAutomatorDevice(int port) throws IOException, InterruptedException {
         this.port = port;
@@ -91,23 +91,19 @@ public class AndroidUiAutomatorDevice extends AndroidAdbDevice {
     }
 
     private void setupUiAutomatorRmiServer() throws IOException, InterruptedException {
-        List<String> cmdLine = new ArrayList<>();
+        List<Object> cmdLine = new ArrayList<>();
         cmdLine.add("push");
         cmdLine.add(uiRmiServer);
         cmdLine.add("/data/local/tmp/");
-        int exitValue = adb.adb(cmdLine);
-        if (exitValue != 0) {
-            throw new IOException("Fail to push ui_rmi_server.jar onto device");
-        }
+        adb.adb(cmdLine);
 
         cmdLine = new ArrayList();
-        cmdLine.add("shell");
         cmdLine.add("uiautomator");
         cmdLine.add("runtest");
         cmdLine.add(UIAUTOMATOR_RMI_SERVER);
         cmdLine.add("-c");
         cmdLine.add("com.android.uiautomator.stub.UiAutomatorRmiServer");
-        this.adb.adbAsync(cmdLine);
+        this.adb.shellAsync(cmdLine, Long.MAX_VALUE);
 
         Thread.sleep(5000);
     }
