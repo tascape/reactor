@@ -74,10 +74,12 @@ public final class SystemConfiguration {
             conf = Paths.get(confFile);
         }
         LOG.info("Loading system configuration from {}", conf);
-        try (InputStream is = new FileInputStream(conf.toFile())) {
-            this.properties.load(is);
-        } catch (IOException ex) {
-            throw new RuntimeException("Cannot load system configuration from " + conf, ex);
+        if (conf.toFile().exists()) {
+            try (InputStream is = new FileInputStream(conf.toFile())) {
+                this.properties.load(is);
+            } catch (IOException ex) {
+                throw new RuntimeException("Cannot load system configuration from " + conf, ex);
+            }
         }
         List<String> keys = new ArrayList<>(System.getProperties().stringPropertyNames());
         keys.stream().filter((key) -> (key.startsWith("qa."))).forEach((key) -> {
@@ -162,7 +164,7 @@ public final class SystemConfiguration {
         String suite = this.getProperty(SYSPROP_TEST_SUITE);
         if (suite == null || suite.isEmpty()) {
             throw new RuntimeException("There is no test suite class name specified (system property "
-                    + SYSPROP_TEST_SUITE + ")");
+                + SYSPROP_TEST_SUITE + ")");
         }
         return suite;
     }
