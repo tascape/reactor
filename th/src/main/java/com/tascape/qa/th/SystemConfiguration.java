@@ -82,7 +82,7 @@ public final class SystemConfiguration {
             }
         }
         List<String> keys = new ArrayList<>(System.getProperties().stringPropertyNames());
-        keys.stream().filter((key) -> (key.startsWith("qa."))).forEach((key) -> {
+        keys.stream().filter((key) -> (key.startsWith("qa.th."))).forEach((key) -> {
             this.properties.setProperty(key, System.getProperty(key));
         });
 

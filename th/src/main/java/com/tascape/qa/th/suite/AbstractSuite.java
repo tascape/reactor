@@ -47,7 +47,7 @@ public abstract class AbstractSuite {
 
     protected Map<String, EntityDriver> suiteEnvironment = new HashMap<>();
 
-    private final SystemConfiguration config = SystemConfiguration.getInstance();
+    protected final SystemConfiguration SYSCONFIG = SystemConfiguration.getInstance();
 
     public static void addSuite(AbstractSuite suite) {
         SUITES.add(suite);
@@ -104,7 +104,7 @@ public abstract class AbstractSuite {
     }
 
     protected String getSuiteProperty(String name, String defValue) {
-        String value = this.config.getProperty(name);
+        String value = this.SYSCONFIG.getProperty(name);
         if (value == null) {
             value = defValue;
         }
