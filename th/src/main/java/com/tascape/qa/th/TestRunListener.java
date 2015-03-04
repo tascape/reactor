@@ -124,9 +124,6 @@ public class TestRunListener extends RunListener {
         }
 
         AbstractTest test = AbstractTest.getTest();
-        if (test != null) {
-            test.captureScreen();
-        }
         this.tcr.setException(throwable);
     }
 
