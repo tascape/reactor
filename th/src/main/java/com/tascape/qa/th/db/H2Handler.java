@@ -1,6 +1,7 @@
 package com.tascape.qa.th.db;
 
 import com.tascape.qa.th.ExecutionResult;
+import com.tascape.qa.th.SystemConfiguration;
 import com.tascape.qa.th.TestSuite;
 import com.tascape.qa.th.Utils;
 import java.io.File;
@@ -35,7 +36,8 @@ public final class H2Handler extends DbHandler {
         }
     }
 
-    private final String dbPath = CONFIG.getLogPath() + "/db/";
+    private final String dbPath = CONFIG.getLogPath() + "/db/" + SystemConfiguration.CONSTANT_LOG_KEEP_ALIVE_PREFIX
+        + System.currentTimeMillis() + "/";
 
     private JdbcConnectionPool connPool;
 
@@ -261,8 +263,7 @@ public final class H2Handler extends DbHandler {
     private void initSchema() throws SQLException, IOException {
         try (Connection conn = this.getConnection()) {
             ScriptRunner runner = new ScriptRunner(conn, true, true);
-            runner.runScript(
-                new InputStreamReader(this.getClass().getClassLoader().getResourceAsStream("thr.sql")));
+            runner.runScript(new InputStreamReader(this.getClass().getClassLoader().getResourceAsStream("thr-h2.sql")));
         }
     }
 }

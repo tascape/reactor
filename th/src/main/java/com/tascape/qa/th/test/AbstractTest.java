@@ -11,6 +11,7 @@ import com.tascape.qa.th.driver.EntityDriver;
 import com.tascape.qa.th.suite.AbstractSuite;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import com.tascape.qa.th.db.TestResultMetric;
+import com.tascape.qa.th.driver.TestDriver;
 import java.awt.AWTException;
 import java.io.File;
 import java.io.IOException;
@@ -106,6 +107,10 @@ public abstract class AbstractTest {
         }
         driver.setTest(this);
         return clazz.cast(driver);
+    }
+
+    protected <D extends EntityDriver> D getEntityDriver(TestDriver name, Class<D> clazz) {
+        return this.getEntityDriver(name.getName(), clazz);
     }
 
     protected TestData getTestData() {

@@ -97,7 +97,6 @@ CREATE TABLE `test_result_ metric` (
   `METRIC_NAME` varchar(127) DEFAULT NULL,
   `METRIC_VALUE` double DEFAULT NULL,
   PRIMARY KEY (`TEST_RESULT_METRIC_ID`),
-  KEY `fk_test_result_idx` (`TEST_RESULT_ID`),
   CONSTRAINT `fk_test_result` FOREIGN KEY (`TEST_RESULT_ID`) REFERENCES `test_result` (`TEST_RESULT_ID`) ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;

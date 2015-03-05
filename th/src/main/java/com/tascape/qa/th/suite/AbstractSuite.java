@@ -3,6 +3,7 @@ package com.tascape.qa.th.suite;
 import com.tascape.qa.th.SystemConfiguration;
 import com.tascape.qa.th.TestHarness;
 import com.tascape.qa.th.driver.EntityDriver;
+import com.tascape.qa.th.driver.TestDriver;
 import com.tascape.qa.th.driver.PoolableEntityDriver;
 import com.tascape.qa.th.test.AbstractTest;
 import java.lang.reflect.Field;
@@ -97,6 +98,10 @@ public abstract class AbstractSuite {
             return;
         }
         throw new UnsupportedOperationException("Cannot add non-poolable driver with the same key " + key);
+    }
+
+    protected void putDirver(TestDriver name, EntityDriver driver) {
+        this.putDirver(name.getTestClass(), name.getName(), driver);
     }
 
     protected <T extends AbstractTest> void addTestClass(Class<T> clazz) {

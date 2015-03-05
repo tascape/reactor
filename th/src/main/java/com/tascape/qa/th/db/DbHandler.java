@@ -92,11 +92,17 @@ public abstract class DbHandler {
         String type = SystemConfiguration.getInstance().getDatabaseType();
         DbHandler dbh;
         switch (type) {
-            case "none":
+            case "h2":
                 dbh = new H2Handler();
                 break;
-            default:
+            case "postgresql":
+                dbh = new PostgresqlHandler();
+                break;
+            case "mysql":
                 dbh = new MysqlHandler();
+                break;
+            default:
+                dbh = new H2Handler();
         }
         try {
             dbh.init();
@@ -316,6 +322,15 @@ public abstract class DbHandler {
                 rs.updateRow();
             }
         }
+    }
+
+    protected int hash(String string) {
+        char[] chars = string.toCharArray();
+        int hash = 7;
+        for (int i = 0; i < chars.length; i++) {
+            hash = hash * 31 + chars[i];
+        }
+        return hash;
     }
 
     protected abstract boolean acquireExecutionLock(Connection conn, String lock) throws SQLException;

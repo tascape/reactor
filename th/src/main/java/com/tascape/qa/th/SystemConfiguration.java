@@ -68,6 +68,13 @@ public final class SystemConfiguration {
     private SystemConfiguration() {
         this.listSysProperties();
 
+        try {
+            InputStream is = SystemConfiguration.class.getResourceAsStream("/th.properties");
+            this.properties.load(is);
+        } catch (Exception ex) {
+            LOG.warn("", ex);
+        }
+
         Path conf = Paths.get(System.getProperty("user.home"), ".th", "th.properties");
         String confFile = System.getProperty(SYSPROP_CONF_FILE);
         if (confFile != null) {
@@ -76,7 +83,9 @@ public final class SystemConfiguration {
         LOG.info("Loading system configuration from {}", conf);
         if (conf.toFile().exists()) {
             try (InputStream is = new FileInputStream(conf.toFile())) {
-                this.properties.load(is);
+                Properties p = new Properties();
+                p.load(is);
+                this.properties.putAll(p);
             } catch (IOException ex) {
                 throw new RuntimeException("Cannot load system configuration from " + conf, ex);
             }

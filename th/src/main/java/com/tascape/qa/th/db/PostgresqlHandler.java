@@ -19,10 +19,10 @@ import org.slf4j.LoggerFactory;
  *
  * @author linsong wang
  */
-public class MysqlHandler extends DbHandler {
-    private static final Logger LOG = LoggerFactory.getLogger(MysqlHandler.class);
+public class PostgresqlHandler extends DbHandler {
+    private static final Logger LOG = LoggerFactory.getLogger(PostgresqlHandler.class);
 
-    private static final String DB_DRIVER = "com.mysql.jdbc.Driver";
+    private static final String DB_DRIVER = "org.postgresql.Driver";
 
     private static final String DB_HOST = CONFIG.getDatabaseHost();
 
@@ -45,7 +45,7 @@ public class MysqlHandler extends DbHandler {
     @Override
     protected void init() throws Exception {
         BoneCPConfig connPoolConfig = new BoneCPConfig();
-        connPoolConfig.setJdbcUrl("jdbc:mysql://" + DB_HOST + "/" + DB_SCHEMA);
+        connPoolConfig.setJdbcUrl("jdbc:postgresql://" + DB_HOST + "/" + DB_SCHEMA);
         connPoolConfig.setUsername(DB_USER);
         connPoolConfig.setPassword(DB_PASS);
         connPoolConfig.setMaxConnectionAgeInSeconds(600);
@@ -268,7 +268,7 @@ public class MysqlHandler extends DbHandler {
 
     @Override
     protected boolean acquireExecutionLock(Connection conn, String lock) throws SQLException {
-        final String sqlLock = String.format("SELECT GET_LOCK('%s', 1200);", lock); // 20 minutes
+        final String sqlLock = String.format("SELECT pg_advisory_lock(%d);", this.hash(lock));
         LOG.debug("Acquire lock {}", lock);
         try (Statement stmt = conn.createStatement(); ResultSet rs = stmt.executeQuery(sqlLock)) {
             if (rs.next() && "1".equals(rs.getString(1))) {
@@ -282,7 +282,7 @@ public class MysqlHandler extends DbHandler {
 
     @Override
     protected boolean releaseExecutionLock(Connection conn, String lock) throws SQLException {
-        final String sqlRelease = String.format("SELECT RELEASE_LOCK('%s');", lock);
+        final String sqlRelease = String.format("SELECT pg_advisory_unlock(%d);", this.hash(lock));
         LOG.debug("Release lock {}", lock);
         try (Statement stmt = conn.createStatement(); ResultSet rs = stmt.executeQuery(sqlRelease)) {
             if (rs.next() && "1".equals(rs.getString(1))) {
@@ -297,7 +297,7 @@ public class MysqlHandler extends DbHandler {
     }
 
     public static void main(String[] args) throws SQLException {
-        MysqlHandler db = new MysqlHandler();
+        PostgresqlHandler db = new PostgresqlHandler();
         TestCase tc = new TestCase();
         tc.setSuiteClass("a");
         LOG.debug("test case id = {}", db.getTestCaseId(tc));
