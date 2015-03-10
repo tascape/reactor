@@ -167,7 +167,7 @@ public final class SystemConfiguration {
     /**
      * Gets the array of test suite class name.
      *
-     * @return
+     * @return the full class name
      */
     public String getTestSuite() {
         String suite = this.getProperty(SYSPROP_TEST_SUITE);

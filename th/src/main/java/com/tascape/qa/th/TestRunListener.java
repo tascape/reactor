@@ -38,7 +38,7 @@ public class TestRunListener extends RunListener {
      *
      * @param description describes the tests to be run
      *
-     * @throws Exception
+     * @throws Exception for various issues
      */
     @Override
     public void testRunStarted(Description description) throws Exception {
@@ -87,7 +87,7 @@ public class TestRunListener extends RunListener {
      *
      * @param description the description of the test that is about to be run (generally a class and method name)
      *
-     * @throws Exception
+     * @throws Exception for various issues
      */
     @Override
     public void testStarted(Description description) throws Exception {
@@ -109,7 +109,7 @@ public class TestRunListener extends RunListener {
      *
      * @param failure describes the test that failed and the exception that was thrown
      *
-     * @throws Exception
+     * @throws Exception for various issues
      */
     @Override
     public void testFailure(Failure failure) throws Exception {
@@ -132,7 +132,7 @@ public class TestRunListener extends RunListener {
      *
      * @param description the description of the test that just ran
      *
-     * @throws Exception
+     * @throws Exception for various issues
      */
     @Override
     public void testFinished(Description description) throws Exception {
@@ -159,7 +159,7 @@ public class TestRunListener extends RunListener {
      *
      * @param result the summary of the test run, including all the tests that failed
      *
-     * @throws Exception
+     * @throws Exception for various issues
      */
     @Override
     public void testRunFinished(Result result) throws Exception {
@@ -201,7 +201,7 @@ public class TestRunListener extends RunListener {
      *
      * @param description describes the test that will not be run
      *
-     * @throws Exception
+     * @throws Exception for various issues
      */
     @Override
     public void testIgnored(Description description) throws Exception {

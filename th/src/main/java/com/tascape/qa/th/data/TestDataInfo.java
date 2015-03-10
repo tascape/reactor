@@ -45,8 +45,8 @@ public class TestDataInfo {
      * @param infoString format class_name.method_name(parameter)#data_index
      *                   example: "com.example.qa.ui.USERTestData.getData(sample.json)#39"
      *
-     * @throws ClassNotFoundException
-     * @throws IOException
+     * @throws ClassNotFoundException issue with test data provide class name
+     * @throws IOException            IO issue
      */
     public TestDataInfo(String infoString) throws ClassNotFoundException, IOException {
         Matcher m = pattern.matcher(infoString);

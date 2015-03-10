@@ -34,7 +34,7 @@ import org.slf4j.LoggerFactory;
 
 /**
  * Collection of utility methods.
- * <p/>
+ * <p>
  * @author linsong wang
  */
 public class Utils {
@@ -136,12 +136,12 @@ public class Utils {
     /**
      * Executes command, and waits for the expected phrase in console printout.
      *
-     * @param command
+     * @param command command line
      *
      * @return console output as a list of strings
      *
-     * @throws IOException
-     * @throws InterruptedException
+     * @throws IOException          for command error
+     * @throws InterruptedException when interrupted
      */
     public static List<String> cmd(String command) throws IOException, InterruptedException {
         return cmd(command.split(" "));
@@ -150,66 +150,66 @@ public class Utils {
     /**
      * Executes command, and waits for the expected phrase in console printout.
      *
-     * @param commands
+     * @param command command line
      *
      * @return console output as a list of strings
      *
-     * @throws IOException
-     * @throws InterruptedException
+     * @throws IOException          for command error
+     * @throws InterruptedException when interrupted
      */
-    public static List<String> cmd(String[] commands) throws IOException, InterruptedException {
-        return cmd(commands, null, null, 300000L, null);
+    public static List<String> cmd(String[] command) throws IOException, InterruptedException {
+        return cmd(command, null, null, 300000L, null);
     }
 
     /**
      * Executes command, and waits for the expected phrase in console printout.
      *
-     * @param commands
-     * @param workindDir
-     * @param timeout
+     * @param command    command line
+     * @param workindDir working directory
+     * @param timeout    in millisecond
      *
      * @return console output as a list of strings
      *
-     * @throws IOException
-     * @throws InterruptedException
+     * @throws IOException          for command error
+     * @throws InterruptedException when interrupted
      */
-    public static List<String> cmdWithWorkingDir(String[] commands, String workindDir, final long timeout)
+    public static List<String> cmdWithWorkingDir(String[] command, String workindDir, final long timeout)
         throws IOException, InterruptedException {
-        return cmd(commands, null, null, timeout, workindDir);
+        return cmd(command, null, null, timeout, workindDir);
     }
 
     /**
      * Executes command, and waits for the expected phrase in console printout.
-     * <p/>
-     * @param commands
-     * @param expected
+     * <p>
+     * @param command  command line
+     * @param expected some expected output
      *
      * @return console output as a list of strings
      *
-     * @throws IOException
-     * @throws InterruptedException
+     * @throws IOException          for command error
+     * @throws InterruptedException when interrupted
      */
-    public static List<String> cmd(String[] commands, String expected) throws IOException, InterruptedException {
-        return cmd(commands, expected, null, 300000L, null);
+    public static List<String> cmd(String[] command, String expected) throws IOException, InterruptedException {
+        return cmd(command, expected, null, 300000L, null);
     }
 
     /**
      * Executes command, and waits for the expected pass/fail phrase in console printout within timeout,
      *
-     * @param commands
+     * @param command    command line
      * @param pass       skip checking if null
      * @param fail       skip checking if null
      * @param timeout    set 0 for not to check the output message, otherwise, waiting for timeout
-     * @param workingDir
+     * @param workingDir working directory
      *
      * @return console output as a list of strings
      *
-     * @throws IOException
-     * @throws InterruptedException
+     * @throws IOException          for command error
+     * @throws InterruptedException when interrupted
      */
-    public static List<String> cmd(String[] commands, final String pass, final String fail, final long timeout,
+    public static List<String> cmd(String[] command, final String pass, final String fail, final long timeout,
         final String workingDir) throws IOException, InterruptedException {
-        ProcessBuilder pb = new ProcessBuilder(commands);
+        ProcessBuilder pb = new ProcessBuilder(command);
         if (workingDir != null) {
             pb.directory(new File(workingDir));
         }
@@ -453,7 +453,7 @@ public class Utils {
 
     /**
      *
-     * @param path
+     * @param path          directory to clean
      * @param keepAliveHour any file/directory having last modified time longer than keepAliveHour will be deleted
      * @param namePrefix    file name prefix
      */
@@ -506,10 +506,10 @@ public class Utils {
 
     /**
      *
-     * @param png
+     * @param png picture file name
      *
-     * @throws AWTException
-     * @throws IOException
+     * @throws AWTException UI related exception
+     * @throws IOException  file IO issue
      */
     public static void captureScreen(File png) throws AWTException, IOException {
         Robot robot = new Robot();

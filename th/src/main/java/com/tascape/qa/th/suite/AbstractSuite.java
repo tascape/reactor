@@ -129,9 +129,9 @@ public abstract class AbstractSuite {
     /**
      * This is used to launch TestHarness from within individual test suite classes.
      *
-     * @param args
+     * @param args command arguments
      *
-     * @throws Exception
+     * @throws Exception any issue
      */
     public static void main(String[] args) throws Exception {
         SystemConfiguration sysConfig = SystemConfiguration.getInstance();
