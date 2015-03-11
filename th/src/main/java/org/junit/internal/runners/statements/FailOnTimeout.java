@@ -55,7 +55,7 @@ public class FailOnTimeout extends Statement {
     @Deprecated
     public FailOnTimeout(Statement statement, long timeoutMillis) {
         this(builder().withTimeout(timeoutMillis, TimeUnit.MILLISECONDS), statement);
-        LOG.trace("Test timeout {} ms", timeout);
+        LOG.debug("Test timeout {} {}", this.timeout, this.timeUnit);
     }
 
     private FailOnTimeout(Builder builder, Statement statement) {
@@ -63,7 +63,7 @@ public class FailOnTimeout extends Statement {
         timeout = builder.timeout;
         timeUnit = builder.unit;
         lookForStuckThread = builder.lookForStuckThread;
-        LOG.trace("Test timeout {} ms", timeout);
+        LOG.debug("Test timeout {} {}", this.timeout, this.timeUnit);
     }
 
     /**
@@ -128,6 +128,7 @@ public class FailOnTimeout extends Statement {
          * wrapping the given statement.
          *
          * @param statement some statement
+         *
          * @return new instance
          */
         public FailOnTimeout build(Statement statement) {
@@ -146,7 +147,7 @@ public class FailOnTimeout extends Statement {
         Thread thread = new Thread(threadGroup, task, "Time-limited test");
         // update the following line, so that thread-based log4j can work
         thread.setName(new StringBuilder(
-            Thread.currentThread().getName()).append("-").append(timeout).append("ms").toString());
+            Thread.currentThread().getName()).append("-").append(this.timeout).append(this.timeUnit).toString());
         thread.setDaemon(true);
         thread.start();
         callable.awaitStarted();

@@ -53,7 +53,7 @@ public abstract class AbstractTest {
     public ExpectedException expectedException = ExpectedException.none();
 
     @Rule
-    public Timeout globalTimeout = new Timeout(900123);
+    public Timeout globalTimeout = new Timeout(15, TimeUnit.MINUTES);
 
     protected SystemConfiguration sysConfig = SystemConfiguration.getInstance();
 

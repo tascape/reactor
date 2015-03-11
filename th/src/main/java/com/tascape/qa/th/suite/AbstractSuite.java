@@ -81,6 +81,7 @@ public abstract class AbstractSuite {
         return testClasses;
     }
 
+    @Deprecated
     protected <T extends AbstractTest> void putDirver(Class<T> testClazz, String name, EntityDriver driver) {
         String key = testClazz.getName() + "." + name;
         LOG.debug("Putting runtime driver {}={} into suite test environment", key, driver);
@@ -100,11 +101,14 @@ public abstract class AbstractSuite {
         throw new UnsupportedOperationException("Cannot add non-poolable driver with the same key " + key);
     }
 
-    protected void putDirver(TestDriver name, EntityDriver driver) {
+    protected void putTestDirver(TestDriver name, EntityDriver driver) {
         this.putDirver(name.getTestClass(), name.getName(), driver);
     }
 
     protected <T extends AbstractTest> void addTestClass(Class<T> clazz) {
+        if (testClasses.contains(clazz)) {
+            throw new UnsupportedOperationException("Adding same test class multiple times is not supported yet.");
+        }
         this.testClasses.add(clazz);
     }
 
