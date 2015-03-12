@@ -263,7 +263,10 @@ public final class H2Handler extends DbHandler {
     private void initSchema() throws SQLException, IOException {
         try (Connection conn = this.getConnection()) {
             ScriptRunner runner = new ScriptRunner(conn, true, true);
-            runner.runScript(new InputStreamReader(this.getClass().getClassLoader().getResourceAsStream("thr-h2.sql")));
+            try (InputStreamReader isr = new InputStreamReader(
+                this.getClass().getClassLoader().getResourceAsStream("/db/thr-h2.sql"))) {
+                runner.runScript(isr);
+            }
         }
     }
 }
