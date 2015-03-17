@@ -14,17 +14,20 @@ public class TestIterationData extends AbstractTestData {
 
     private int iterations = 1;
 
+    public TestIterationData() {
+    }
+
     private TestIterationData(int iteration, int iterations) {
         this.iteration = iteration;
         this.iterations = iterations;
     }
 
-    public static TestIterationData[] getData(String sysPropIterations) {
+    public TestIterationData[] getData(String sysPropIterations) {
         String n = config.getProperty(sysPropIterations);
         return useIterations(n);
     }
 
-    public static TestIterationData[] useIterations(String n) {
+    public TestIterationData[] useIterations(String n) {
         int iters = 1;
         try {
             iters = Integer.parseInt(n);

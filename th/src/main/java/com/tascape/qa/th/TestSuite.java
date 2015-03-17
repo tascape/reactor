@@ -103,10 +103,10 @@ public class TestSuite {
                     LOG.debug("Adding test case {}", tc.format());
                     tcs.add(tc);
                 } else {
-                    LOG.trace("Calling class {}, method {}, with parameters {}", tdp.klass(), tdp.method(),
+                    LOG.trace("Calling class {}, method {}, with parameter {}", tdp.klass(), tdp.method(),
                         tdp.parameter());
                     TestData[] data = AbstractTestData.getTestData(tdp.klass(), tdp.method(), tdp.parameter());
-                    LOG.debug("{} is a data-driven test case, test data size is {}", tc, data.length);
+                    LOG.debug("{} is a data-driven test case, test data size is {}", tc.format(), data.length);
                     int length = (data.length + "").length();
                     for (int i = 0; i < data.length; i++) {
                         TestCase t = new TestCase(tc);

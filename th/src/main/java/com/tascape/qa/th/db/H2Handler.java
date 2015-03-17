@@ -264,7 +264,7 @@ public final class H2Handler extends DbHandler {
         try (Connection conn = this.getConnection()) {
             ScriptRunner runner = new ScriptRunner(conn, true, true);
             try (InputStreamReader isr = new InputStreamReader(
-                this.getClass().getClassLoader().getResourceAsStream("/db/thr-h2.sql"))) {
+                this.getClass().getClassLoader().getResourceAsStream("db/thr-h2.sql"))) {
                 runner.runScript(isr);
             }
         }
