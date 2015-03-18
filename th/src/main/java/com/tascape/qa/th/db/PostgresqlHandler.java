@@ -24,13 +24,13 @@ public class PostgresqlHandler extends DbHandler {
 
     private static final String DB_DRIVER = "org.postgresql.Driver";
 
-    private static final String DB_HOST = CONFIG.getDatabaseHost();
+    private static final String DB_HOST = SYS_CONFIG.getDatabaseHost();
 
-    private static final String DB_SCHEMA = CONFIG.getDatabaseSchema();
+    private static final String DB_SCHEMA = SYS_CONFIG.getDatabaseSchema();
 
-    private static final String DB_USER = CONFIG.getDatabaseUser();
+    private static final String DB_USER = SYS_CONFIG.getDatabaseUser();
 
-    private static final String DB_PASS = CONFIG.getDatabasePass();
+    private static final String DB_PASS = SYS_CONFIG.getDatabasePass();
 
     static {
         try {
@@ -105,15 +105,15 @@ public class PostgresqlHandler extends DbHandler {
 
                 rs.updateString(Suite_Result.SUITE_RESULT_ID.name(), execId);
                 rs.updateString(Suite_Result.SUITE_NAME.name(), suite.getName());
-                rs.updateString(Suite_Result.JOB_NAME.name(), CONFIG.getJobName());
-                rs.updateInt(Suite_Result.JOB_BUILD_NUMBER.name(), CONFIG.getJobBuildNumber());
-                rs.updateString(Suite_Result.JOB_BUILD_URL.name(), CONFIG.getJobBuildUrl());
+                rs.updateString(Suite_Result.JOB_NAME.name(), SYS_CONFIG.getJobName());
+                rs.updateInt(Suite_Result.JOB_BUILD_NUMBER.name(), SYS_CONFIG.getJobBuildNumber());
+                rs.updateString(Suite_Result.JOB_BUILD_URL.name(), SYS_CONFIG.getJobBuildUrl());
                 rs.updateLong(Suite_Result.START_TIME.name(), time);
                 rs.updateLong(Suite_Result.STOP_TIME.name(), time);
                 rs.updateString(Suite_Result.EXECUTION_RESULT.name(), ExecutionResult.QUEUED.name());
                 rs.updateInt(Suite_Result.NUMBER_OF_TESTS.name(), suite.getTests().size());
                 rs.updateInt(Suite_Result.NUMBER_OF_FAILURE.name(), suite.getTests().size());
-                rs.updateNString(Suite_Result.PRODUCT_UNDER_TEST.name(), CONFIG.getProdUnderTest());
+                rs.updateNString(Suite_Result.PRODUCT_UNDER_TEST.name(), SYS_CONFIG.getProdUnderTest());
 
                 rs.insertRow();
                 rs.last();

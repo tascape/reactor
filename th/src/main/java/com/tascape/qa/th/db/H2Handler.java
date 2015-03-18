@@ -36,7 +36,7 @@ public final class H2Handler extends DbHandler {
         }
     }
 
-    private final String dbPath = CONFIG.getLogPath() + "/db/" + SystemConfiguration.CONSTANT_LOG_KEEP_ALIVE_PREFIX
+    private final String dbPath = SYS_CONFIG.getLogPath() + "/db/" + SystemConfiguration.CONSTANT_LOG_KEEP_ALIVE_PREFIX
         + System.currentTimeMillis() + "/";
 
     private JdbcConnectionPool connPool;
@@ -47,7 +47,7 @@ public final class H2Handler extends DbHandler {
         if (dir.exists()) {
             FileUtils.cleanDirectory(dir);
         }
-        this.connPool = JdbcConnectionPool.create("jdbc:h2:" + this.dbPath + CONFIG.getExecId(), "sa", "sa");
+        this.connPool = JdbcConnectionPool.create("jdbc:h2:" + this.dbPath + SYS_CONFIG.getExecId(), "sa", "sa");
         connPool.setMaxConnections(10);
         try (Connection conn = this.getConnection()) {
             try {
@@ -81,15 +81,15 @@ public final class H2Handler extends DbHandler {
             Long time = System.currentTimeMillis();
             stmt.setString(1, execId);
             stmt.setString(2, "");
-            stmt.setString(3, CONFIG.getJobName());
-            stmt.setInt(4, CONFIG.getJobBuildNumber());
-            stmt.setString(5, CONFIG.getJobBuildUrl());
+            stmt.setString(3, SYS_CONFIG.getJobName());
+            stmt.setInt(4, SYS_CONFIG.getJobBuildNumber());
+            stmt.setString(5, SYS_CONFIG.getJobBuildUrl());
             stmt.setLong(6, time);
             stmt.setLong(7, time + 11);
             stmt.setString(8, ExecutionResult.QUEUED.name());
             stmt.setInt(9, suite.getTests().size());
             stmt.setInt(10, suite.getTests().size());
-            stmt.setString(11, CONFIG.getProdUnderTest());
+            stmt.setString(11, SYS_CONFIG.getProdUnderTest());
             LOG.debug("{}", stmt);
             int i = stmt.executeUpdate();
             return i == 1;

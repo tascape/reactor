@@ -3,6 +3,10 @@ package com.tascape.qa.th.db;
 import com.tascape.qa.th.ExecutionResult;
 import com.tascape.qa.th.SystemConfiguration;
 import com.tascape.qa.th.TestSuite;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.OutputStream;
+import java.nio.file.Path;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -13,6 +17,9 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import javax.xml.stream.XMLOutputFactory;
+import javax.xml.stream.XMLStreamException;
+import javax.xml.stream.XMLStreamWriter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -23,7 +30,7 @@ import org.slf4j.LoggerFactory;
 public abstract class DbHandler {
     private static final Logger LOG = LoggerFactory.getLogger(DbHandler.class);
 
-    static final SystemConfiguration CONFIG = SystemConfiguration.getInstance();
+    static final SystemConfiguration SYS_CONFIG = SystemConfiguration.getInstance();
 
     public static final String SYSPROP_DATABASE_TYPE = "qa.th.db.type";
 
@@ -253,12 +260,12 @@ public abstract class DbHandler {
                 String host = rs.getString(Test_Result.TEST_STATION.name());
                 if (rs.getString(Test_Result.EXECUTION_RESULT.name()).equals(ExecutionResult.QUEUED.result())) {
                     LOG.debug("Found test case {} in DB with QUEUED state", tcr.getTestCase().format());
-                    if (CONFIG.getHostName().equals(host)) {
+                    if (SYS_CONFIG.getHostName().equals(host)) {
                         LOG.debug("This test case Failed on current host, and was requeue. Skip...");
                         return false;
                     }
                     rs.updateString(Test_Result.EXECUTION_RESULT.name(), ExecutionResult.ACQUIRED.result());
-                    rs.updateString(Test_Result.TEST_STATION.name(), CONFIG.getHostName());
+                    rs.updateString(Test_Result.TEST_STATION.name(), SYS_CONFIG.getHostName());
                     rs.updateRow();
                     return true;
                 } else {
@@ -300,6 +307,55 @@ public abstract class DbHandler {
 
     public abstract void updateSuiteExecutionResult(String execId) throws SQLException;
 
+    public void saveJunitXml(String execId) throws IOException, SQLException, XMLStreamException {
+        Path path = SYS_CONFIG.getLogPath().resolve(execId).resolve("result.xml");
+
+        final String sql = "SELECT * FROM " + TABLES.suite_result.name() + " WHERE "
+            + Suite_Result.SUITE_RESULT_ID.name() + " = ?;";
+        try (PreparedStatement stmt = this.getConnection().prepareStatement(sql)) {
+            stmt.setString(1, execId);
+            ResultSet rs = stmt.executeQuery();
+            if (rs.first()) {
+                try (OutputStream os = new FileOutputStream(path.toFile())) {
+                    XMLStreamWriter xsw = XMLOutputFactory.newInstance().createXMLStreamWriter(os);
+                    xsw.writeStartDocument();
+
+                    xsw.writeStartElement("testsuite");
+                    xsw.writeAttribute("name", rs.getString(Suite_Result.SUITE_NAME.name()));
+                    xsw.writeAttribute("srid", rs.getString(Suite_Result.SUITE_RESULT_ID.name()));
+                    xsw.writeAttribute("tests", rs.getInt(Suite_Result.NUMBER_OF_TESTS.name()) + "");
+                    xsw.writeAttribute("failures", rs.getInt(Suite_Result.NUMBER_OF_FAILURE.name()) + "");
+                    xsw.writeAttribute("time", (rs.getLong(Test_Result.STOP_TIME.name())
+                        - rs.getLong(Test_Result.START_TIME.name())) / 1000.0 + "");
+
+                    final String sql1 = "SELECT * FROM " + TABLES.test_result.name() + " tr JOIN "
+                        + TABLES.test_case.name() + " tc ON "
+                        + "tr." + Test_Result.TEST_CASE_ID + " = tc." + Test_Case.TEST_CASE_ID
+                        + " WHERE " + Test_Result.SUITE_RESULT.name() + " = ?;";
+                    try (PreparedStatement stmt1 = this.getConnection().prepareStatement(sql1)) {
+                        stmt1.setString(1, execId);
+                        ResultSet rs1 = stmt1.executeQuery();
+                        while (rs1.next()) {
+                            xsw.writeStartElement("testcase");
+                            xsw.writeAttribute("name", rs1.getString("tc." + Test_Case.TEST_METHOD.name()) + "("
+                                + rs1.getString(Test_Case.TEST_DATA.name()) + ")");
+                            xsw.writeAttribute("classname", rs1.getString("tc." + Test_Case.TEST_CLASS.name()));
+                            xsw.writeAttribute("time", (rs1.getLong("tr." + Test_Result.STOP_TIME.name())
+                                - rs1.getLong("tr." + Test_Result.START_TIME.name())) / 1000.0 + "");
+                            xsw.writeEndElement();
+                        }
+                    }
+
+                    xsw.writeEndElement();
+                    xsw.writeEndDocument();
+                    xsw.close();
+                }
+            } else {
+                LOG.error("No test suite result of exec id {}", execId);
+            }
+        }
+    }
+
     public void saveTestResultMetrics(String trid, List<TestResultMetric> resultMetrics) throws SQLException {
         final String sql = "SELECT * FROM " + TABLES.test_result_metric.name() + ";";
         try (Connection conn = this.getConnection();
@@ -337,10 +393,8 @@ public abstract class DbHandler {
 
     protected abstract boolean releaseExecutionLock(Connection conn, String lock) throws SQLException;
 
-    public static void main(String[] args) throws SQLException {
+    public static void main(String[] args) throws Exception {
         DbHandler db = DbHandler.getInstance();
-        TestCase tc = new TestCase();
-        tc.setSuiteClass("a");
-        LOG.debug("test case id = {}", db.getTestCaseId(tc));
+        db.saveJunitXml("th_0a6de24b_ac8b_47d7_b347_b28b64eb71d4");
     }
 }

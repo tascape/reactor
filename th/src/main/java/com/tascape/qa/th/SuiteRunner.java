@@ -16,6 +16,7 @@ import java.util.concurrent.ExecutorCompletionService;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
+import javax.xml.stream.XMLStreamException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -48,7 +49,7 @@ public class SuiteRunner {
         db.queueSuiteExecution(ts, this.execId);
     }
 
-    public int startExecution() throws IOException, InterruptedException, SQLException {
+    public int startExecution() throws IOException, InterruptedException, SQLException, XMLStreamException {
         File dir = sysConfig.getLogPath().resolve(execId).toFile();
         LOG.info("Create suite execution log directory {}", dir);
         if (!dir.exists() && !dir.mkdirs()) {
@@ -106,6 +107,7 @@ public class SuiteRunner {
 
         LOG.info("No more test case to run on this host, updating suite execution result");
         this.db.updateSuiteExecutionResult(this.execId);
+        this.db.saveJunitXml(this.execId);
         return numberOfFailures;
     }
 
