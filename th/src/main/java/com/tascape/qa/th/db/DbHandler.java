@@ -337,11 +337,11 @@ public abstract class DbHandler {
                         ResultSet rs1 = stmt1.executeQuery();
                         while (rs1.next()) {
                             xsw.writeStartElement("testcase");
-                            xsw.writeAttribute("name", rs1.getString("tc." + Test_Case.TEST_METHOD.name()) + "("
+                            xsw.writeAttribute("name", rs1.getString(Test_Case.TEST_METHOD.name()) + "("
                                 + rs1.getString(Test_Case.TEST_DATA.name()) + ")");
-                            xsw.writeAttribute("classname", rs1.getString("tc." + Test_Case.TEST_CLASS.name()));
-                            xsw.writeAttribute("time", (rs1.getLong("tr." + Test_Result.STOP_TIME.name())
-                                - rs1.getLong("tr." + Test_Result.START_TIME.name())) / 1000.0 + "");
+                            xsw.writeAttribute("classname", rs1.getString(Test_Case.TEST_CLASS.name()));
+                            xsw.writeAttribute("time", (rs1.getLong(Test_Result.STOP_TIME.name())
+                                - rs1.getLong(Test_Result.START_TIME.name())) / 1000.0 + "");
                             xsw.writeEndElement();
                         }
                     }
