@@ -319,14 +319,16 @@ public abstract class DbHandler {
                 try (OutputStream os = new FileOutputStream(path.toFile())) {
                     XMLStreamWriter xsw = XMLOutputFactory.newInstance().createXMLStreamWriter(os);
                     xsw.writeStartDocument();
+                    xsw.writeCharacters("\n");
 
                     xsw.writeStartElement("testsuite");
                     xsw.writeAttribute("name", rs.getString(Suite_Result.SUITE_NAME.name()));
-                    xsw.writeAttribute("srid", rs.getString(Suite_Result.SUITE_RESULT_ID.name()));
                     xsw.writeAttribute("tests", rs.getInt(Suite_Result.NUMBER_OF_TESTS.name()) + "");
                     xsw.writeAttribute("failures", rs.getInt(Suite_Result.NUMBER_OF_FAILURE.name()) + "");
                     xsw.writeAttribute("time", (rs.getLong(Test_Result.STOP_TIME.name())
                         - rs.getLong(Test_Result.START_TIME.name())) / 1000.0 + "");
+                    xsw.writeAttribute("srid", rs.getString(Suite_Result.SUITE_RESULT_ID.name()));
+                    xsw.writeCharacters("\n");
 
                     final String sql1 = "SELECT * FROM " + TABLES.test_result.name() + " tr JOIN "
                         + TABLES.test_case.name() + " tc ON "
@@ -336,6 +338,7 @@ public abstract class DbHandler {
                         stmt1.setString(1, execId);
                         ResultSet rs1 = stmt1.executeQuery();
                         while (rs1.next()) {
+                            xsw.writeCharacters("  ");
                             xsw.writeStartElement("testcase");
                             xsw.writeAttribute("name", rs1.getString(Test_Case.TEST_METHOD.name()) + "("
                                 + rs1.getString(Test_Case.TEST_DATA.name()) + ")");
@@ -343,10 +346,12 @@ public abstract class DbHandler {
                             xsw.writeAttribute("time", (rs1.getLong(Test_Result.STOP_TIME.name())
                                 - rs1.getLong(Test_Result.START_TIME.name())) / 1000.0 + "");
                             xsw.writeEndElement();
+                            xsw.writeCharacters("\n");
                         }
                     }
 
                     xsw.writeEndElement();
+                    xsw.writeCharacters("\n");
                     xsw.writeEndDocument();
                     xsw.close();
                 }
