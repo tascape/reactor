@@ -76,7 +76,9 @@ public abstract class AbstractTestRunner {
                 newline = newline.replaceAll("<", "&lt;");
                 if (newline.contains(" WARN  ")) {
                     newline = "<b>" + newline + "</b> ";
-                } else if (newline.contains(" ERROR ") || newline.contains(" Failure in test")) {
+                } else if (newline.contains(" ERROR ")
+                    || newline.contains("Failure in test")
+                    || newline.contains("AssertionError")) {
                     newline = "<font color='red'><b>" + newline + "</b></font> ";
                 }
                 pw.println(newline);
