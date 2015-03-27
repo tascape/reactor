@@ -9,6 +9,8 @@ import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import org.apache.commons.io.FileUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -60,6 +62,8 @@ public abstract class AbstractTestRunner {
     public abstract void runTestCase() throws Exception;
 
     protected void generateHtml(Path logFile) {
+        Pattern http = Pattern.compile("((http|https)://\\S+)");
+
         Path html = logFile.getParent().resolve("log.html");
         LOG.trace("creating file {}", html);
         try (PrintWriter pw = new PrintWriter(html.toFile())) {
@@ -80,6 +84,13 @@ public abstract class AbstractTestRunner {
                     || newline.contains("Failure in test")
                     || newline.contains("AssertionError")) {
                     newline = "<font color='red'><b>" + newline + "</b></font> ";
+                } else {
+                    Matcher m = http.matcher(line);
+                    if (m.find()) {
+                        String url = m.group(1);
+                        String a = String.format("<a href='%s'>%s</a>", url, url);
+                        newline = newline.replace(url, a);
+                    }
                 }
                 pw.println(newline);
                 for (File file : files) {
