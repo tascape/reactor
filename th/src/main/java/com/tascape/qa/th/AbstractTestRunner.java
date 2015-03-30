@@ -68,7 +68,7 @@ public abstract class AbstractTestRunner {
         LOG.trace("creating file {}", html);
         try (PrintWriter pw = new PrintWriter(html.toFile())) {
             pw.println("<html><body><pre>");
-            pw.println("<a href=\"../\">Parent Directory</a>,<a href=\"./\">Current Directory</a>");
+            pw.println("<a href='../'>Suite Log Directory</a><br /><a href='./'>Test Log Directory</a>");
             pw.println();
             pw.println(logFile);
             pw.println();

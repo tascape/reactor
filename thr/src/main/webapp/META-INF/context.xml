@@ -1,0 +1,4 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Context antiJARLocking="true" path="/thrd">
+  <Resource auth="Container" driverClassName="com.mysql.jdbc.Driver" maxActive="20" maxIdle="1" name="jdbc/thr" password="p@ssword" testWhileIdle="true" type="javax.sql.DataSource" url="jdbc:mysql://127.0.0.1/testharness" username="th" validationQuery="SELECT 1;"/>
+</Context>
