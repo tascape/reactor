@@ -136,7 +136,7 @@ public abstract class DbHandler {
             ResultSet rs = stmt.executeQuery();
             SuiteResult tsr = new SuiteResult();
             if (rs.first()) {
-                tsr.setId(rs.getString(Suite_Result.SUITE_RESULT_ID.name()));
+                tsr.setSuiteResultId(rs.getString(Suite_Result.SUITE_RESULT_ID.name()));
                 tsr.setJobName(rs.getString(Suite_Result.JOB_NAME.name()));
                 tsr.setJobBuildNumber(rs.getInt(Suite_Result.JOB_BUILD_NUMBER.name()));
                 tsr.setJobBuildUrl(rs.getString(Suite_Result.JOB_BUILD_URL.name()));
