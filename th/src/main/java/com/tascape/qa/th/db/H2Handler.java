@@ -205,6 +205,10 @@ public final class H2Handler extends DbHandler {
     }
 
     @Override
+    public void saveTestResultMetrics(String trid, List<TestResultMetric> resultMetrics) throws SQLException {
+    }
+
+    @Override
     public void updateSuiteExecutionResult(String execId) throws SQLException {
         LOG.info("Update test suite execution result with execution id {}", execId);
         int total = 0, fail = 0;
