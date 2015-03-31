@@ -45,4 +45,8 @@ public class TestResultMetric implements Serializable {
     public void setMetricValue(Double metricValue) {
         this.metricValue = metricValue;
     }
+
+    public String tosString() {
+        return metricGroup + ":" + metricName + ":" + metricValue;
+    }
 }

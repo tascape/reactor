@@ -84,13 +84,13 @@ CREATE TABLE `test_result` (
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
 
 --
--- Table structure for table `test_result_ metric`
+-- Table structure for table `test_result_metric`
 --
 
-DROP TABLE IF EXISTS `test_result_ metric`;
+DROP TABLE IF EXISTS `test_result_metric`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8 */;
-CREATE TABLE `test_result_ metric` (
+CREATE TABLE `test_result_metric` (
   `TEST_RESULT_METRIC_ID` int(11) NOT NULL AUTO_INCREMENT,
   `TEST_RESULT_ID` varchar(63) DEFAULT NULL,
   `METRIC_GROUP` varchar(63) DEFAULT NULL,

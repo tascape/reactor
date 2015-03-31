@@ -362,11 +362,13 @@ public abstract class DbHandler {
     }
 
     public void saveTestResultMetrics(String trid, List<TestResultMetric> resultMetrics) throws SQLException {
-        final String sql = "SELECT * FROM " + TABLES.test_result_metric.name() + ";";
+        final String sql = "SELECT * FROM " + TABLES.test_result_metric.name() + " WHERE "
+            + Test_Result_Metric.TEST_RESULT_ID.name() + " = ?;";
         try (Connection conn = this.getConnection();
             PreparedStatement stmt = conn.prepareStatement(sql,
                 ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE)) {
             stmt.setMaxRows(1);
+            stmt.setString(1, trid);
             LOG.trace("save metric data {}", resultMetrics);
             ResultSet rs = stmt.executeQuery();
 
