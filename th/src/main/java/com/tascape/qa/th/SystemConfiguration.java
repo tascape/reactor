@@ -223,7 +223,7 @@ public final class SystemConfiguration {
     }
 
     public String getJobName() {
-        String value = this.getProperty(SYSENV_JOB_NAME);
+        String value = this.getProperty("qa.th." + SYSENV_JOB_NAME);
         if (value == null) {
             value = System.getenv().get(SYSENV_JOB_NAME);
         }
@@ -236,7 +236,7 @@ public final class SystemConfiguration {
     }
 
     public int getJobBuildNumber() {
-        String value = this.getProperty(SYSENV_JOB_NUMBER);
+        String value = this.getProperty("qa.th." + SYSENV_JOB_NUMBER);
         if (value == null) {
             value = System.getenv().get(SYSENV_JOB_NUMBER);
         }
@@ -249,7 +249,7 @@ public final class SystemConfiguration {
     }
 
     public String getJobBuildUrl() {
-        String value = this.getProperty(SYSENV_JOB_BUILD_URL);
+        String value = this.getProperty("qa.th." + SYSENV_JOB_BUILD_URL);
         if (value == null) {
             value = System.getenv().get(SYSENV_JOB_BUILD_URL);
         }
