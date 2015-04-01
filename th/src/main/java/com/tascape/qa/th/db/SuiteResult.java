@@ -15,9 +15,11 @@
  */
 package com.tascape.qa.th.db;
 
+import com.tascape.qa.th.TestSuite;
 import com.tascape.qa.th.db1.TestResult;
 import java.io.Serializable;
-import java.math.BigInteger;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.List;
 import javax.persistence.Basic;
 import javax.persistence.Column;
@@ -27,6 +29,7 @@ import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlTransient;
+import static com.tascape.qa.th.db.DbHandler.SYS_CONFIG;
 
 /**
  *
@@ -36,7 +39,6 @@ import javax.xml.bind.annotation.XmlTransient;
 @Table(name = "suite_result")
 @XmlRootElement
 public class SuiteResult implements Serializable {
-
     private static final long serialVersionUID = 1L;
 
     @Id
@@ -60,10 +62,10 @@ public class SuiteResult implements Serializable {
     private String executionResult;
 
     @Column(name = "START_TIME")
-    private BigInteger startTime;
+    private Long startTime;
 
     @Column(name = "STOP_TIME")
-    private BigInteger stopTime;
+    private Long stopTime;
 
     @Column(name = "NUMBER_OF_TESTS")
     private Integer numberOfTests;
@@ -72,7 +74,7 @@ public class SuiteResult implements Serializable {
     private Integer numberOfFailure;
 
     @Column(name = "INVISIBLE_ENTRY")
-    private Short invisibleEntry;
+    private Boolean invisibleEntry;
 
     @Column(name = "PRODUCT_UNDER_TEST")
     private String productUnderTest;
@@ -81,6 +83,52 @@ public class SuiteResult implements Serializable {
     private List<TestResult> testResultList;
 
     public SuiteResult() {
+    }
+
+    public SuiteResult(TestSuite testSuite, String execId) {
+        Long time = System.currentTimeMillis();
+        this.suiteResultId = execId;
+        this.suiteName = testSuite.getName();
+        this.jobName = SYS_CONFIG.getJobName();
+        this.jobBuildNumber = SYS_CONFIG.getJobBuildNumber();
+        this.jobBuildUrl = SYS_CONFIG.getJobBuildUrl();
+        this.executionResult = "";
+        this.startTime = time;
+        this.stopTime = time + 1;
+        this.numberOfTests = testSuite.getTests().size();
+        this.numberOfFailure = testSuite.getTests().size();
+        this.invisibleEntry = false;
+        this.productUnderTest = SYS_CONFIG.getProdUnderTest();
+    }
+
+    public SuiteResult(ResultSet rs) throws SQLException {
+        this.suiteResultId = rs.getString("SUITE_RESULT_ID");
+        this.suiteName = rs.getString("SUITE_NAME");
+        this.jobName = rs.getString("JOB_NAME");
+        this.jobBuildNumber = rs.getInt("JOB_BUILD_NUMBER");
+        this.jobBuildUrl = rs.getString("JOB_BUILD_URL");
+        this.executionResult = rs.getString("EXECUTION_RESULT");
+        this.startTime = rs.getLong("START_TIME");
+        this.stopTime = rs.getLong("STOP_TIME");
+        this.numberOfTests = rs.getInt("NUMBER_OF_TESTS");
+        this.numberOfFailure = rs.getInt("NUMBER_OF_FAILURE");
+        this.invisibleEntry = rs.getBoolean("INVISIBLE_ENTRY");
+        this.productUnderTest = rs.getNString("PRODUCT_UNDER_TEST");
+    }
+
+    public void update(ResultSet rs) throws SQLException {
+        rs.updateString("SUITE_RESULT_ID", this.getSuiteResultId());
+        rs.updateString("SUITE_NAME", this.getSuiteName());
+        rs.updateString("JOB_NAME", this.getJobName());
+        rs.updateInt("JOB_BUILD_NUMBER", this.getJobBuildNumber());
+        rs.updateString("JOB_BUILD_URL", this.getJobBuildUrl());
+        rs.updateLong("START_TIME", this.getStartTime());
+        rs.updateLong("STOP_TIME", this.getStartTime());
+        rs.updateString("EXECUTION_RESULT", this.getExecutionResult());
+        rs.updateInt("NUMBER_OF_TESTS", this.getNumberOfTests());
+        rs.updateInt("NUMBER_OF_FAILURE", this.getNumberOfFailure());
+        rs.updateBoolean("INVISIBLE_ENTRY", this.getInvisibleEntry());
+        rs.updateNString("PRODUCT_UNDER_TEST", this.getProductUnderTest());
     }
 
     public SuiteResult(String suiteResultId) {
@@ -135,19 +183,19 @@ public class SuiteResult implements Serializable {
         this.executionResult = executionResult;
     }
 
-    public BigInteger getStartTime() {
+    public Long getStartTime() {
         return startTime;
     }
 
-    public void setStartTime(BigInteger startTime) {
+    public void setStartTime(Long startTime) {
         this.startTime = startTime;
     }
 
-    public BigInteger getStopTime() {
+    public Long getStopTime() {
         return stopTime;
     }
 
-    public void setStopTime(BigInteger stopTime) {
+    public void setStopTime(Long stopTime) {
         this.stopTime = stopTime;
     }
 
@@ -167,11 +215,11 @@ public class SuiteResult implements Serializable {
         this.numberOfFailure = numberOfFailure;
     }
 
-    public Short getInvisibleEntry() {
+    public Boolean getInvisibleEntry() {
         return invisibleEntry;
     }
 
-    public void setInvisibleEntry(Short invisibleEntry) {
+    public void setInvisibleEntry(Boolean invisibleEntry) {
         this.invisibleEntry = invisibleEntry;
     }
 

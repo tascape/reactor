@@ -86,6 +86,7 @@ public class MysqlHandler extends DbHandler {
         LOG.info("Queueing test suite result with execution id {} ", execId);
         final String sql = "SELECT * FROM " + TABLES.suite_result.name() + " WHERE "
             + Suite_Result.SUITE_RESULT_ID.name() + " = ?";
+        SuiteResult sr = new SuiteResult(suite, execId);
 
         try (Connection conn = this.getConnection()) {
             PreparedStatement stmt = conn.prepareStatement(sql,
@@ -102,19 +103,7 @@ public class MysqlHandler extends DbHandler {
                 Long time = System.currentTimeMillis();
                 LOG.debug("Queueing suite execution {}", execId);
                 rs.moveToInsertRow();
-
-                rs.updateString(Suite_Result.SUITE_RESULT_ID.name(), execId);
-                rs.updateString(Suite_Result.SUITE_NAME.name(), suite.getName());
-                rs.updateString(Suite_Result.JOB_NAME.name(), SYS_CONFIG.getJobName());
-                rs.updateInt(Suite_Result.JOB_BUILD_NUMBER.name(), SYS_CONFIG.getJobBuildNumber());
-                rs.updateString(Suite_Result.JOB_BUILD_URL.name(), SYS_CONFIG.getJobBuildUrl());
-                rs.updateLong(Suite_Result.START_TIME.name(), time);
-                rs.updateLong(Suite_Result.STOP_TIME.name(), time);
-                rs.updateString(Suite_Result.EXECUTION_RESULT.name(), ExecutionResult.QUEUED.name());
-                rs.updateInt(Suite_Result.NUMBER_OF_TESTS.name(), suite.getTests().size());
-                rs.updateInt(Suite_Result.NUMBER_OF_FAILURE.name(), suite.getTests().size());
-                rs.updateNString(Suite_Result.PRODUCT_UNDER_TEST.name(), SYS_CONFIG.getProdUnderTest());
-
+                sr.update(rs);
                 rs.insertRow();
                 rs.last();
                 rs.updateRow();
