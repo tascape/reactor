@@ -49,8 +49,6 @@ public final class SystemConfiguration {
 
     public static final String SYSPROP_PRODUCT_UNDER_TEST = "qa.th.product.under.test";
 
-    public static final String SYSPROP_JOB_NAME_CUSTOM = "JOB_NAME_CUSTOM";
-
     public static final String SYSENV_JOB_NAME = "JOB_NAME";
 
     public static final String SYSENV_JOB_NUMBER = "BUILD_NUMBER";
@@ -225,20 +223,23 @@ public final class SystemConfiguration {
     }
 
     public String getJobName() {
-        String value = this.getProperty(SYSPROP_JOB_NAME_CUSTOM);
+        String value = this.getProperty(SYSENV_JOB_NAME);
         if (value == null) {
             value = System.getenv().get(SYSENV_JOB_NAME);
-            if (value == null) {
-                value = System.getProperty("user.name") + "@" + StringUtils.substringBefore(this.getHostName(), ".");
-            } else {
-                value = value.split("/")[0];
-            }
+        }
+        if (value == null) {
+            value = System.getProperty("user.name") + "@" + StringUtils.substringBefore(this.getHostName(), ".");
+        } else {
+            value = value.split("/")[0];
         }
         return value.trim();
     }
 
     public int getJobBuildNumber() {
-        String value = System.getenv().get(SYSENV_JOB_NUMBER);
+        String value = this.getProperty(SYSENV_JOB_NUMBER);
+        if (value == null) {
+            value = System.getenv().get(SYSENV_JOB_NUMBER);
+        }
         try {
             return value == null ? 0 : Integer.parseInt(value);
         } catch (NumberFormatException ex) {
@@ -248,7 +249,10 @@ public final class SystemConfiguration {
     }
 
     public String getJobBuildUrl() {
-        String value = System.getenv().get(SYSENV_JOB_BUILD_URL);
+        String value = this.getProperty(SYSENV_JOB_BUILD_URL);
+        if (value == null) {
+            value = System.getenv().get(SYSENV_JOB_BUILD_URL);
+        }
         return value == null ? "#" : value;
     }
 
