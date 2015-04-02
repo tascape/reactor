@@ -112,7 +112,8 @@ public class TestSuite {
                         TestCase t = new TestCase(tc);
                         TestDataInfo tdi = new TestDataInfo(tdp.klass(), tdp.method(), tdp.parameter(), i);
                         t.setTestDataInfo(tdi.format(length));
-                        t.setTestData(data[i].getValue());
+                        String v = data[i].getValue();
+                        t.setTestData(v == null ? data[i].format() : v);
                         t.setPriority(Math.min(t.getPriority(), data[i].getPriority()));
 
                         LOG.debug("Adding test case {}", t.format());

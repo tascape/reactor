@@ -38,7 +38,7 @@ public abstract class AbstractTestData implements TestData {
 
     @Override
     public String getValue() {
-        return value == null ? this.format() : value;
+        return this.value;
     }
 
     @Override
