@@ -25,6 +25,7 @@ import org.slf4j.LoggerFactory;
 @ManagedBean(name = "perfHistory", eager = false)
 @RequestScoped
 public class PerfHistory extends ResultBase {
+
     private static final Logger LOG = LoggerFactory.getLogger(PerfHistory.class);
 
     @ManagedProperty(value = "#{param.suiteids}")
@@ -99,7 +100,8 @@ public class PerfHistory extends ResultBase {
                 int data = -1;
                 try {
                     data = Integer.parseInt(perfEntry.get(sid) + "");
-                } catch (NumberFormatException ex) {
+                }
+                catch (NumberFormatException ex) {
                     LOG.warn("wx {}", ex.getMessage());
                 }
                 if (data <= 0) {

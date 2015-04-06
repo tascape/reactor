@@ -1,3 +1,18 @@
+/*
+ * Copyright 2015.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package com.tascape.qa.th.db;
 
 import com.tascape.qa.th.ExecutionResult;
@@ -43,35 +58,7 @@ public abstract class DbHandler {
     public static final String SYSPROP_DATABASE_PASS = "qa.th.db.pass";
 
     public enum TABLES {
-        suite_result,
-        test_case,
-        test_result,
         test_result_metric,
-    }
-
-    public enum Suite_Result {
-        SUITE_RESULT_ID,
-        SUITE_NAME,
-        JOB_NAME,
-        JOB_BUILD_NUMBER,
-        JOB_BUILD_URL,
-        EXECUTION_RESULT,
-        START_TIME,
-        STOP_TIME,
-        NUMBER_OF_TESTS,
-        NUMBER_OF_FAILURE,
-        INVISIBLE_ENTRY,
-        PRODUCT_UNDER_TEST,
-    }
-
-    public enum Test_Case {
-        TEST_CASE_ID,
-        SUITE_CLASS,
-        TEST_CLASS,
-        TEST_METHOD,
-        TEST_DATA_INFO,
-        TEST_DATA,
-        TEST_ISSUES,
     }
 
     public enum Test_Result {
@@ -125,8 +112,8 @@ public abstract class DbHandler {
 
     public SuiteResult getSuiteResult(String id) throws SQLException {
         LOG.info("Query for suite result with execution id {}", id);
-        final String sql = "SELECT * FROM " + TABLES.suite_result.name() + " WHERE "
-            + Suite_Result.SUITE_RESULT_ID.name() + " = ?";
+        final String sql = "SELECT * FROM " + SuiteResult.TABLE_NAME + " WHERE "
+            + SuiteResult.SUITE_RESULT_ID + " = ?";
 
         try (Connection conn = this.getConnection()) {
             PreparedStatement stmt = conn.prepareStatement(sql);
@@ -136,10 +123,10 @@ public abstract class DbHandler {
             ResultSet rs = stmt.executeQuery();
             SuiteResult tsr = new SuiteResult();
             if (rs.first()) {
-                tsr.setSuiteResultId(rs.getString(Suite_Result.SUITE_RESULT_ID.name()));
-                tsr.setJobName(rs.getString(Suite_Result.JOB_NAME.name()));
-                tsr.setJobBuildNumber(rs.getInt(Suite_Result.JOB_BUILD_NUMBER.name()));
-                tsr.setJobBuildUrl(rs.getString(Suite_Result.JOB_BUILD_URL.name()));
+                tsr.setSuiteResultId(rs.getString(SuiteResult.SUITE_RESULT_ID));
+                tsr.setJobName(rs.getString(SuiteResult.JOB_NAME));
+                tsr.setJobBuildNumber(rs.getInt(SuiteResult.JOB_BUILD_NUMBER));
+                tsr.setJobBuildUrl(rs.getString(SuiteResult.JOB_BUILD_URL));
             } else {
                 LOG.warn("no suite result with execution id {}", id);
             }
@@ -176,11 +163,11 @@ public abstract class DbHandler {
         });
 
         Map<String, Integer> idMap = new HashMap<>();
-        String sql = "SELECT * FROM " + TABLES.test_case + " WHERE ";
+        String sql = "SELECT * FROM " + TestCase.TABLE_NAME + " WHERE ";
         String sql0 = "";
-        for (String sc : suiteClasses) {
-            sql0 += " OR " + Test_Case.SUITE_CLASS.name() + "='" + sc + "'";
-        }
+        sql0 = suiteClasses.stream()
+            .map((sc) -> " OR " + TestCase.SUITE_CLASS + "='" + sc + "'")
+            .reduce(sql0, String::concat);
         sql += sql0.substring(4);
         try (Connection conn = this.getConnection()) {
             PreparedStatement stmt = conn.prepareStatement(sql);
@@ -188,12 +175,12 @@ public abstract class DbHandler {
             ResultSet rs = stmt.executeQuery();
             while (rs.next()) {
                 TestCase tc = new TestCase();
-                tc.setSuiteClass(rs.getString(Test_Case.SUITE_CLASS.name()));
-                tc.setTestClass(rs.getString(Test_Case.TEST_CLASS.name()));
-                tc.setTestMethod(rs.getString(Test_Case.TEST_METHOD.name()));
-                tc.setTestDataInfo(rs.getString(Test_Case.TEST_DATA_INFO.name()));
-                tc.setTestData(rs.getString(Test_Case.TEST_DATA.name()));
-                idMap.put(tc.format(), rs.getInt(Test_Case.TEST_CASE_ID.name()));
+                tc.setSuiteClass(rs.getString(TestCase.SUITE_CLASS));
+                tc.setTestClass(rs.getString(TestCase.TEST_CLASS));
+                tc.setTestMethod(rs.getString(TestCase.TEST_METHOD));
+                tc.setTestDataInfo(rs.getString(TestCase.TEST_DATA_INFO));
+                tc.setTestData(rs.getString(TestCase.TEST_DATA));
+                idMap.put(tc.format(), rs.getInt(TestCase.TEST_CASE_ID));
             }
             LOG.debug("Found {} tests exist", idMap.size());
             return idMap;
@@ -204,8 +191,8 @@ public abstract class DbHandler {
 
     public List<TestResult> getQueuedTestCaseResults(String execId, int limit) throws SQLException {
         LOG.info("Query database for all queued test cases");
-        final String sql = "SELECT * FROM " + TABLES.test_result.name() + " tr "
-            + "INNER JOIN " + TABLES.test_case.name() + " tc "
+        final String sql = "SELECT * FROM " + TestResult.TABLE_NAME + " tr "
+            + "INNER JOIN " + TestCase.TABLE_NAME + " tc "
             + "ON tr.TEST_CASE_ID=tc.TEST_CASE_ID AND " + Test_Result.EXECUTION_RESULT.name() + " = ? "
             + "WHERE " + Test_Result.SUITE_RESULT.name() + " = ? "
             + "ORDER BY SUITE_CLASS, TEST_CLASS, TEST_METHOD, TEST_DATA_INFO "
@@ -221,22 +208,22 @@ public abstract class DbHandler {
 
             while (rs.next()) {
                 TestResult tcr = new TestResult();
-                tcr.setId(rs.getString(Test_Result.TEST_RESULT_ID.name()));
-                tcr.setSuiteResult(execId);
+                tcr.setTestResultId(rs.getString(Test_Result.TEST_RESULT_ID.name()));
+                tcr.setSuiteResultId(execId);
                 tcr.setStartTime(rs.getLong(Test_Result.START_TIME.name()));
                 tcr.setStopTime(rs.getLong(Test_Result.STOP_TIME.name()));
                 tcr.setRetry(rs.getInt(Test_Result.RETRY.name()));
 
                 TestCase tc = new TestCase();
-                tc.setSuiteClass(rs.getString(Test_Case.SUITE_CLASS.name()));
-                tc.setTestClass(rs.getString(Test_Case.TEST_CLASS.name()));
-                tc.setTestMethod(rs.getString(Test_Case.TEST_METHOD.name()));
-                tc.setTestDataInfo(rs.getString(Test_Case.TEST_DATA_INFO.name()));
-                tc.setTestData(rs.getString(Test_Case.TEST_DATA.name()));
+                tc.setSuiteClass(rs.getString(TestCase.SUITE_CLASS));
+                tc.setTestClass(rs.getString(TestCase.TEST_CLASS));
+                tc.setTestMethod(rs.getString(TestCase.TEST_METHOD));
+                tc.setTestDataInfo(rs.getString(TestCase.TEST_DATA_INFO));
+                tc.setTestData(rs.getString(TestCase.TEST_DATA));
                 tcr.setTestCase(tc);
 
-                tcr.setHost(rs.getString(Test_Result.TEST_STATION.name()));
-                tcr.setLogDirectory(rs.getString(Test_Result.LOG_DIR.name()));
+                tcr.setTestStation(rs.getString(Test_Result.TEST_STATION.name()));
+                tcr.setLogDir(rs.getString(Test_Result.LOG_DIR.name()));
                 tcrs.add(tcr);
             }
         }
@@ -248,13 +235,13 @@ public abstract class DbHandler {
 
     public boolean acquireTestCaseResult(TestResult tcr) throws SQLException {
         LOG.info("Acquire test case {}", tcr.getTestCase().format());
-        final String sql = "SELECT * FROM " + TABLES.test_result.name() + " WHERE "
+        final String sql = "SELECT * FROM " + TestResult.TABLE_NAME + " WHERE "
             + Test_Result.TEST_RESULT_ID.name() + " = ? LIMIT 1;";
 
         try (Connection conn = this.getConnection()) {
             PreparedStatement stmt = conn.prepareStatement(sql,
                 ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE);
-            stmt.setString(1, tcr.getId());
+            stmt.setString(1, tcr.getTestResultId());
             ResultSet rs = stmt.executeQuery();
             if (rs.next()) {
                 String host = rs.getString(Test_Result.TEST_STATION.name());
@@ -277,27 +264,27 @@ public abstract class DbHandler {
     }
 
     public void updateTestExecutionResult(TestResult tcr) throws SQLException {
-        LOG.info("Update test result {} ({}) to {}", tcr.getId(), tcr.getTestCase().format(),
-            tcr.getExecutionResult().result());
-        final String sql = "SELECT tr.* FROM " + TABLES.test_result.name() + " tr INNER JOIN " + TABLES.test_case.name()
+        LOG.info("Update test result {} ({}) to {}", tcr.getTestResultId(), tcr.getTestCase().format(),
+            tcr.getResult().result());
+        final String sql = "SELECT tr.* FROM " + TestResult.TABLE_NAME + " tr INNER JOIN " + TestCase.TABLE_NAME
             + " tc WHERE tr.TEST_CASE_ID=tc.TEST_CASE_ID AND "
             + Test_Result.TEST_RESULT_ID.name() + " = ?;";
 
         try (Connection conn = this.getConnection()) {
             PreparedStatement stmt = conn.prepareStatement(sql,
                 ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE);
-            stmt.setString(1, tcr.getId());
+            stmt.setString(1, tcr.getTestResultId());
             ResultSet rs = stmt.executeQuery();
             if (rs.first()) {
 // TODO: update test data into test case table
-//                rs.updateString(Test_Case.TEST_DATA.name(), tcr.getTestCase().getTestData());
-                rs.updateString(Test_Result.EXECUTION_RESULT.name(), tcr.getExecutionResult().result());
+//                rs.updateString(TestCase.TEST_DATA.name(), tcr.getTestCase().getTestData());
+                rs.updateString(Test_Result.EXECUTION_RESULT.name(), tcr.getResult().result());
                 rs.updateString(Test_Result.AUT.name(), tcr.getAut());
                 rs.updateLong(Test_Result.START_TIME.name(), tcr.getStartTime());
                 rs.updateLong(Test_Result.STOP_TIME.name(), tcr.getStopTime());
                 rs.updateInt(Test_Result.RETRY.name(), tcr.getRetry());
-                rs.updateString(Test_Result.TEST_STATION.name(), tcr.getHost());
-                rs.updateString(Test_Result.LOG_DIR.name(), tcr.getLogDirectory());
+                rs.updateString(Test_Result.TEST_STATION.name(), tcr.getTestStation());
+                rs.updateString(Test_Result.LOG_DIR.name(), tcr.getLogDir());
                 rs.updateRow();
             } else {
                 LOG.warn("Cannot update test result");
@@ -310,8 +297,8 @@ public abstract class DbHandler {
     public void saveJunitXml(String execId) throws IOException, SQLException, XMLStreamException {
         Path path = SYS_CONFIG.getLogPath().resolve(execId).resolve("result.xml");
 
-        final String sql = "SELECT * FROM " + TABLES.suite_result.name() + " WHERE "
-            + Suite_Result.SUITE_RESULT_ID.name() + " = ?;";
+        final String sql = "SELECT * FROM " + SuiteResult.TABLE_NAME + " WHERE "
+            + SuiteResult.SUITE_RESULT_ID + " = ?;";
         try (PreparedStatement stmt = this.getConnection().prepareStatement(sql)) {
             stmt.setString(1, execId);
             ResultSet rs = stmt.executeQuery();
@@ -322,17 +309,17 @@ public abstract class DbHandler {
                     xsw.writeCharacters("\n");
 
                     xsw.writeStartElement("testsuite");
-                    xsw.writeAttribute("name", rs.getString(Suite_Result.SUITE_NAME.name()));
-                    xsw.writeAttribute("tests", rs.getInt(Suite_Result.NUMBER_OF_TESTS.name()) + "");
-                    xsw.writeAttribute("failures", rs.getInt(Suite_Result.NUMBER_OF_FAILURE.name()) + "");
-                    xsw.writeAttribute("time", (rs.getLong(Test_Result.STOP_TIME.name())
+                    xsw.writeAttribute("name", rs.getString(SuiteResult.SUITE_NAME));
+                    xsw.writeAttribute("tests", rs.getInt(SuiteResult.NUMBER_OF_TESTS) + "");
+                    xsw.writeAttribute("failures", rs.getInt(SuiteResult.NUMBER_OF_FAILURE) + "");
+                    xsw.writeAttribute("time", (rs.getLong(SuiteResult.STOP_TIME)
                         - rs.getLong(Test_Result.START_TIME.name())) / 1000.0 + "");
-                    xsw.writeAttribute("srid", rs.getString(Suite_Result.SUITE_RESULT_ID.name()));
+                    xsw.writeAttribute("srid", rs.getString(SuiteResult.SUITE_RESULT_ID));
                     xsw.writeCharacters("\n");
 
-                    final String sql1 = "SELECT * FROM " + TABLES.test_result.name() + " tr JOIN "
-                        + TABLES.test_case.name() + " tc ON "
-                        + "tr." + Test_Result.TEST_CASE_ID + " = tc." + Test_Case.TEST_CASE_ID
+                    final String sql1 = "SELECT * FROM " + TestResult.TABLE_NAME + " tr JOIN "
+                        + TestCase.TABLE_NAME + " tc ON "
+                        + "tr." + Test_Result.TEST_CASE_ID + " = tc." + TestCase.TEST_CASE_ID
                         + " WHERE " + Test_Result.SUITE_RESULT.name() + " = ?;";
                     try (PreparedStatement stmt1 = this.getConnection().prepareStatement(sql1)) {
                         stmt1.setString(1, execId);
@@ -340,9 +327,9 @@ public abstract class DbHandler {
                         while (rs1.next()) {
                             xsw.writeCharacters("  ");
                             xsw.writeStartElement("testcase");
-                            xsw.writeAttribute("name", rs1.getString(Test_Case.TEST_METHOD.name()) + "("
-                                + rs1.getString(Test_Case.TEST_DATA.name()) + ")");
-                            xsw.writeAttribute("classname", rs1.getString(Test_Case.TEST_CLASS.name()));
+                            xsw.writeAttribute("name", rs1.getString(TestCase.TEST_METHOD) + "("
+                                + rs1.getString(TestCase.TEST_DATA) + ")");
+                            xsw.writeAttribute("classname", rs1.getString(TestCase.TEST_CLASS));
                             xsw.writeAttribute("time", (rs1.getLong(Test_Result.STOP_TIME.name())
                                 - rs1.getLong(Test_Result.START_TIME.name())) / 1000.0 + "");
                             xsw.writeEndElement();

@@ -24,6 +24,7 @@ import org.slf4j.LoggerFactory;
 @ManagedBean
 @RequestScoped
 public class SuitesBean extends ResultBase {
+
     private static final Logger LOG = LoggerFactory.getLogger(SuitesBean.class);
 
     private int number = 50;

@@ -19,6 +19,7 @@ import javax.ws.rs.QueryParam;
 @Path("sr")
 @RequestScoped
 public class SuiteResult {
+
     @Context
     private UriInfo context;
 
@@ -29,7 +30,8 @@ public class SuiteResult {
     }
 
     /**
-     * Retrieves representation of an instance of com.tascape.qa.thr.rest.SuiteResult
+     * Retrieves representation of an instance of
+     * com.tascape.qa.thr.rest.SuiteResult
      *
      * @param srid
      *

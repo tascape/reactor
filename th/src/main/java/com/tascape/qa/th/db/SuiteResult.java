@@ -16,7 +16,6 @@
 package com.tascape.qa.th.db;
 
 import com.tascape.qa.th.TestSuite;
-import com.tascape.qa.th.db1.TestResult;
 import java.io.Serializable;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -40,6 +39,32 @@ import static com.tascape.qa.th.db.DbHandler.SYS_CONFIG;
 @XmlRootElement
 public class SuiteResult implements Serializable {
     private static final long serialVersionUID = 1L;
+
+    public static final String TABLE_NAME = "suite_result";
+
+    public static final String SUITE_RESULT_ID = "SUITE_RESULT_ID";
+
+    public static final String SUITE_NAME = "SUITE_NAME";
+
+    public static final String JOB_NAME = "JOB_NAME";
+
+    public static final String JOB_BUILD_NUMBER = "JOB_BUILD_NUMBER";
+
+    public static final String JOB_BUILD_URL = "JOB_BUILD_URL";
+
+    public static final String EXECUTION_RESULT = "EXECUTION_RESULT";
+
+    public static final String START_TIME = "START_TIME";
+
+    public static final String STOP_TIME = "STOP_TIME";
+
+    public static final String NUMBER_OF_TESTS = "NUMBER_OF_TESTS";
+
+    public static final String NUMBER_OF_FAILURE = "NUMBER_OF_FAILURE";
+
+    public static final String INVISIBLE_ENTRY = "INVISIBLE_ENTRY";
+
+    public static final String PRODUCT_UNDER_TEST = "PRODUCT_UNDER_TEST";
 
     @Id
     @Basic(optional = false)

@@ -1,6 +1,6 @@
 package com.tascape.qa.thr;
 
-import com.tascape.qa.th.db.DbHandler.Suite_Result;
+import com.tascape.qa.th.db.SuiteResult;
 import com.tascape.qa.th.db.TestCase;
 import java.io.Serializable;
 import java.sql.SQLException;
@@ -25,6 +25,7 @@ import org.slf4j.LoggerFactory;
 @Named
 @RequestScoped
 public class SuiteResultDetailHistoryView implements Serializable {
+
     private static final Logger LOG = LoggerFactory.getLogger(SuiteResultDetailHistoryView.class);
 
     private static final long serialVersionUID = 1L;
@@ -57,7 +58,7 @@ public class SuiteResultDetailHistoryView implements Serializable {
                     this.suiteName, this.invisibleIncluded);
 
             for (Map<String, Object> suiteResult : this.suitesResult) {
-                String srid = suiteResult.get(Suite_Result.SUITE_RESULT_ID.name()).toString();
+                String srid = suiteResult.get(SuiteResult.SUITE_RESULT_ID).toString();
 
                 List<Map<String, Object>> testsResult = this.db.getTestsResult(srid);
                 for (Map<String, Object> testResult : testsResult) {
@@ -90,7 +91,8 @@ public class SuiteResultDetailHistoryView implements Serializable {
                     }
                 }
             }
-        } catch (NamingException | SQLException ex) {
+        }
+        catch (NamingException | SQLException ex) {
             throw new RuntimeException(ex);
         }
     }

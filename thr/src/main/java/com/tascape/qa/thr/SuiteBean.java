@@ -24,6 +24,7 @@ import org.slf4j.LoggerFactory;
 @ManagedBean
 @RequestScoped
 public class SuiteBean extends ResultBase {
+
     private static final Logger LOG = LoggerFactory.getLogger(SuiteBean.class);
 
     @ManagedProperty(value = "#{param.srid}")
@@ -82,7 +83,8 @@ public class SuiteBean extends ResultBase {
                 long start = Long.parseLong(test.get("START_TIME") + "");
                 long stop = Long.parseLong(test.get("STOP_TIME") + "");
                 test.put("_exec_time", new Period(stop - start).toString().substring(2));
-            } catch (NumberFormatException ex) {
+            }
+            catch (NumberFormatException ex) {
                 LOG.debug("", ex);
             }
         }

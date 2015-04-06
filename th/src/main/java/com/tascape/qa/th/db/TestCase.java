@@ -1,8 +1,30 @@
+/*
+ * Copyright 2015.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package com.tascape.qa.th.db;
 
-import com.tascape.qa.th.db.DbHandler.Test_Case;
 import com.tascape.qa.th.test.Priority;
+import java.util.List;
 import java.util.Map;
+import javax.persistence.Basic;
+import javax.persistence.Column;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.OneToMany;
+import javax.xml.bind.annotation.XmlTransient;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -14,19 +36,51 @@ import org.slf4j.LoggerFactory;
 public class TestCase {
     private static final Logger LOG = LoggerFactory.getLogger(TestCase.class);
 
-    private int id = 0;
+    public static final String TABLE_NAME = "test_case";
 
-    private String suiteClass = "";
+    public static final String TEST_CASE_ID = "TEST_CASE_ID";
 
-    private String testClass = "";
+    public static final String SUITE_CLASS = "SUITE_CLASS";
 
-    private String testMethod = "";
+    public static final String TEST_CLASS = "TEST_CLASS";
 
+    public static final String TEST_METHOD = "TEST_METHOD";
+
+    public static final String TEST_DATA_INFO = "TEST_DATA_INFO";
+
+    public static final String TEST_DATA = "TEST_DATA";
+
+    public static final String TEST_ISSUES = "TEST_ISSUES";
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Basic(optional = false)
+    @Column(name = "TEST_CASE_ID")
+    private Integer testCaseId;
+
+    @Basic(optional = false)
+    @Column(name = "SUITE_CLASS")
+    private String suiteClass;
+
+    @Basic(optional = false)
+    @Column(name = "TEST_CLASS")
+    private String testClass;
+
+    @Basic(optional = false)
+    @Column(name = "TEST_METHOD")
+    private String testMethod;
+
+    @Column(name = "TEST_DATA_INFO")
     private String testDataInfo = "";
 
+    @Column(name = "TEST_DATA")
     private String testData = "";
 
+    @Column(name = "TEST_ISSUES")
     private String testIssues = "";
+
+    @OneToMany(mappedBy = "testCaseId")
+    private List<com.tascape.qa.th.db.TestResult> testResultList;
 
     private int priority = Priority.P3;
 
@@ -41,15 +95,23 @@ public class TestCase {
     }
 
     public TestCase(Map<String, Object> row) {
-        this.id = (int) row.get(Test_Case.TEST_CASE_ID.name());
-        this.suiteClass = row.get(Test_Case.SUITE_CLASS.name()).toString();
-        this.testClass = row.get(Test_Case.TEST_CLASS.name()).toString();
-        this.testMethod = row.get(Test_Case.TEST_METHOD.name()).toString();
-        this.testDataInfo = row.get(Test_Case.TEST_DATA_INFO.name()).toString();
-        this.testData = row.get(Test_Case.TEST_DATA.name()).toString();
+        this.testCaseId = (int) row.get(TestCase.TEST_CASE_ID);
+        this.suiteClass = row.get(TestCase.SUITE_CLASS).toString();
+        this.testClass = row.get(TestCase.TEST_CLASS).toString();
+        this.testMethod = row.get(TestCase.TEST_METHOD).toString();
+        this.testDataInfo = row.get(TestCase.TEST_DATA_INFO).toString();
+        this.testData = row.get(TestCase.TEST_DATA).toString();
     }
 
     public TestCase() {
+    }
+
+    public Integer getTestCaseId() {
+        return testCaseId;
+    }
+
+    public void setTestCaseId(Integer testCaseId) {
+        this.testCaseId = testCaseId;
     }
 
     public String getSuiteClass() {
@@ -92,23 +154,21 @@ public class TestCase {
         this.testData = testData;
     }
 
-    public String format() {
-        return String.format("%s.%s.%s.%s.%s", this.suiteClass, this.testClass, this.testMethod, testDataInfo, testData);
-    }
-
-    public String formatForLogPath() {
-        return String.format("%s.%s.%s.%s",
-                StringUtils.substringAfterLast(this.suiteClass, "."),
-                StringUtils.substringAfterLast(this.testClass, "."), this.testMethod,
-                this.testDataInfo.isEmpty() ? "" : StringUtils.substringAfterLast(this.testDataInfo, "#"));
-    }
-
     public String getTestIssues() {
         return testIssues;
     }
 
     public void setTestIssues(String testIssues) {
         this.testIssues = testIssues;
+    }
+
+    @XmlTransient
+    public List<TestResult> getTestResultList() {
+        return testResultList;
+    }
+
+    public void setTestResultList(List<TestResult> testResultList) {
+        this.testResultList = testResultList;
     }
 
     public int getPriority() {
@@ -119,21 +179,37 @@ public class TestCase {
         this.priority = priority;
     }
 
-    public int getId() {
-        return id;
+    @Override
+    public int hashCode() {
+        int hash = 0;
+        hash += (testCaseId != null ? testCaseId.hashCode() : 0);
+        return hash;
     }
 
-    public void setId(int id) {
-        this.id = id;
-    }
-
-    public boolean equals(TestCase testCase) {
-        if (this.id == 0 || testCase.getId() == 0) {
-            return this.suiteClass.equals(testCase.getSuiteClass())
-                    && this.testClass.equals(testCase.getTestClass())
-                    && this.testMethod.equals(testCase.getTestMethod())
-                    && this.testDataInfo.equals(testCase.getTestDataInfo());
+    @Override
+    public boolean equals(Object object) {
+        // TODO: Warning - this method won't work in the case the id fields are not set
+        if (!(object instanceof TestCase)) {
+            return false;
         }
-        return this.id == testCase.getId();
+        TestCase other = (TestCase) object;
+        return !((this.testCaseId == null && other.testCaseId != null)
+            || (this.testCaseId != null && !this.testCaseId.equals(other.testCaseId)));
+    }
+
+    @Override
+    public String toString() {
+        return "com.tascape.qa.th.db.TestCase[ testCaseId=" + testCaseId + " ]";
+    }
+
+    public String format() {
+        return String.format("%s.%s.%s.%s.%s", this.suiteClass, this.testClass, this.testMethod, testDataInfo, testData);
+    }
+
+    public String formatForLogPath() {
+        return String.format("%s.%s.%s.%s",
+            StringUtils.substringAfterLast(this.suiteClass, "."),
+            StringUtils.substringAfterLast(this.testClass, "."), this.testMethod,
+            this.testDataInfo.isEmpty() ? "" : StringUtils.substringAfterLast(this.testDataInfo, "#"));
     }
 }

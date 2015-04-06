@@ -1,3 +1,18 @@
+/*
+ * Copyright 2015.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package com.tascape.qa.th.db;
 
 import com.tascape.qa.th.ExecutionResult;
@@ -84,8 +99,8 @@ public class MysqlHandler extends DbHandler {
     @Override
     public boolean queueTestSuite(TestSuite suite, String execId) throws SQLException {
         LOG.info("Queueing test suite result with execution id {} ", execId);
-        final String sql = "SELECT * FROM " + TABLES.suite_result.name() + " WHERE "
-            + Suite_Result.SUITE_RESULT_ID.name() + " = ?";
+        final String sql = "SELECT * FROM " + SuiteResult.TABLE_NAME + " WHERE "
+            + SuiteResult.SUITE_RESULT_ID + " = ?";
         SuiteResult sr = new SuiteResult(suite, execId);
 
         try (Connection conn = this.getConnection()) {
@@ -115,12 +130,12 @@ public class MysqlHandler extends DbHandler {
     @Override
     protected int getTestCaseId(TestCase test) throws SQLException {
         LOG.info("Query for id of test case {} ", test.format());
-        final String sql = "SELECT * FROM " + TABLES.test_case.name() + " WHERE "
-            + Test_Case.SUITE_CLASS + " = ? AND "
-            + Test_Case.TEST_CLASS + " = ? AND "
-            + Test_Case.TEST_METHOD + " = ? AND "
-            + Test_Case.TEST_DATA_INFO + " = ? AND "
-            + Test_Case.TEST_DATA + " = ?";
+        final String sql = "SELECT * FROM " + TestCase.TABLE_NAME + " WHERE "
+            + TestCase.SUITE_CLASS + " = ? AND "
+            + TestCase.TEST_CLASS + " = ? AND "
+            + TestCase.TEST_METHOD + " = ? AND "
+            + TestCase.TEST_DATA_INFO + " = ? AND "
+            + TestCase.TEST_DATA + " = ?";
 
         try (Connection conn = this.getConnection()) {
             PreparedStatement stmt = conn.prepareStatement(sql,
@@ -136,24 +151,24 @@ public class MysqlHandler extends DbHandler {
             ResultSet rs = stmt.executeQuery();
             if (!rs.next()) {
                 rs.moveToInsertRow();
-                rs.updateString(Test_Case.SUITE_CLASS.name(), test.getSuiteClass());
-                rs.updateString(Test_Case.TEST_CLASS.name(), test.getTestClass());
-                rs.updateString(Test_Case.TEST_METHOD.name(), test.getTestMethod());
-                rs.updateString(Test_Case.TEST_DATA_INFO.name(), test.getTestDataInfo());
-                rs.updateString(Test_Case.TEST_DATA.name(), test.getTestData());
+                rs.updateString(TestCase.SUITE_CLASS, test.getSuiteClass());
+                rs.updateString(TestCase.TEST_CLASS, test.getTestClass());
+                rs.updateString(TestCase.TEST_METHOD, test.getTestMethod());
+                rs.updateString(TestCase.TEST_DATA_INFO, test.getTestDataInfo());
+                rs.updateString(TestCase.TEST_DATA, test.getTestData());
 
                 rs.insertRow();
                 rs.last();
                 rs.updateRow();
             }
-            return rs.getInt(Test_Case.TEST_CASE_ID.name());
+            return rs.getInt(TestCase.TEST_CASE_ID);
         }
     }
 
     @Override
     protected void queueTestCaseResults(String execId, List<TestCase> tests) throws SQLException {
         LOG.info("Queue {} test case result(s) with execution id {} ", tests.size(), execId);
-        final String sql = "SELECT * FROM " + TABLES.test_result.name() + " WHERE "
+        final String sql = "SELECT * FROM " + TestResult.TABLE_NAME + " WHERE "
             + Test_Result.SUITE_RESULT + " = ?";
         Map<String, Integer> idMap = this.getTestCaseIds(tests);
 
@@ -214,7 +229,7 @@ public class MysqlHandler extends DbHandler {
 
             int total = 0, fail = 0;
             final String sql1 = "SELECT " + Test_Result.EXECUTION_RESULT.name() + " FROM "
-                + TABLES.test_result.name() + " WHERE " + Test_Result.SUITE_RESULT.name()
+                + TestResult.TABLE_NAME + " WHERE " + Test_Result.SUITE_RESULT.name()
                 + " = ?;";
             try (PreparedStatement stmt = this.getConnection().prepareStatement(sql1,
                 ResultSet.TYPE_FORWARD_ONLY,
@@ -231,18 +246,18 @@ public class MysqlHandler extends DbHandler {
                 }
             }
 
-            final String sql2 = "SELECT * FROM " + TABLES.suite_result.name()
-                + " WHERE " + Suite_Result.SUITE_RESULT_ID.name() + " = ?;";
+            final String sql2 = "SELECT * FROM " + SuiteResult.TABLE_NAME
+                + " WHERE " + SuiteResult.SUITE_RESULT_ID + " = ?;";
             try (PreparedStatement stmt = this.getConnection().prepareStatement(sql2,
                 ResultSet.TYPE_SCROLL_SENSITIVE,
                 ResultSet.CONCUR_UPDATABLE)) {
                 stmt.setString(1, execId);
                 ResultSet rs = stmt.executeQuery();
                 if (rs.first()) {
-                    rs.updateInt(Suite_Result.NUMBER_OF_TESTS.name(), total);
-                    rs.updateInt(Suite_Result.NUMBER_OF_FAILURE.name(), fail);
-                    rs.updateString(Suite_Result.EXECUTION_RESULT.name(), fail == 0 ? "PASS" : "FAIL");
-                    rs.updateLong(Suite_Result.STOP_TIME.name(), System.currentTimeMillis());
+                    rs.updateInt(SuiteResult.NUMBER_OF_TESTS, total);
+                    rs.updateInt(SuiteResult.NUMBER_OF_FAILURE, fail);
+                    rs.updateString(SuiteResult.EXECUTION_RESULT, fail == 0 ? "PASS" : "FAIL");
+                    rs.updateLong(SuiteResult.STOP_TIME, System.currentTimeMillis());
                     rs.updateRow();
                 }
             }

@@ -20,6 +20,7 @@ import org.slf4j.LoggerFactory;
 @Named
 @RequestScoped
 public class SuitesResultView implements Serializable {
+
     private static final Logger LOG = LoggerFactory.getLogger(SuitesResultView.class);
 
     private static final long serialVersionUID = 1L;
@@ -47,8 +48,9 @@ public class SuitesResultView implements Serializable {
 
         try {
             this.results = this.db.getSuitesResult(this.startTime, this.stopTime, this.numberOfEntries,
-                this.suiteName, this.invisibleIncluded);
-        } catch (NamingException | SQLException ex) {
+                    this.suiteName, this.invisibleIncluded);
+        }
+        catch (NamingException | SQLException ex) {
             throw new RuntimeException(ex);
         }
     }

@@ -23,6 +23,7 @@ import org.slf4j.LoggerFactory;
 @ManagedBean(name = "suiteHistoryDetail", eager = false)
 @RequestScoped
 public class SuiteHistoryDetail extends ResultBase {
+
     private static final Logger LOG = LoggerFactory.getLogger(SuiteHistoryDetail.class);
 
     @ManagedProperty(value = "#{param.suiteids}")

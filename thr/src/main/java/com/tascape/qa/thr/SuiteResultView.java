@@ -1,6 +1,6 @@
 package com.tascape.qa.thr;
 
-import com.tascape.qa.th.db.DbHandler.Suite_Result;
+import com.tascape.qa.th.db.SuiteResult;
 import java.io.IOException;
 import java.io.Serializable;
 import java.sql.SQLException;
@@ -24,6 +24,7 @@ import org.slf4j.LoggerFactory;
 @Named
 @RequestScoped
 public class SuiteResultView implements Serializable {
+
     private static final Logger LOG = LoggerFactory.getLogger(SuiteResultView.class);
 
     private static final long serialVersionUID = 1L;
@@ -45,7 +46,7 @@ public class SuiteResultView implements Serializable {
 
         try {
             this.suiteResult = this.db.getSuiteResult(this.srid);
-            boolean invisible = this.suiteResult.get(Suite_Result.INVISIBLE_ENTRY.name()).equals(1);
+            boolean invisible = this.suiteResult.get(SuiteResult.INVISIBLE_ENTRY).equals(1);
             if (this.toggleInvisible) {
                 this.setInvisible(!invisible);
                 return;
@@ -60,7 +61,8 @@ public class SuiteResultView implements Serializable {
             }).forEach(row -> {
                 MySqlBaseBean.setLogUrl(row);
             });
-        } catch (NamingException | SQLException | IOException ex) {
+        }
+        catch (NamingException | SQLException | IOException ex) {
             throw new RuntimeException(ex);
         }
     }

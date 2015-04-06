@@ -1,8 +1,31 @@
+/*
+ * Copyright 2015.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package com.tascape.qa.th.db;
 
 import com.tascape.qa.th.ExecutionResult;
 import java.io.PrintWriter;
 import java.io.StringWriter;
+import java.util.List;
+import javax.persistence.Basic;
+import javax.persistence.Column;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
+import javax.xml.bind.annotation.XmlTransient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -15,29 +38,52 @@ public class TestResult {
 
     private static final long serialVersionUID = 1L;
 
+    public static final String TABLE_NAME = "test_result";
+
+    @Id
+    @Basic(optional = false)
+    @Column(name = "TEST_RESULT_ID")
+    private String testResultId;
+
+    @Column(name = "EXECUTION_RESULT")
+    private String executionResult = ExecutionResult.NA.name();
+
+    private String aut;
+
+    @Column(name = "START_TIME")
+    private Long startTime;
+
+    @Column(name = "STOP_TIME")
+    private Long stopTime;
+
+    private Integer retry = 2;
+
+    @Column(name = "TEST_STATION")
+    private String testStation;
+
+    @Column(name = "LOG_DIR")
+    private String logDir;
+
+    @JoinColumn(name = "SUITE_RESULT", referencedColumnName = "SUITE_RESULT_ID")
+    @ManyToOne
+    private SuiteResult suiteResult;
+
+    @JoinColumn(name = "TEST_CASE_ID", referencedColumnName = "TEST_CASE_ID")
+    @ManyToOne
+    private TestCase testCaseId;
+
+    @OneToMany(mappedBy = "testResultId")
+    private List<com.tascape.qa.th.db.TestResultMetric> testResultMetricList;
+
+    private ExecutionResult result = ExecutionResult.NA;
+
     private TestCase testCase = null;
 
-    private String id = "";
-
-    private String suiteResult = "";
-
-    private long startTime = 0;
-
-    private long stopTime = 0;
-
-    private ExecutionResult executionResult = ExecutionResult.NA;
-
-    private String host = "";
-
-    private String logDirectory = "";
+    private String suiteResultId = "";
 
     private Throwable exception = null;
 
     private String stacktrace = "";
-
-    private String aut = "";
-
-    private int retry = 2;
 
     TestResult() {
     }
@@ -46,60 +92,105 @@ public class TestResult {
         this.testCase = tc;
     }
 
-    public String getId() {
-        return id;
+    public String getTestResultId() {
+        return testResultId;
     }
 
-    public void setId(String id) {
-        this.id = id;
+    public void setTestResultId(String testResultId) {
+        this.testResultId = testResultId;
     }
 
-    public String getSuiteResult() {
+    public String getExecutionResult() {
+        return executionResult;
+    }
+
+    public void setExecutionResult(String executionResult) {
+        this.executionResult = executionResult;
+    }
+
+    public String getAut() {
+        return aut;
+    }
+
+    public void setAut(String aut) {
+        this.aut = aut;
+    }
+
+    public Long getStartTime() {
+        return startTime;
+    }
+
+    public void setStartTime(Long startTime) {
+        this.startTime = startTime;
+    }
+
+    public Long getStopTime() {
+        return stopTime;
+    }
+
+    public void setStopTime(Long stopTime) {
+        this.stopTime = stopTime;
+    }
+
+    public Integer getRetry() {
+        return retry;
+    }
+
+    public void setRetry(Integer retry) {
+        this.retry = retry;
+    }
+
+    public String getTestStation() {
+        return testStation;
+    }
+
+    public void setTestStation(String testStation) {
+        this.testStation = testStation;
+    }
+
+    public String getLogDir() {
+        return logDir;
+    }
+
+    public void setLogDir(String logDir) {
+        this.logDir = logDir;
+    }
+
+    public SuiteResult getSuiteResult() {
         return suiteResult;
     }
 
-    public void setSuiteResult(String suiteResult) {
+    public void setSuiteResult(SuiteResult suiteResult) {
         this.suiteResult = suiteResult;
     }
 
-    public long getStartTime() {
-        return startTime;
+    public TestCase getTestCaseId() {
+        return testCaseId;
+    }
+
+    public void setTestCaseId(TestCase testCaseId) {
+        this.testCaseId = testCaseId;
+    }
+
+    @XmlTransient
+    public List<TestResultMetric> getTestResultMetricList() {
+        return testResultMetricList;
+    }
+
+    public void setTestResultMetricList(List<TestResultMetric> testResultMetricList) {
+        this.testResultMetricList = testResultMetricList;
+    }
+
+    public String getSuiteResultId() {
+        return suiteResultId;
+    }
+
+    public void setSuiteResultId(String suiteResultId) {
+        this.suiteResultId = suiteResultId;
     }
 
     public void setStartTime(long startTime) {
         this.startTime = startTime;
-    }
-
-    public long getStopTime() {
-        return stopTime;
-    }
-
-    public void setStopTime(long stopTime) {
-        this.stopTime = stopTime;
-    }
-
-    public ExecutionResult getExecutionResult() {
-        return executionResult;
-    }
-
-    public void setExecutionResult(ExecutionResult executionResult) {
-        this.executionResult = executionResult;
-    }
-
-    public String getHost() {
-        return host;
-    }
-
-    public void setHost(String host) {
-        this.host = host;
-    }
-
-    public String getLogDirectory() {
-        return logDirectory;
-    }
-
-    public void setLogDirectory(String logDirectory) {
-        this.logDirectory = logDirectory;
     }
 
     public TestCase getTestCase() {
@@ -128,20 +219,34 @@ public class TestResult {
         return stacktrace;
     }
 
-    public int getRetry() {
-        return retry;
+    @Override
+    public int hashCode() {
+        int hash = 0;
+        hash += (testResultId != null ? testResultId.hashCode() : 0);
+        return hash;
     }
 
-    public void setRetry(int retry) {
-        this.retry = retry;
+    @Override
+    public boolean equals(Object object) {
+        // TODO: Warning - this method won't work in the case the id fields are not set
+        if (!(object instanceof TestResult)) {
+            return false;
+        }
+        TestResult other = (TestResult) object;
+        return !((this.testResultId == null && other.testResultId != null)
+            || (this.testResultId != null && !this.testResultId.equals(other.testResultId)));
     }
 
-    public String getAut() {
-        return aut;
+    @Override
+    public String toString() {
+        return "com.tascape.qa.th.db.TestResult[ testResultId=" + testResultId + " ]";
     }
 
-    public void setAut(String aut) {
-        this.aut = aut;
+    public ExecutionResult getResult() {
+        return result;
     }
 
+    public void setResult(ExecutionResult result) {
+        this.result = result;
+    }
 }

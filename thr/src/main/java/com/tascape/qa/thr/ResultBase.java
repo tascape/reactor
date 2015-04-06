@@ -27,6 +27,7 @@ import org.slf4j.LoggerFactory;
  * @author linsong
  */
 public class ResultBase implements Serializable {
+
     private static final Logger LOG = LoggerFactory.getLogger(ResultBase.class);
 
     public static final String TEST_METHOD_NA = "no-method";

@@ -1,3 +1,18 @@
+/*
+ * Copyright 2015.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package com.tascape.qa.th;
 
 import com.tascape.qa.th.data.AbstractTestData;
@@ -9,13 +24,8 @@ import com.tascape.qa.th.driver.EntityDriver;
 import com.tascape.qa.th.suite.AbstractSuite;
 import java.io.IOException;
 import java.nio.file.Path;
-import java.util.Date;
 import java.util.Map;
 import java.util.concurrent.Callable;
-import java.util.concurrent.CompletionService;
-import java.util.concurrent.ExecutorCompletionService;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 import org.junit.runner.JUnitCore;
 import org.junit.runner.Request;
 import org.slf4j.Logger;
@@ -31,7 +41,7 @@ public class TestRunnerJUnit4 extends AbstractTestRunner implements Callable<Tes
     public TestRunnerJUnit4(DbHandler db, TestResult tcr) {
         this.db = db;
         this.tcr = tcr;
-        this.execId = this.tcr.getSuiteResult();
+        this.execId = this.tcr.getSuiteResultId();
     }
 
     @Override
@@ -49,7 +59,7 @@ public class TestRunnerJUnit4 extends AbstractTestRunner implements Callable<Tes
             this.runTestCase();
         } catch (Exception ex) {
             LOG.error("Cannot execute test case {}", this.tcr.getTestCase().format(), ex);
-            this.tcr.setExecutionResult(ExecutionResult.FAIL);
+            this.tcr.setResult(ExecutionResult.FAIL);
             this.tcr.setException(ex);
             this.db.updateTestExecutionResult(this.tcr);
             return null;
@@ -82,15 +92,15 @@ public class TestRunnerJUnit4 extends AbstractTestRunner implements Callable<Tes
 
         TestCase tc = this.tcr.getTestCase();
         Path testLogPath = sysConfig.getLogPath().resolve(this.execId)
-                .resolve(tc.formatForLogPath() + "." + System.currentTimeMillis() + "."
-                        + Thread.currentThread().getName());
+            .resolve(tc.formatForLogPath() + "." + System.currentTimeMillis() + "."
+                + Thread.currentThread().getName());
 
         LOG.info("Creating test case execution log directory {}", testLogPath);
         if (!testLogPath.toFile().mkdirs()) {
             throw new IOException("Cannot create log directory " + testLogPath);
         }
         AbstractTestRunner.setTestLogPath(testLogPath);
-        this.tcr.setLogDirectory(testLogPath.toFile().getAbsolutePath());
+        this.tcr.setLogDir(testLogPath.toFile().getAbsolutePath());
 
         LOG.info("Creating log file");
         final Path logFile = testLogPath.resolve("test.log");
@@ -107,34 +117,5 @@ public class TestRunnerJUnit4 extends AbstractTestRunner implements Callable<Tes
         }
 
         this.generateHtml(logFile);
-    }
-
-    public static void main(String[] args) throws Exception {
-        SystemConfiguration sysConfig = SystemConfiguration.getInstance();
-        try {
-            TestCase tc = new TestCase();
-            tc.setTestClass("com.adara.qa.th.test.JUnit4Test");
-            tc.setTestMethod("testPositive");
-
-            TestResult tcr = new TestResult(tc);
-            tcr.setSuiteResult(sysConfig.getExecId());
-            tcr.setHost(sysConfig.getHostName());
-
-            ExecutorService es = Executors.newFixedThreadPool(1);
-            CompletionService<TestResult> executor = new ExecutorCompletionService<>(es);
-
-            executor.submit(new TestRunnerJUnit4(null, tcr));
-            TestResult r = executor.take().get();
-
-            LOG.info("execId: {}", r.getSuiteResult());
-            LOG.info("test case: {}", tc.format());
-            LOG.info("result: {}", r.getExecutionResult().result());
-            LOG.info("host: {}", r.getHost());
-            LOG.info("start: {}", new Date(r.getStartTime()));
-            LOG.info("stop: {}", new Date(r.getStopTime()));
-            LOG.info("log: {}", r.getLogDirectory());
-        } finally {
-            System.exit(0);
-        }
     }
 }

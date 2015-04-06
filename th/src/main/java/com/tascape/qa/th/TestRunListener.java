@@ -1,3 +1,18 @@
+/*
+ * Copyright 2015.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package com.tascape.qa.th;
 
 import com.tascape.qa.th.db.DbHandler;
@@ -60,8 +75,8 @@ public class TestRunListener extends RunListener {
         long millis = System.currentTimeMillis();
         this.tcr.setStartTime(millis);
         this.tcr.setStopTime(millis + 11);
-        this.tcr.setExecutionResult(ExecutionResult.RUNNING);
-        this.tcr.setHost(SystemConfiguration.getInstance().getHostName());
+        this.tcr.setResult(ExecutionResult.RUNNING);
+        this.tcr.setTestStation(SystemConfiguration.getInstance().getHostName());
 
         try {
             this.db.updateTestExecutionResult(this.tcr);
@@ -150,7 +165,7 @@ public class TestRunListener extends RunListener {
 
         List<TestResultMetric> resultMetrics = test.getTestResultMetrics();
         if (!resultMetrics.isEmpty()) {
-            db.saveTestResultMetrics(tcr.getId(), resultMetrics);
+            db.saveTestResultMetrics(tcr.getTestResultId(), resultMetrics);
         }
     }
 
@@ -177,14 +192,14 @@ public class TestRunListener extends RunListener {
         }
 
         this.tcr.setStopTime(System.currentTimeMillis());
-        this.tcr.setExecutionResult(pass ? ExecutionResult.PASS : ExecutionResult.FAIL);
+        this.tcr.setResult(pass ? ExecutionResult.PASS : ExecutionResult.FAIL);
 
         AbstractTest test = AbstractTest.getTest();
         if (test != null) {
             ExecutionResult er = test.getExecutionResult();
             if (!ExecutionResult.NA.equals(er)) {
                 LOG.debug("Overwriting JUnit4 execution engine result with the one from test case - {}", er.result());
-                this.tcr.setExecutionResult(er);
+                this.tcr.setResult(er);
             }
         } else {
             LOG.warn("Null test case? Test may have failed in @BeforeClass methods.");
@@ -223,6 +238,6 @@ public class TestRunListener extends RunListener {
         }
         LOG.debug("Requeue test case {}", this.tcr.getTestCase().format());
         this.tcr.setRetry(this.tcr.getRetry() + 1);
-        this.tcr.setExecutionResult(ExecutionResult.QUEUED);
+        this.tcr.setResult(ExecutionResult.QUEUED);
     }
 }

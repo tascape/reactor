@@ -21,6 +21,7 @@ import org.slf4j.LoggerFactory;
 @ManagedBean(name = "testsBean", eager = false)
 @RequestScoped
 public class TestsBean extends ResultBase {
+
     private static final Logger LOG = LoggerFactory.getLogger(TestsBean.class);
 
     private int number = 100;
