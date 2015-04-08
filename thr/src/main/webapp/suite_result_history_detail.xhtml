@@ -40,11 +40,14 @@
             <p:columns value="#{suiteResultDetailHistoryView.suitesResult}" var="suiteResult" width="108">
                 <ui:param name="srid" value="#{suiteResult.get('SUITE_RESULT_ID')}" />
                 <ui:param name="result" value="#{row.get(srid).get('EXECUTION_RESULT')}" />
+                <ui:param name="bn" value="#{suiteResult.get('JOB_BUILD_NUMBER')}" />
+                <ui:param name="url" value="#{suiteResult.get('JOB_BUILD_URL')}" />
                 <f:facet name="header">
                     <h:outputText value="#{mySqlBaseBean.convertToDate(suiteResult.get('START_TIME'))}"
                                   style="font-family: monospace; white-space: pre-line;">
-                        <f:convertDateTime type="date" pattern="yyyy-MM-dd&#10;HH:mm:ss" timeZone="US/Pacific" />
+                        <f:convertDateTime type="date" pattern="yyyy-MM-dd&#10;HH:mm:ss&#10;" timeZone="US/Pacific" />
                     </h:outputText>
+                    <h:outputLink rendered="#{bn gt 0}" value="#{url}" target="_blank" style="font: smaller monospace">Build ##{bn}</h:outputLink>
                 </f:facet>
 
                 <h:outputLink value="#{row.get(srid).get('_url')}" target="_blank">

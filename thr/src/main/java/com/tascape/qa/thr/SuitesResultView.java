@@ -35,6 +35,8 @@ public class SuitesResultView implements Serializable {
 
     private String suiteName = "";
 
+    private String jobName = "";
+
     @Inject
     private MySqlBaseBean db;
 
@@ -48,7 +50,7 @@ public class SuitesResultView implements Serializable {
 
         try {
             this.results = this.db.getSuitesResult(this.startTime, this.stopTime, this.numberOfEntries,
-                    this.suiteName, this.invisibleIncluded);
+                    this.suiteName, this.jobName, this.invisibleIncluded);
         }
         catch (NamingException | SQLException ex) {
             throw new RuntimeException(ex);
@@ -73,6 +75,18 @@ public class SuitesResultView implements Serializable {
 
     public String getSuiteName() {
         return suiteName;
+    }
+
+    public void setSuiteName(String suiteName) {
+        this.suiteName = suiteName;
+    }
+
+    public String getJobName() {
+        return jobName;
+    }
+
+    public void setJobName(String jobName) {
+        this.jobName = jobName;
     }
 
     public List<Map<String, Object>> getResults() {
@@ -103,10 +117,6 @@ public class SuitesResultView implements Serializable {
         this.invisibleIncluded = invisibleIncluded;
     }
 
-    public void setSuiteName(String suiteName) {
-        this.suiteName = suiteName;
-    }
-
     private void getParameters() {
         Map<String, String> map = FacesContext.getCurrentInstance().getExternalContext().getRequestParameterMap();
         String v = map.get("start");
@@ -133,6 +143,11 @@ public class SuitesResultView implements Serializable {
         if (v != null) {
             this.suiteName = v;
             LOG.warn("suite={}", this.suiteName);
+        }
+        v = map.get("job");
+        if (v != null) {
+            this.jobName = v;
+            LOG.warn("job={}", this.jobName);
         }
     }
 }

@@ -296,6 +296,7 @@ public abstract class DbHandler {
 
     public void saveJunitXml(String execId) throws IOException, SQLException, XMLStreamException {
         Path path = SYS_CONFIG.getLogPath().resolve(execId).resolve("result.xml");
+        LOG.debug("Generate JUnit XML result");
 
         final String sql = "SELECT * FROM " + SuiteResult.TABLE_NAME + " WHERE "
             + SuiteResult.SUITE_RESULT_ID + " = ?;";

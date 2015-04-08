@@ -52,7 +52,9 @@ public class TestHarness {
             LOG.error("TestHarness finishes with exception", t);
             exitCode = -1;
         } finally {
-            LOG.error("TestHarness finishes with exit code {}", exitCode);
+            if (exitCode != 0) {
+                LOG.error("TestHarness finishes with exit code {}", exitCode);
+            }
             System.exit(exitCode);
         }
     }

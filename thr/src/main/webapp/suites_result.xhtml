@@ -13,6 +13,8 @@
     </h:head>
     <h:body>
         <ui:param name="suite" value="#{suitesResultView.suiteName}" />
+        <ui:param name="job" value="#{suitesResultView.jobName}" />
+        <ui:param name="grouped" value="#{(not empty suite) or (not empty job)}" />
 
         <h:panelGrid columns="2" style="margin-bottom: 10px">
             <h:outputLink value=".">
@@ -24,26 +26,26 @@
         <h:panelGrid columns="8">
             <h:outputText value="From" />
             <p:calendar id="starttime" widgetVar="wv_start" pattern="yyyy-MM-dd HH:mm" value="#{suitesResultView.startTime}">
-                <p:ajax event="dateSelect" oncomplete="thr.querySuiteResults('#{suite}')" global="false" />
+                <p:ajax event="dateSelect" oncomplete="thr.querySuiteResults('#{suite}', '#{job}')" global="false" />
             </p:calendar>
             <h:outputText value="to" />
             <p:calendar id="stoptime" widgetVar="wv_stop" pattern="yyyy-MM-dd HH:mm" value="#{suitesResultView.stopTime}">
-                <p:ajax event="dateSelect" oncomplete="thr.querySuiteResults('#{suite}')" global="false" />
+                <p:ajax event="dateSelect" oncomplete="thr.querySuiteResults('#{suite}', '#{job}')" global="false" />
             </p:calendar>
             <h:outputText value=", with maximum" />
             <p:spinner id="number" widgetVar="wv_number" value="#{suitesResultView.numberOfEntries}"
-                       min="1" max="10000" size="5" onchange="thr.querySuiteResults('#{suite}')" />
+                       min="1" max="10000" size="5" onchange="thr.querySuiteResults('#{suite}', '#{job}')" />
             <h:outputText value="entries," />
             <p:selectOneMenu id="invisibleIncluded" widgetVar="wv_invisible" value="#{suitesResultView.invisibleIncluded}"
-                             onchange="thr.querySuiteResults('#{suite}')">
+                             onchange="thr.querySuiteResults('#{suite}', '#{job}')">
                 <f:selectItem id="invisibleIncluded_false" itemLabel="including no invisible entries" itemValue="false" />
                 <f:selectItem id="invisibleIncluded_true" itemLabel="including invisible entries" itemValue="true" />
             </p:selectOneMenu>
         </h:panelGrid>
 
-        <h:panelGrid columns="2" rendered="#{not empty suite}">
+        <h:panelGrid columns="2" rendered="#{grouped}">
             <p:commandButton onclick="thr.querySuiteResults()" value="All Test Suites" style="font-size: xx-small" />
-            <p:commandButton onclick="thr.querySuiteResultDetail('#{suite}')" value="Detail History" style="font-size: xx-small" />
+            <p:commandButton onclick="thr.querySuiteResultDetail('#{suite}', '#{job}')" value="Detail History" style="font-size: xx-small" />
         </h:panelGrid>
 
         <p:dataTable value="#{suitesResultView.results}" var="row" rowIndexVar="rowIndex" resizableColumns="true"
@@ -55,21 +57,25 @@
 
             <p:column headerText="Test Suite Name">
                 <ui:param name="s" value="#{row.get('SUITE_NAME')}" />
-                <h:outputLink onclick="thr.querySuiteResults('#{s}');
-                    return false;" rendered="#{empty suite}">#{s}</h:outputLink>
-                <h:outputText rendered="#{not empty suite}" value="#{s}" />
+                <h:outputLink onclick="thr.querySuiteResults('#{s}', null);
+                        return false;" rendered="#{not grouped}">#{s}</h:outputLink>
+                <h:outputText rendered="#{grouped}" value="#{s}" />
             </p:column>
 
             <p:column headerText="Job Name" width="168">
-                <nobr><h:outputText value="#{row.get('JOB_NAME')}" /></nobr>
+                <ui:param name="s" value="#{row.get('JOB_NAME')}" />
+                <h:outputLink onclick="thr.querySuiteResults(null, '#{s}');
+                        return false;" rendered="#{not grouped}">#{s}</h:outputLink>
+                <h:outputText rendered="#{grouped}" value="#{s}" />
             </p:column>
 
             <ui:param name="bn" value="#{row.get('JOB_BUILD_NUMBER')}" />
+            <ui:param name="url" value="#{row.get('JOB_BUILD_URL')}" />
             <p:column width="40">
                 <f:facet name="header">
                     <h:outputText value="Build&#10;#" escape="false" style="white-space: pre-line;" />
                 </f:facet>
-                <h:outputText value="#{bn}" rendered="#{bn gt 0}" />
+                <h:outputLink rendered="#{bn gt 0}" value="#{url}" target="_blank">#{bn}</h:outputLink>
             </p:column>
 
             <ui:param name="result" value="#{row.get('EXECUTION_RESULT')}" />

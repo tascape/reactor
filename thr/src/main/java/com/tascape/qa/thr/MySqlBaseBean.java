@@ -42,12 +42,15 @@ public class MySqlBaseBean implements Serializable {
     private DataSource ds;
 
     public List<Map<String, Object>> getSuitesResult(long startTime, long stopTime, int numberOfEntries,
-            String suiteName, boolean invisibleIncluded) throws NamingException, SQLException {
+            String suiteName, String jobName, boolean invisibleIncluded)
+            throws NamingException, SQLException {
         String sql = "SELECT * FROM " + SuiteResult.TABLE_NAME
                 + " WHERE " + SuiteResult.START_TIME + " > ?"
                 + " AND " + SuiteResult.STOP_TIME + " < ?";
-        if (suiteName != null && !suiteName.isEmpty()) {
+        if (notEmpty(suiteName)) {
             sql += " AND " + SuiteResult.SUITE_NAME + " = ?";
+        } else if (notEmpty(jobName)) {
+            sql += " AND " + SuiteResult.JOB_NAME + " = ?";
         }
         if (!invisibleIncluded) {
             sql += " AND NOT " + SuiteResult.INVISIBLE_ENTRY;
@@ -57,8 +60,10 @@ public class MySqlBaseBean implements Serializable {
             PreparedStatement stmt = conn.prepareStatement(sql);
             stmt.setLong(1, startTime);
             stmt.setLong(2, stopTime);
-            if (suiteName != null && !suiteName.isEmpty()) {
+            if (notEmpty(suiteName)) {
                 stmt.setString(3, suiteName);
+            } else if (notEmpty(jobName)) {
+                stmt.setString(3, jobName);
             }
             LOG.trace("{}", stmt);
             stmt.setMaxRows(numberOfEntries);
@@ -200,6 +205,16 @@ public class MySqlBaseBean implements Serializable {
         }
     }
 
+    public static boolean notEmpty(String string) {
+        if (string == null) {
+            return false;
+        }
+        if (string.trim().isEmpty()) {
+            return false;
+        }
+        return true;
+    }
+
     private Connection getConnection() throws NamingException, SQLException {
         Connection conn = this.ds.getConnection();
         if (conn == null) {
@@ -207,5 +222,4 @@ public class MySqlBaseBean implements Serializable {
         }
         return conn;
     }
-
 }

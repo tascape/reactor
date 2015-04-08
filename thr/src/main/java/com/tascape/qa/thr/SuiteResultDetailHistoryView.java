@@ -40,6 +40,8 @@ public class SuiteResultDetailHistoryView implements Serializable {
 
     private String suiteName = "";
 
+    private String jobName = "";
+
     @Inject
     private MySqlBaseBean db;
 
@@ -55,7 +57,7 @@ public class SuiteResultDetailHistoryView implements Serializable {
 
         try {
             this.suitesResult = this.db.getSuitesResult(this.startTime, this.stopTime, this.numberOfEntries,
-                    this.suiteName, this.invisibleIncluded);
+                    this.suiteName, this.jobName, this.invisibleIncluded);
 
             for (Map<String, Object> suiteResult : this.suitesResult) {
                 String srid = suiteResult.get(SuiteResult.SUITE_RESULT_ID).toString();
@@ -123,6 +125,14 @@ public class SuiteResultDetailHistoryView implements Serializable {
 
     public void setStartTime(long startTime) {
         this.startTime = startTime;
+    }
+
+    public String getJobName() {
+        return jobName;
+    }
+
+    public void setJobName(String jobName) {
+        this.jobName = jobName;
     }
 
     public void setStopTime(long stopTime) {
