@@ -1,3 +1,18 @@
+/*
+ * Copyright 2015.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package com.tascape.qa.th;
 
 import com.tascape.qa.th.db.DbHandler;
@@ -94,13 +109,16 @@ public abstract class AbstractTestRunner {
                 }
                 pw.println(newline);
                 for (File file : files) {
-                    if (newline.contains(file.getAbsolutePath())) {
-                        if (file.getName().endsWith(".png")) {
+                    String path = file.getAbsolutePath();
+                    String name = file.getName();
+                    if (newline.contains(path)) {
+                        if (name.endsWith(".png")) {
                             pw.printf("<a href=\"%s\" target=\"_blank\"><img src=\"%s\" width=\"360px\"/></a>",
-                                file.getName(), file.getName());
+                                name, name);
                         }
-                        pw.printf("open attachment <a href=\"%s\" target=\"_blank\">%s</a>",
-                            file.getName(), file.getName());
+                        String a = String.format("<a href=\"%s\" target=\"_blank\">%s</a>", name, name);
+                        int len = newline.indexOf("    ");
+                        pw.printf((len > 0 ? newline.substring(0, len + 5) : "") + a);
                         pw.println();
                         files.remove(file);
                         break;

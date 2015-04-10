@@ -108,7 +108,7 @@ public class Utils {
     public static String addLog4jFileAppender(String file) throws IOException {
         org.apache.log4j.Logger rootLogger = org.apache.log4j.Logger.getRootLogger();
 
-        String pattern = "%d{yyyy-MM-dd HH:mm:ss.SSS} %-5p %C.%M:%L - %m%n";
+        String pattern = "%d{HH:mm:ss.SSS} %-5p %t %C{1}.%M:%L - %m%n";
         final String threadName = Thread.currentThread().getName();
 
         class ThreadFilter extends Filter {

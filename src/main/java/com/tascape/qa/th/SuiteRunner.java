@@ -15,6 +15,7 @@
  */
 package com.tascape.qa.th;
 
+import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import com.tascape.qa.th.db.DbHandler;
 import com.tascape.qa.th.db.TestCase;
 import com.tascape.qa.th.db.TestResult;
@@ -31,6 +32,7 @@ import java.util.concurrent.ExecutorCompletionService;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
+import java.util.concurrent.ThreadFactory;
 import javax.xml.stream.XMLStreamException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -73,7 +75,9 @@ public class SuiteRunner {
 
         int threadCount = sysConfig.getExecutionThreadCount();
         LOG.info("Start execution engine with {} thread(s)", threadCount);
-        ExecutorService executorService = Executors.newFixedThreadPool(threadCount);
+        int len = (threadCount + "").length();
+        ThreadFactory namedThreadFactory = new ThreadFactoryBuilder().setNameFormat("t%0" + len + "d").build();
+        ExecutorService executorService = Executors.newFixedThreadPool(threadCount, namedThreadFactory);
         CompletionService<TestResult> completionService = new ExecutorCompletionService<>(executorService);
 
         LOG.info("Start to acquire test cases to execute");
