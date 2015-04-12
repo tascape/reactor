@@ -15,6 +15,7 @@
  */
 package com.tascape.qa.th;
 
+import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import com.tascape.qa.th.db.DbHandler;
 import com.tascape.qa.th.db.TestCase;
 import com.tascape.qa.th.db.TestResult;
@@ -23,6 +24,7 @@ import java.io.File;
 import java.io.IOException;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -31,7 +33,9 @@ import java.util.concurrent.ExecutorCompletionService;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
+import java.util.concurrent.ThreadFactory;
 import javax.xml.stream.XMLStreamException;
+import org.apache.commons.io.FileUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -46,9 +50,9 @@ public class SuiteRunner {
 
     private DbHandler db = null;
 
-    private final SystemConfiguration sysConfig = SystemConfiguration.getInstance();
+    private final SystemConfiguration SYS_CONFIG = SystemConfiguration.getInstance();
 
-    private final String execId = sysConfig.getExecId();
+    private final String execId = SYS_CONFIG.getExecId();
 
     private static final Map<String, TestCase> UNSUPPORTED_TESTS = new HashMap<>();
 
@@ -65,15 +69,18 @@ public class SuiteRunner {
     }
 
     public int startExecution() throws IOException, InterruptedException, SQLException, XMLStreamException {
-        File dir = sysConfig.getLogPath().resolve(execId).toFile();
+        File dir = SYS_CONFIG.getLogPath().resolve(execId).toFile();
         LOG.info("Create suite execution log directory {}", dir);
         if (!dir.exists() && !dir.mkdirs()) {
             throw new IOException("Cannot create directory " + dir);
         }
+        this.logAppProperties(dir);
 
-        int threadCount = sysConfig.getExecutionThreadCount();
+        int threadCount = SYS_CONFIG.getExecutionThreadCount();
         LOG.info("Start execution engine with {} thread(s)", threadCount);
-        ExecutorService executorService = Executors.newFixedThreadPool(threadCount);
+        int len = (threadCount + "").length();
+        ThreadFactory namedThreadFactory = new ThreadFactoryBuilder().setNameFormat("t%0" + len + "d").build();
+        ExecutorService executorService = Executors.newFixedThreadPool(threadCount, namedThreadFactory);
         CompletionService<TestResult> completionService = new ExecutorCompletionService<>(executorService);
 
         LOG.info("Start to acquire test cases to execute");
@@ -124,6 +131,11 @@ public class SuiteRunner {
         this.db.updateSuiteExecutionResult(this.execId);
         this.db.saveJunitXml(this.execId);
         return numberOfFailures;
+    }
+
+    private void logAppProperties(File dir) throws IOException {
+        File props = new File(dir, "execution.properties");
+        SYS_CONFIG.getProperties().store(FileUtils.openOutputStream(props), "Testharness");
     }
 
     private List<TestResult> filter(List<TestResult> tcrs) {
