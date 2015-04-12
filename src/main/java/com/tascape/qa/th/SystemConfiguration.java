@@ -275,9 +275,13 @@ public final class SystemConfiguration {
         LOG.debug("Application properties");
         List<String> keys = new ArrayList<>(this.properties.stringPropertyNames());
         Collections.sort(keys);
-        keys.stream().forEach((key) -> {
+        keys.forEach((key) -> {
             LOG.debug(String.format("%50s : %s", key, this.properties.getProperty(key)));
         });
+    }
+
+    public Properties getProperties() {
+        return properties;
     }
 
     private void listSysProperties() {
