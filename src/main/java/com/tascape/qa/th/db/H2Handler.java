@@ -114,7 +114,7 @@ public final class H2Handler extends DbHandler {
     @Override
     protected void queueTestCaseResults(String execId, List<TestCase> tests) throws SQLException {
         LOG.info("Queue {} test case result(s) with execution id {} ", tests.size(), execId);
-        final String sql = "INSERT INTO " + TestCase.TABLE_NAME + " ("
+        final String sql = "INSERT INTO " + TestResult.TABLE_NAME + " ("
             + Test_Result.TEST_RESULT_ID.name() + ", "
             + Test_Result.SUITE_RESULT.name() + ", "
             + Test_Result.TEST_CASE_ID.name() + ", "
@@ -229,9 +229,9 @@ public final class H2Handler extends DbHandler {
         int total = 0, fail = 0;
 
         try (Connection conn = this.getConnection();) {
-            final String sql1 = "SELECT " + Test_Result.EXECUTION_RESULT.name() + " FROM "
-                + TestCase.TABLE_NAME + " WHERE " + Test_Result.SUITE_RESULT.name()
-                + " = ?;";
+            final String sql1 = "SELECT " + Test_Result.EXECUTION_RESULT.name()
+                + " FROM " + TestResult.TABLE_NAME
+                + " WHERE " + Test_Result.SUITE_RESULT.name() + " = ?;";
             try (PreparedStatement stmt = conn.prepareStatement(sql1)) {
                 stmt.setString(1, execId);
                 ResultSet rs = stmt.executeQuery();
