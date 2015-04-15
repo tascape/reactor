@@ -104,9 +104,11 @@ public final class SystemConfiguration {
             }
         }
         List<String> keys = new ArrayList<>(System.getProperties().stringPropertyNames());
-        keys.stream().filter((key) -> (key.startsWith("qa.th."))).forEach((key) -> {
-            this.properties.setProperty(key, System.getProperty(key));
-        });
+        keys.stream()
+            .filter((key) -> (key.startsWith("qa.th.")))
+            .forEach((key) -> {
+                this.properties.setProperty(key, System.getProperty(key));
+            });
 
         String execId = this.properties.getProperty(SYSPROP_EXECUTION_ID);
         if (execId == null || execId.trim().isEmpty()) {
@@ -214,7 +216,7 @@ public final class SystemConfiguration {
     }
 
     public String getDatabaseType() {
-        return this.getProperty(DbHandler.SYSPROP_DATABASE_TYPE, "mysql");
+        return this.getProperty(DbHandler.SYSPROP_DATABASE_TYPE, "th");
     }
 
     public String getDatabaseHost() {
