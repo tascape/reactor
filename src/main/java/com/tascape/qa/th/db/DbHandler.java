@@ -21,6 +21,7 @@ import com.tascape.qa.th.TestSuite;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.io.PrintWriter;
 import java.nio.file.Path;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -296,6 +297,7 @@ public abstract class DbHandler {
 
     public void saveJunitXml(String execId) throws IOException, SQLException, XMLStreamException {
         Path path = SYS_CONFIG.getLogPath().resolve(execId).resolve("result.xml");
+        Path html = SYS_CONFIG.getLogPath().resolve(execId).resolve("result.html");
         LOG.debug("Generate JUnit XML result");
 
         final String sql = "SELECT * FROM " + SuiteResult.TABLE_NAME + " WHERE "
@@ -304,7 +306,9 @@ public abstract class DbHandler {
             stmt.setString(1, execId);
             ResultSet rs = stmt.executeQuery();
             if (rs.first()) {
-                try (OutputStream os = new FileOutputStream(path.toFile())) {
+                try (
+                    OutputStream os = new FileOutputStream(path.toFile());
+                    PrintWriter pwh = new PrintWriter(html.toFile())) {
                     XMLStreamWriter xsw = XMLOutputFactory.newInstance().createXMLStreamWriter(os);
                     xsw.writeStartDocument();
                     xsw.writeCharacters("\n");
@@ -317,6 +321,12 @@ public abstract class DbHandler {
                         - rs.getLong(Test_Result.START_TIME.name())) / 1000.0 + "");
                     xsw.writeAttribute("srid", rs.getString(SuiteResult.SUITE_RESULT_ID));
                     xsw.writeCharacters("\n");
+
+                    pwh.println("<html><body>");
+                    pwh.printf("<h2>%s</h2>", rs.getString(SuiteResult.SUITE_NAME));
+                    pwh.printf("<h4>tests %d, failures %d</h4>",
+                        rs.getInt(SuiteResult.NUMBER_OF_TESTS), rs.getInt(SuiteResult.NUMBER_OF_FAILURE));
+                    pwh.println("<ol>");
 
                     final String sql1 = "SELECT * FROM " + TestResult.TABLE_NAME + " tr JOIN "
                         + TestCase.TABLE_NAME + " tc ON "
@@ -331,12 +341,22 @@ public abstract class DbHandler {
                             xsw.writeAttribute("name", rs1.getString(TestCase.TEST_METHOD) + "("
                                 + rs1.getString(TestCase.TEST_DATA) + ")");
                             xsw.writeAttribute("classname", rs1.getString(TestCase.TEST_CLASS));
+                            xsw.writeAttribute("result", rs1.getString(Test_Result.EXECUTION_RESULT.name()));
                             xsw.writeAttribute("time", (rs1.getLong(Test_Result.STOP_TIME.name())
                                 - rs1.getLong(Test_Result.START_TIME.name())) / 1000.0 + "");
                             xsw.writeEndElement();
                             xsw.writeCharacters("\n");
+
+                            String l = rs1.getString(Test_Result.LOG_DIR.name());
+                            int i = l.lastIndexOf("/");
+                            if (i >= 0) {
+                                pwh.printf("<li><a href='%s/log.html'>%s</a> - %s</li>", l.substring(i + 1),
+                                    rs1.getString(TestCase.TEST_METHOD) + "(" + rs1.getString(TestCase.TEST_DATA) + ")",
+                                    rs1.getString(Test_Result.EXECUTION_RESULT.name()));
+                            }
                         }
                     }
+                    pwh.println("</ol></body></html>");
 
                     xsw.writeEndElement();
                     xsw.writeCharacters("\n");
