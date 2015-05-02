@@ -40,6 +40,24 @@ CREATE TABLE `suite_result` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
+-- Table structure for table `suite_property`
+--
+
+DROP TABLE IF EXISTS `suite_property`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `suite_property` (
+  `SUITE_PROPERTY_ID` int(11) NOT NULL AUTO_INCREMENT,
+  `SUITE_RESULT_ID` varchar(63) NOT NULL,
+  `PROPERTY_NAME` varchar(63) DEFAULT NULL,
+  `PROPERTY_VALUE` varchar(127) DEFAULT NULL,
+  PRIMARY KEY (`SUITE_PROPERTY_ID`),
+  KEY `fk_suite_result_idx` (`SUITE_RESULT_ID`),
+  CONSTRAINT `fk_script_result` FOREIGN KEY (`SUITE_RESULT_ID`) REFERENCES `suite_result` (`SUITE_RESULT_ID`) ON DELETE CASCADE ON UPDATE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
 -- Table structure for table `test_case`
 --
 
