@@ -107,6 +107,9 @@ public class SuiteResult implements Serializable {
     @OneToMany(mappedBy = "suiteResult")
     private List<TestResult> testResultList;
 
+    @OneToMany(mappedBy = "suiteResult")
+    private List<SuiteProperty> suitePropertyList;
+
     public SuiteResult() {
     }
 
@@ -263,6 +266,14 @@ public class SuiteResult implements Serializable {
 
     public void setTestResultList(List<TestResult> testResultList) {
         this.testResultList = testResultList;
+    }
+
+    public List<SuiteProperty> getSuitePropertyList() {
+        return suitePropertyList;
+    }
+
+    public void setSuitePropertyList(List<SuiteProperty> suitePropertyList) {
+        this.suitePropertyList = suitePropertyList;
     }
 
     @Override
