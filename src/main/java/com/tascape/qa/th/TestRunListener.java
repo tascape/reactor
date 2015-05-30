@@ -114,7 +114,7 @@ public class TestRunListener extends RunListener {
             if (aut == null || aut.isEmpty()) {
                 return;
             }
-            this.tcr.setAut(test.getApplicationUnderTest());
+            this.tcr.setAut(aut);
             this.db.updateTestExecutionResult(this.tcr);
         }
     }

@@ -33,7 +33,7 @@ CREATE TABLE `test_result` (
   `START_TIME` bigint(20) DEFAULT NULL,
   `STOP_TIME` bigint(20) DEFAULT NULL,
   `RETRY` int(11) DEFAULT NULL,
-  `TEST_STATION` varchar(45) DEFAULT NULL,
+  `TEST_STATION` varchar(125) DEFAULT NULL,
   `LOG_DIR` varchar(200) DEFAULT NULL,
   PRIMARY KEY (`TEST_RESULT_ID`),
   KEY `suite-test_idx` (`SUITE_RESULT`),
