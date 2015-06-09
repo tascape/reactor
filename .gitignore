@@ -1,7 +1,5 @@
 *.class
 
-# Mobile Tools for Java (J2ME)
-.mtj.tmp/
 
 # Package Files #
 # *.jar
@@ -14,8 +12,9 @@ hs_err_pid*
 target/
 lib/
 
-nbactions.xml
 .classpath
 .project
 .settings/
+
+nbactions.xml
 
