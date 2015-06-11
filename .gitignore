@@ -11,6 +11,8 @@ hs_err_pid*
 
 target/
 lib/
+/logs
+/th.log
 
 # eclipse
 .classpath
