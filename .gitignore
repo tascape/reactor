@@ -12,9 +12,17 @@ hs_err_pid*
 target/
 lib/
 
+# eclipse
 .classpath
 .project
 .settings/
 
+# netbeans
+nbproject/private/
+build/
+nbbuild/
+dist/
+nbdist/
 nbactions.xml
+nb-configuration.xml
 
