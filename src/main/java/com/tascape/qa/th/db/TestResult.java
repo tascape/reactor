@@ -40,6 +40,26 @@ public class TestResult {
 
     public static final String TABLE_NAME = "test_result";
 
+    public static final String TEST_RESULT_ID = "TEST_RESULT_ID";
+
+    public static final String SUITE_RESULT = "SUITE_RESULT";
+
+    public static final String TEST_CASE_ID = "TEST_CASE_ID";
+
+    public static final String EXECUTION_RESULT = "EXECUTION_RESULT";
+
+    public static final String AUT = "AUT";
+
+    public static final String START_TIME = "START_TIME";
+
+    public static final String STOP_TIME = "STOP_TIME";
+
+    public static final String RETRY = "RETRY";
+
+    public static final String TEST_STATION = "TEST_STATION";
+
+    public static final String LOG_DIR = "LOG_DIR";
+
     @Id
     @Basic(optional = false)
     @Column(name = "TEST_RESULT_ID")

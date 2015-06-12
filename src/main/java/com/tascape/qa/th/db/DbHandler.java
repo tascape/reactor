@@ -423,29 +423,91 @@ public abstract class DbHandler {
     public void importFromJson(String json) throws SQLException {
         JSONObject j = new JSONObject(json);
         JSONObject sr = j.getJSONObject("suite_result");
-        String execId = sr.getString(SuiteResult.SUITE_RESULT_ID);
+        String srid = sr.getString(SuiteResult.SUITE_RESULT_ID);
+        LOG.debug("srid {}", srid);
+        try (Connection conn = this.getConnection()) {
+            String sql = "SELECT * FROM " + SuiteResult.TABLE_NAME + " WHERE " + SuiteResult.SUITE_RESULT_ID + " = ?;";
+            PreparedStatement stmt = conn.prepareStatement(sql,
+                ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE);
+            stmt.setString(1, srid);
+            ResultSet rs = stmt.executeQuery();
+            ResultSetMetaData rsmd = rs.getMetaData();
+            if (rs.first()) {
+                LOG.debug("already imported {}", srid);
+                return;
+            }
+            rs.moveToInsertRow();
+            for (int col = 1; col <= rsmd.getColumnCount(); col++) {
+                String cn = rsmd.getColumnLabel(col);
+                rs.updateObject(cn, sr.get(cn));
+            }
+            rs.insertRow();
+            rs.last();
+            rs.updateRow();
+        }
+        LOG.debug("sr imported");
+
         JSONArray trs = sr.getJSONArray("test_results");
-        {
-            String sql = "SELECT * FROM " + SuiteResult.TABLE_NAME + " WHERE "
-                + SuiteResult.SUITE_RESULT_ID + " = ?;";
-            try (Connection conn = this.getConnection();
-                PreparedStatement stmt = conn.prepareStatement(sql,
-                    ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE)) {
-                stmt.setString(1, execId);
+        int len = trs.length();
+
+        try (Connection conn = this.getConnection()) {
+            String sql = String.format("SELECT * FROM %s WHERE %s=? AND %s=? AND %s=? AND %s=? AND %s=?;",
+                TestCase.TABLE_NAME,
+                TestCase.SUITE_CLASS,
+                TestCase.TEST_CLASS,
+                TestCase.TEST_METHOD,
+                TestCase.TEST_DATA_INFO,
+                TestCase.TEST_DATA
+            );
+            PreparedStatement stmt
+                = conn.prepareStatement(sql, ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE);
+            stmt.setMaxRows(1);
+            for (int i = 0; i < len; i++) {
+                JSONObject tr = trs.getJSONObject(i);
+                stmt.setString(1, tr.getString(TestCase.SUITE_CLASS));
+                stmt.setString(2, tr.getString(TestCase.TEST_CLASS));
+                stmt.setString(3, tr.getString(TestCase.TEST_METHOD));
+                stmt.setString(4, tr.getString(TestCase.TEST_DATA_INFO));
+                stmt.setString(5, tr.getString(TestCase.TEST_DATA));
                 ResultSet rs = stmt.executeQuery();
-                ResultSetMetaData rsmd = rs.getMetaData();
                 if (!rs.first()) {
                     rs.moveToInsertRow();
+                    rs.updateString(TestCase.SUITE_CLASS, tr.getString(TestCase.SUITE_CLASS));
+                    rs.updateString(TestCase.TEST_CLASS, tr.getString(TestCase.TEST_CLASS));
+                    rs.updateString(TestCase.TEST_METHOD, tr.getString(TestCase.TEST_METHOD));
+                    rs.updateString(TestCase.TEST_DATA_INFO, tr.getString(TestCase.TEST_DATA_INFO));
+                    rs.updateString(TestCase.TEST_DATA, tr.getString(TestCase.TEST_DATA));
                     rs.insertRow();
+                    rs.last();
+                    rs.updateRow();
+                    rs = stmt.executeQuery();
+                    rs.first();
                 }
+                tr.put(TestCase.TEST_CASE_ID, rs.getLong(TestCase.TEST_CASE_ID));
+            }
+        }
+        LOG.debug("tcid updated");
+
+        try (Connection conn = this.getConnection()) {
+            String sql = "SELECT * FROM " + TestResult.TABLE_NAME + " WHERE " + TestResult.SUITE_RESULT + " = ?;";
+            PreparedStatement stmt = conn.prepareStatement(sql,
+                ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE);
+            stmt.setString(1, srid);
+            ResultSet rs = stmt.executeQuery();
+            ResultSetMetaData rsmd = rs.getMetaData();
+            for (int i = 0; i < len; i++) {
+                rs.moveToInsertRow();
+                JSONObject tr = trs.getJSONObject(i);
                 for (int col = 1; col <= rsmd.getColumnCount(); col++) {
                     String cn = rsmd.getColumnLabel(col);
-                    rs.updateObject(cn, sr.get(cn));
+                    rs.updateObject(cn, tr.get(cn));
                 }
+                rs.insertRow();
                 rs.last();
                 rs.updateRow();
             }
         }
+        LOG.debug("trs imported");
     }
 
     public void saveTestResultMetrics(String trid, List<TestResultMetric> resultMetrics) throws SQLException {
