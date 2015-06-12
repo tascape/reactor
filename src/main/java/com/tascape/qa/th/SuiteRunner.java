@@ -24,7 +24,6 @@ import java.io.File;
 import java.io.IOException;
 import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -130,6 +129,7 @@ public class SuiteRunner {
         LOG.info("No more test case to run on this host, updating suite execution result");
         this.db.updateSuiteExecutionResult(this.execId);
         this.db.saveJunitXml(this.execId);
+        this.db.exportToJson(this.execId);
         return numberOfFailures;
     }
 

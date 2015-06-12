@@ -1,7 +1,5 @@
 *.class
 
-# Mobile Tools for Java (J2ME)
-.mtj.tmp/
 
 # Package Files #
 # *.jar
@@ -13,9 +11,20 @@ hs_err_pid*
 
 target/
 lib/
+/logs
+/th.log
 
-nbactions.xml
+# eclipse
 .classpath
 .project
 .settings/
+
+# netbeans
+nbproject/private/
+build/
+nbbuild/
+dist/
+nbdist/
+nbactions.xml
+nb-configuration.xml
 

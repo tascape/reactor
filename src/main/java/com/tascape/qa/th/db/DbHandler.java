@@ -18,6 +18,7 @@ package com.tascape.qa.th.db;
 import com.tascape.qa.th.ExecutionResult;
 import com.tascape.qa.th.SystemConfiguration;
 import com.tascape.qa.th.TestSuite;
+import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
@@ -26,16 +27,21 @@ import java.nio.file.Path;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import javax.xml.stream.XMLOutputFactory;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamWriter;
+import org.apache.commons.io.FileUtils;
+import org.json.JSONArray;
+import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -369,6 +375,79 @@ public abstract class DbHandler {
         }
     }
 
+    public void exportToJson(String execId) throws IOException, SQLException, XMLStreamException {
+        Path path = SYS_CONFIG.getLogPath().resolve(execId).resolve("result.json");
+        LOG.debug("Generate JSON result");
+
+        JSONObject sr = new JSONObject();
+        {
+            final String sql = "SELECT * FROM " + SuiteResult.TABLE_NAME + " WHERE "
+                + SuiteResult.SUITE_RESULT_ID + " = ?;";
+            try (Connection conn = this.getConnection(); PreparedStatement stmt = conn.prepareStatement(sql)) {
+                stmt.setString(1, execId);
+                ResultSet rs = stmt.executeQuery();
+                List<Map<String, Object>> l = dumpResultSetToList(rs);
+                if (l.isEmpty()) {
+                    LOG.error("No test suite result of exec id {}", execId);
+
+                }
+                Map<String, Object> r = l.get(0);
+                r.entrySet().forEach(entry -> {
+                    sr.put(entry.getKey(), entry.getValue());
+                });
+            }
+        }
+        JSONArray trs = new JSONArray();
+        {
+            final String sql = "SELECT * FROM " + TestResult.TABLE_NAME + " tr JOIN "
+                + TestCase.TABLE_NAME + " tc ON "
+                + "tr." + Test_Result.TEST_CASE_ID + " = tc." + TestCase.TEST_CASE_ID
+                + " WHERE " + Test_Result.SUITE_RESULT.name() + " = ?;";
+            try (Connection conn = this.getConnection(); PreparedStatement stmt = conn.prepareStatement(sql)) {
+                stmt.setString(1, execId);
+                ResultSet rs1 = stmt.executeQuery();
+                List<Map<String, Object>> l = dumpResultSetToList(rs1);
+                l.forEach(row -> {
+                    JSONObject j = new JSONObject();
+                    row.entrySet().forEach(col -> {
+                        j.put(col.getKey(), col.getValue());
+                    });
+                    trs.put(trs.length(), j);
+                });
+            }
+        }
+        sr.put("test_results", trs);
+        FileUtils.write(path.toFile(), new JSONObject().put("suite_result", sr).toString(2));
+    }
+
+    public void importFromJson(String json) throws SQLException {
+        JSONObject j = new JSONObject(json);
+        JSONObject sr = j.getJSONObject("suite_result");
+        String execId = sr.getString(SuiteResult.SUITE_RESULT_ID);
+        JSONArray trs = sr.getJSONArray("test_results");
+        {
+            String sql = "SELECT * FROM " + SuiteResult.TABLE_NAME + " WHERE "
+                + SuiteResult.SUITE_RESULT_ID + " = ?;";
+            try (Connection conn = this.getConnection();
+                PreparedStatement stmt = conn.prepareStatement(sql,
+                    ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE)) {
+                stmt.setString(1, execId);
+                ResultSet rs = stmt.executeQuery();
+                ResultSetMetaData rsmd = rs.getMetaData();
+                if (!rs.first()) {
+                    rs.moveToInsertRow();
+                    rs.insertRow();
+                }
+                for (int col = 1; col <= rsmd.getColumnCount(); col++) {
+                    String cn = rsmd.getColumnLabel(col);
+                    rs.updateObject(cn, sr.get(cn));
+                }
+                rs.last();
+                rs.updateRow();
+            }
+        }
+    }
+
     public void saveTestResultMetrics(String trid, List<TestResultMetric> resultMetrics) throws SQLException {
         final String sql = "SELECT * FROM " + TABLES.test_result_metric.name() + " WHERE "
             + Test_Result_Metric.TEST_RESULT_ID.name() + " = ?;";
@@ -395,6 +474,22 @@ public abstract class DbHandler {
         }
     }
 
+    public static List<Map<String, Object>> dumpResultSetToList(ResultSet rs) throws SQLException {
+        List<Map<String, Object>> rsml = new ArrayList<>();
+        ResultSetMetaData rsmd = rs.getMetaData();
+
+        int row = 1;
+        while (rs.next()) {
+            Map<String, Object> d = new LinkedHashMap<>();
+            for (int col = 1; col <= rsmd.getColumnCount(); col++) {
+                d.put(rsmd.getColumnLabel(col), rs.getObject(col));
+            }
+            rsml.add(d);
+        }
+        LOG.trace("{} rows loaded", rsml.size());
+        return rsml;
+    }
+
     protected int hash(String string) {
         char[] chars = string.toCharArray();
         int hash = 7;
@@ -409,7 +504,9 @@ public abstract class DbHandler {
     protected abstract boolean releaseExecutionLock(Connection conn, String lock) throws SQLException;
 
     public static void main(String[] args) throws Exception {
+        SystemConfiguration.getInstance();
         DbHandler db = DbHandler.getInstance();
-        db.saveJunitXml("th_0a6de24b_ac8b_47d7_b347_b28b64eb71d4");
+        String json = FileUtils.readFileToString(new File(args[0]));
+        db.importFromJson(json);
     }
 }
