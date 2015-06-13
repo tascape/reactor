@@ -95,7 +95,7 @@ public final class H2Handler extends DbHandler {
             PreparedStatement stmt = conn.prepareStatement(sql);
             Long time = System.currentTimeMillis();
             stmt.setString(1, execId);
-            stmt.setString(2, "");
+            stmt.setString(2, suite.getName());
             stmt.setString(3, SYS_CONFIG.getJobName());
             stmt.setInt(4, SYS_CONFIG.getJobBuildNumber());
             stmt.setString(5, SYS_CONFIG.getJobBuildUrl());
