@@ -115,14 +115,14 @@ public final class H2Handler extends DbHandler {
     protected void queueTestCaseResults(String execId, List<TestCase> tests) throws SQLException {
         LOG.info("Queue {} test case result(s) with execution id {} ", tests.size(), execId);
         final String sql = "INSERT INTO " + TestResult.TABLE_NAME + " ("
-            + Test_Result.TEST_RESULT_ID.name() + ", "
-            + Test_Result.SUITE_RESULT.name() + ", "
-            + Test_Result.TEST_CASE_ID.name() + ", "
-            + Test_Result.EXECUTION_RESULT.name() + ", "
-            + Test_Result.START_TIME.name() + ", "
-            + Test_Result.STOP_TIME.name() + ", "
-            + Test_Result.TEST_STATION.name() + ", "
-            + Test_Result.LOG_DIR.name()
+            + TestResult.TEST_RESULT_ID + ", "
+            + TestResult.SUITE_RESULT + ", "
+            + TestResult.TEST_CASE_ID + ", "
+            + TestResult.EXECUTION_RESULT + ", "
+            + TestResult.START_TIME + ", "
+            + TestResult.STOP_TIME + ", "
+            + TestResult.TEST_STATION + ", "
+            + TestResult.LOG_DIR
             + ") VALUES (?,?,?,?,?,?,?,?);";
         Map<String, Integer> idMap = this.getTestCaseIds(tests);
 
@@ -229,15 +229,15 @@ public final class H2Handler extends DbHandler {
         int total = 0, fail = 0;
 
         try (Connection conn = this.getConnection();) {
-            final String sql1 = "SELECT " + Test_Result.EXECUTION_RESULT.name()
+            final String sql1 = "SELECT " + TestResult.EXECUTION_RESULT
                 + " FROM " + TestResult.TABLE_NAME
-                + " WHERE " + Test_Result.SUITE_RESULT.name() + " = ?;";
+                + " WHERE " + TestResult.SUITE_RESULT + " = ?;";
             try (PreparedStatement stmt = conn.prepareStatement(sql1)) {
                 stmt.setString(1, execId);
                 ResultSet rs = stmt.executeQuery();
                 while (rs.next()) {
                     total++;
-                    String result = rs.getString(Test_Result.EXECUTION_RESULT.name());
+                    String result = rs.getString(TestResult.EXECUTION_RESULT);
                     if (!result.equals(ExecutionResult.PASS.name()) && !result.endsWith("/0")) {
                         fail++;
                     }

@@ -169,7 +169,7 @@ public class MysqlHandler extends DbHandler {
     protected void queueTestCaseResults(String execId, List<TestCase> tests) throws SQLException {
         LOG.info("Queue {} test case result(s) with execution id {} ", tests.size(), execId);
         final String sql = "SELECT * FROM " + TestResult.TABLE_NAME + " WHERE "
-            + Test_Result.SUITE_RESULT + " = ?";
+            + TestResult.SUITE_RESULT + " = ?";
         Map<String, Integer> idMap = this.getTestCaseIds(tests);
 
         try (Connection conn = this.getConnection()) {
@@ -193,14 +193,14 @@ public class MysqlHandler extends DbHandler {
                         tcid = this.getTestCaseId(test);
                     }
 
-                    rs.updateString(Test_Result.TEST_RESULT_ID.name(), Utils.getUniqueId());
-                    rs.updateString(Test_Result.SUITE_RESULT.name(), execId);
-                    rs.updateInt(Test_Result.TEST_CASE_ID.name(), tcid);
-                    rs.updateString(Test_Result.EXECUTION_RESULT.name(), ExecutionResult.QUEUED.name());
-                    rs.updateLong(Test_Result.START_TIME.name(), System.currentTimeMillis());
-                    rs.updateLong(Test_Result.STOP_TIME.name(), System.currentTimeMillis());
-                    rs.updateString(Test_Result.TEST_STATION.name(), "?");
-                    rs.updateString(Test_Result.LOG_DIR.name(), "?");
+                    rs.updateString(TestResult.TEST_RESULT_ID, Utils.getUniqueId());
+                    rs.updateString(TestResult.SUITE_RESULT, execId);
+                    rs.updateInt(TestResult.TEST_CASE_ID, tcid);
+                    rs.updateString(TestResult.EXECUTION_RESULT, ExecutionResult.QUEUED.name());
+                    rs.updateLong(TestResult.START_TIME, System.currentTimeMillis());
+                    rs.updateLong(TestResult.STOP_TIME, System.currentTimeMillis());
+                    rs.updateString(TestResult.TEST_STATION, "?");
+                    rs.updateString(TestResult.LOG_DIR, "?");
 
                     rs.insertRow();
                     rs.last();
@@ -228,8 +228,8 @@ public class MysqlHandler extends DbHandler {
             }
 
             int total = 0, fail = 0;
-            final String sql1 = "SELECT " + Test_Result.EXECUTION_RESULT.name() + " FROM "
-                + TestResult.TABLE_NAME + " WHERE " + Test_Result.SUITE_RESULT.name()
+            final String sql1 = "SELECT " + TestResult.EXECUTION_RESULT + " FROM "
+                + TestResult.TABLE_NAME + " WHERE " + TestResult.SUITE_RESULT
                 + " = ?;";
             try (PreparedStatement stmt = this.getConnection().prepareStatement(sql1,
                 ResultSet.TYPE_FORWARD_ONLY,
@@ -239,7 +239,7 @@ public class MysqlHandler extends DbHandler {
                 ResultSet rs = stmt.executeQuery();
                 while (rs.next()) {
                     total++;
-                    String result = rs.getString(Test_Result.EXECUTION_RESULT.name());
+                    String result = rs.getString(TestResult.EXECUTION_RESULT);
                     if (!result.equals(ExecutionResult.PASS.name()) && !result.endsWith("/0")) {
                         fail++;
                     }

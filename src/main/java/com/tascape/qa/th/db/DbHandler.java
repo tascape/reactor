@@ -68,19 +68,6 @@ public abstract class DbHandler {
         test_result_metric,
     }
 
-    public enum Test_Result {
-        TEST_RESULT_ID,
-        SUITE_RESULT,
-        TEST_CASE_ID,
-        EXECUTION_RESULT,
-        AUT,
-        START_TIME,
-        STOP_TIME,
-        RETRY,
-        TEST_STATION,
-        LOG_DIR,
-    }
-
     public enum Test_Result_Metric {
         TEST_RESULT_METRIC_ID,
         TEST_RESULT_ID,
@@ -159,6 +146,29 @@ public abstract class DbHandler {
         }
     }
 
+    public void setSuiteExecutionProperties(List<SuiteProperty> properties) throws SQLException {
+        if (properties.isEmpty()) {
+            return;
+        }
+        final String sql = "SELECT * FROM " + SuiteProperty.TABLE_NAME + " WHERE "
+            + SuiteProperty.SUITE_RESULT_ID + " = ?";
+        try (Connection conn = this.getConnection()) {
+            PreparedStatement stmt = conn.prepareStatement(sql,
+                ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE);
+            stmt.setString(1, properties.get(0).getSuiteResultId());
+            ResultSet rs = stmt.executeQuery();
+            for (SuiteProperty prop : properties) {
+                rs.moveToInsertRow();
+                rs.updateString(SuiteProperty.SUITE_RESULT_ID, prop.getSuiteResultId());
+                rs.updateString(SuiteProperty.PROPERTY_NAME, prop.getPropertyName());
+                rs.updateString(SuiteProperty.PROPERTY_VALUE, prop.getPropertyValue());
+                rs.insertRow();
+                rs.last();
+                rs.updateRow();
+            }
+        }
+    }
+
     public abstract boolean queueTestSuite(TestSuite suite, String execId) throws SQLException;
 
     protected abstract int getTestCaseId(TestCase test) throws SQLException;
@@ -200,8 +210,8 @@ public abstract class DbHandler {
         LOG.info("Query database for all queued test cases");
         final String sql = "SELECT * FROM " + TestResult.TABLE_NAME + " tr "
             + "INNER JOIN " + TestCase.TABLE_NAME + " tc "
-            + "ON tr.TEST_CASE_ID=tc.TEST_CASE_ID AND " + Test_Result.EXECUTION_RESULT.name() + " = ? "
-            + "WHERE " + Test_Result.SUITE_RESULT.name() + " = ? "
+            + "ON tr.TEST_CASE_ID=tc.TEST_CASE_ID AND " + TestResult.EXECUTION_RESULT + " = ? "
+            + "WHERE " + TestResult.SUITE_RESULT + " = ? "
             + "ORDER BY SUITE_CLASS, TEST_CLASS, TEST_METHOD, TEST_DATA_INFO "
             + "LIMIT ?;";
         List<TestResult> tcrs = new ArrayList<>();
@@ -215,11 +225,11 @@ public abstract class DbHandler {
 
             while (rs.next()) {
                 TestResult tcr = new TestResult();
-                tcr.setTestResultId(rs.getString(Test_Result.TEST_RESULT_ID.name()));
+                tcr.setTestResultId(rs.getString(TestResult.TEST_RESULT_ID));
                 tcr.setSuiteResultId(execId);
-                tcr.setStartTime(rs.getLong(Test_Result.START_TIME.name()));
-                tcr.setStopTime(rs.getLong(Test_Result.STOP_TIME.name()));
-                tcr.setRetry(rs.getInt(Test_Result.RETRY.name()));
+                tcr.setStartTime(rs.getLong(TestResult.START_TIME));
+                tcr.setStopTime(rs.getLong(TestResult.STOP_TIME));
+                tcr.setRetry(rs.getInt(TestResult.RETRY));
 
                 TestCase tc = new TestCase();
                 tc.setSuiteClass(rs.getString(TestCase.SUITE_CLASS));
@@ -229,8 +239,8 @@ public abstract class DbHandler {
                 tc.setTestData(rs.getString(TestCase.TEST_DATA));
                 tcr.setTestCase(tc);
 
-                tcr.setTestStation(rs.getString(Test_Result.TEST_STATION.name()));
-                tcr.setLogDir(rs.getString(Test_Result.LOG_DIR.name()));
+                tcr.setTestStation(rs.getString(TestResult.TEST_STATION));
+                tcr.setLogDir(rs.getString(TestResult.LOG_DIR));
                 tcrs.add(tcr);
             }
         }
@@ -243,7 +253,7 @@ public abstract class DbHandler {
     public boolean acquireTestCaseResult(TestResult tcr) throws SQLException {
         LOG.info("Acquire test case {}", tcr.getTestCase().format());
         final String sql = "SELECT * FROM " + TestResult.TABLE_NAME + " WHERE "
-            + Test_Result.TEST_RESULT_ID.name() + " = ? LIMIT 1;";
+            + TestResult.TEST_RESULT_ID+ " = ? LIMIT 1;";
 
         try (Connection conn = this.getConnection()) {
             PreparedStatement stmt = conn.prepareStatement(sql,
@@ -251,15 +261,15 @@ public abstract class DbHandler {
             stmt.setString(1, tcr.getTestResultId());
             ResultSet rs = stmt.executeQuery();
             if (rs.next()) {
-                String host = rs.getString(Test_Result.TEST_STATION.name());
-                if (rs.getString(Test_Result.EXECUTION_RESULT.name()).equals(ExecutionResult.QUEUED.result())) {
+                String host = rs.getString(TestResult.TEST_STATION);
+                if (rs.getString(TestResult.EXECUTION_RESULT).equals(ExecutionResult.QUEUED.result())) {
                     LOG.debug("Found test case {} in DB with QUEUED state", tcr.getTestCase().format());
                     if (SYS_CONFIG.getHostName().equals(host)) {
                         LOG.debug("This test case Failed on current host, and was requeue. Skip...");
                         return false;
                     }
-                    rs.updateString(Test_Result.EXECUTION_RESULT.name(), ExecutionResult.ACQUIRED.result());
-                    rs.updateString(Test_Result.TEST_STATION.name(), SYS_CONFIG.getHostName());
+                    rs.updateString(TestResult.EXECUTION_RESULT, ExecutionResult.ACQUIRED.result());
+                    rs.updateString(TestResult.TEST_STATION, SYS_CONFIG.getHostName());
                     rs.updateRow();
                     return true;
                 } else {
@@ -275,7 +285,7 @@ public abstract class DbHandler {
             tcr.getResult().result());
         final String sql = "SELECT tr.* FROM " + TestResult.TABLE_NAME + " tr INNER JOIN " + TestCase.TABLE_NAME
             + " tc WHERE tr.TEST_CASE_ID=tc.TEST_CASE_ID AND "
-            + Test_Result.TEST_RESULT_ID.name() + " = ?;";
+            + TestResult.TEST_RESULT_ID + " = ?;";
 
         try (Connection conn = this.getConnection()) {
             PreparedStatement stmt = conn.prepareStatement(sql,
@@ -285,13 +295,13 @@ public abstract class DbHandler {
             if (rs.first()) {
 // TODO: update test data into test case table
 //                rs.updateString(TestCase.TEST_DATA.name(), tcr.getTestCase().getTestData());
-                rs.updateString(Test_Result.EXECUTION_RESULT.name(), tcr.getResult().result());
-                rs.updateString(Test_Result.AUT.name(), tcr.getAut());
-                rs.updateLong(Test_Result.START_TIME.name(), tcr.getStartTime());
-                rs.updateLong(Test_Result.STOP_TIME.name(), tcr.getStopTime());
-                rs.updateInt(Test_Result.RETRY.name(), tcr.getRetry());
-                rs.updateString(Test_Result.TEST_STATION.name(), tcr.getTestStation());
-                rs.updateString(Test_Result.LOG_DIR.name(), tcr.getLogDir());
+                rs.updateString(TestResult.EXECUTION_RESULT, tcr.getResult().result());
+                rs.updateString(TestResult.AUT, tcr.getAut());
+                rs.updateLong(TestResult.START_TIME, tcr.getStartTime());
+                rs.updateLong(TestResult.STOP_TIME, tcr.getStopTime());
+                rs.updateInt(TestResult.RETRY, tcr.getRetry());
+                rs.updateString(TestResult.TEST_STATION, tcr.getTestStation());
+                rs.updateString(TestResult.LOG_DIR, tcr.getLogDir());
                 rs.updateRow();
             } else {
                 LOG.warn("Cannot update test result");
@@ -324,7 +334,7 @@ public abstract class DbHandler {
                     xsw.writeAttribute("tests", rs.getInt(SuiteResult.NUMBER_OF_TESTS) + "");
                     xsw.writeAttribute("failures", rs.getInt(SuiteResult.NUMBER_OF_FAILURE) + "");
                     xsw.writeAttribute("time", (rs.getLong(SuiteResult.STOP_TIME)
-                        - rs.getLong(Test_Result.START_TIME.name())) / 1000.0 + "");
+                        - rs.getLong(TestResult.START_TIME)) / 1000.0 + "");
                     xsw.writeAttribute("srid", rs.getString(SuiteResult.SUITE_RESULT_ID));
                     xsw.writeCharacters("\n");
 
@@ -336,8 +346,8 @@ public abstract class DbHandler {
 
                     final String sql1 = "SELECT * FROM " + TestResult.TABLE_NAME + " tr JOIN "
                         + TestCase.TABLE_NAME + " tc ON "
-                        + "tr." + Test_Result.TEST_CASE_ID + " = tc." + TestCase.TEST_CASE_ID
-                        + " WHERE " + Test_Result.SUITE_RESULT.name() + " = ?;";
+                        + "tr." + TestResult.TEST_CASE_ID + " = tc." + TestCase.TEST_CASE_ID
+                        + " WHERE " + TestResult.SUITE_RESULT + " = ?;";
                     try (PreparedStatement stmt1 = this.getConnection().prepareStatement(sql1)) {
                         stmt1.setString(1, execId);
                         ResultSet rs1 = stmt1.executeQuery();
@@ -347,18 +357,18 @@ public abstract class DbHandler {
                             xsw.writeAttribute("name", rs1.getString(TestCase.TEST_METHOD) + "("
                                 + rs1.getString(TestCase.TEST_DATA) + ")");
                             xsw.writeAttribute("classname", rs1.getString(TestCase.TEST_CLASS));
-                            xsw.writeAttribute("result", rs1.getString(Test_Result.EXECUTION_RESULT.name()));
-                            xsw.writeAttribute("time", (rs1.getLong(Test_Result.STOP_TIME.name())
-                                - rs1.getLong(Test_Result.START_TIME.name())) / 1000.0 + "");
+                            xsw.writeAttribute("result", rs1.getString(TestResult.EXECUTION_RESULT));
+                            xsw.writeAttribute("time", (rs1.getLong(TestResult.STOP_TIME)
+                                - rs1.getLong(TestResult.START_TIME)) / 1000.0 + "");
                             xsw.writeEndElement();
                             xsw.writeCharacters("\n");
 
-                            String l = rs1.getString(Test_Result.LOG_DIR.name());
+                            String l = rs1.getString(TestResult.LOG_DIR);
                             int i = l.lastIndexOf("/");
                             if (i >= 0) {
                                 pwh.printf("<li><a href='%s/log.html'>%s</a> - %s</li>", l.substring(i + 1),
                                     rs1.getString(TestCase.TEST_METHOD) + "(" + rs1.getString(TestCase.TEST_DATA) + ")",
-                                    rs1.getString(Test_Result.EXECUTION_RESULT.name()));
+                                    rs1.getString(TestResult.EXECUTION_RESULT));
                             }
                         }
                     }
@@ -401,8 +411,8 @@ public abstract class DbHandler {
         {
             final String sql = "SELECT * FROM " + TestResult.TABLE_NAME + " tr JOIN "
                 + TestCase.TABLE_NAME + " tc ON "
-                + "tr." + Test_Result.TEST_CASE_ID + " = tc." + TestCase.TEST_CASE_ID
-                + " WHERE " + Test_Result.SUITE_RESULT.name() + " = ?;";
+                + "tr." + TestResult.TEST_CASE_ID + " = tc." + TestCase.TEST_CASE_ID
+                + " WHERE " + TestResult.SUITE_RESULT + " = ?;";
             try (Connection conn = this.getConnection(); PreparedStatement stmt = conn.prepareStatement(sql)) {
                 stmt.setString(1, execId);
                 ResultSet rs1 = stmt.executeQuery();
