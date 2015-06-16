@@ -17,6 +17,7 @@ package com.tascape.qa.th;
 
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import com.tascape.qa.th.db.DbHandler;
+import com.tascape.qa.th.db.SuiteProperty;
 import com.tascape.qa.th.db.TestCase;
 import com.tascape.qa.th.db.TestResult;
 import com.tascape.qa.th.suite.AbstractSuite;
@@ -73,7 +74,7 @@ public class SuiteRunner {
         if (!dir.exists() && !dir.mkdirs()) {
             throw new IOException("Cannot create directory " + dir);
         }
-        this.logAppProperties(dir);
+        this.saveExectionProperties(dir);
 
         int threadCount = SYS_CONFIG.getExecutionThreadCount();
         LOG.info("Start execution engine with {} thread(s)", threadCount);
@@ -133,9 +134,21 @@ public class SuiteRunner {
         return numberOfFailures;
     }
 
-    private void logAppProperties(File dir) throws IOException {
+    private void saveExectionProperties(File dir) throws IOException, SQLException {
         File props = new File(dir, "execution.properties");
         SYS_CONFIG.getProperties().store(FileUtils.openOutputStream(props), "Testharness");
+
+        List<SuiteProperty> sps = new ArrayList<>();
+        SYS_CONFIG.getProperties().entrySet().stream()
+            .filter(entry -> !DbHandler.SYSPROP_DATABASE_PASS.equals(entry.getKey()))
+            .forEach(entry -> {
+                SuiteProperty sp = new SuiteProperty();
+                sp.setSuiteResultId(this.execId);
+                sp.setPropertyName(entry.getKey().toString());
+                sp.setPropertyValue(entry.getValue().toString());
+                sps.add(sp);
+            });
+        this.db.setSuiteExecutionProperties(sps);
     }
 
     private List<TestResult> filter(List<TestResult> tcrs) {
