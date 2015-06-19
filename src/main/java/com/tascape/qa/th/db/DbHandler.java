@@ -391,8 +391,7 @@ public abstract class DbHandler {
                 + SuiteResult.SUITE_RESULT_ID + " = ?;";
             try (Connection conn = this.getConnection(); PreparedStatement stmt = conn.prepareStatement(sql)) {
                 stmt.setString(1, execId);
-                ResultSet rs = stmt.executeQuery();
-                List<Map<String, Object>> l = dumpResultSetToList(rs);
+                List<Map<String, Object>> l = dumpResultSetToList(stmt.executeQuery());
                 if (l.isEmpty()) {
                     LOG.error("No test suite result of exec id {}", execId);
 
@@ -403,16 +402,15 @@ public abstract class DbHandler {
                 });
             }
         }
-        JSONArray trs = new JSONArray();
         {
+            JSONArray trs = new JSONArray();
             final String sql = "SELECT * FROM " + TestResult.TABLE_NAME + " tr JOIN "
                 + TestCase.TABLE_NAME + " tc ON "
                 + "tr." + TestResult.TEST_CASE_ID + " = tc." + TestCase.TEST_CASE_ID
                 + " WHERE " + TestResult.SUITE_RESULT + " = ?;";
             try (Connection conn = this.getConnection(); PreparedStatement stmt = conn.prepareStatement(sql)) {
                 stmt.setString(1, execId);
-                ResultSet rs1 = stmt.executeQuery();
-                List<Map<String, Object>> l = dumpResultSetToList(rs1);
+                List<Map<String, Object>> l = dumpResultSetToList(stmt.executeQuery());
                 l.forEach(row -> {
                     JSONObject j = new JSONObject();
                     row.entrySet().forEach(col -> {
@@ -421,8 +419,25 @@ public abstract class DbHandler {
                     trs.put(trs.length(), j);
                 });
             }
+            sr.put("test_results", trs);
         }
-        sr.put("test_results", trs);
+        {
+            JSONArray sps = new JSONArray();
+            final String sql = "SELECT * FROM " + SuiteProperty.TABLE_NAME
+                + " WHERE " + SuiteProperty.SUITE_RESULT_ID + " = ?;";
+            try (Connection conn = this.getConnection(); PreparedStatement stmt = conn.prepareStatement(sql)) {
+                stmt.setString(1, execId);
+                List<Map<String, Object>> l = dumpResultSetToList(stmt.executeQuery());
+                l.forEach(row -> {
+                    JSONObject j = new JSONObject();
+                    row.entrySet().forEach(col -> {
+                        j.put(col.getKey(), col.getValue());
+                    });
+                    sps.put(sps.length(), j);
+                });
+            }
+            sr.put("suite_properties", sps);
+        }
         FileUtils.write(path.toFile(), new JSONObject().put("suite_result", sr).toString(2));
     }
 

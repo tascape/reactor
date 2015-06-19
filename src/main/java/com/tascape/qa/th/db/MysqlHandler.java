@@ -105,8 +105,7 @@ public class MysqlHandler extends DbHandler {
 
         try (Connection conn = this.getConnection()) {
             PreparedStatement stmt = conn.prepareStatement(sql,
-                ResultSet.TYPE_SCROLL_SENSITIVE,
-                ResultSet.CONCUR_UPDATABLE);
+                ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE);
             stmt.setMaxRows(1);
             stmt.setString(1, execId);
             ResultSet rs = stmt.executeQuery();
