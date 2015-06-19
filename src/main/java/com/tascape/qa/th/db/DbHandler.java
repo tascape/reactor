@@ -150,21 +150,17 @@ public abstract class DbHandler {
         if (properties.isEmpty()) {
             return;
         }
-        final String sql = "SELECT * FROM " + SuiteProperty.TABLE_NAME + " WHERE "
-            + SuiteProperty.SUITE_RESULT_ID + " = ?";
+        final String sql = "INSERT INTO " + SuiteProperty.TABLE_NAME + " ("
+            + SuiteProperty.SUITE_RESULT_ID + ", "
+            + SuiteProperty.PROPERTY_NAME + ", "
+            + SuiteProperty.PROPERTY_VALUE + ") VALUES (?,?,?)";
         try (Connection conn = this.getConnection()) {
-            PreparedStatement stmt = conn.prepareStatement(sql,
-                ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE);
-            stmt.setString(1, properties.get(0).getSuiteResultId());
-            ResultSet rs = stmt.executeQuery();
+            PreparedStatement stmt = conn.prepareStatement(sql);
             for (SuiteProperty prop : properties) {
-                rs.moveToInsertRow();
-                rs.updateString(SuiteProperty.SUITE_RESULT_ID, prop.getSuiteResultId());
-                rs.updateString(SuiteProperty.PROPERTY_NAME, prop.getPropertyName());
-                rs.updateString(SuiteProperty.PROPERTY_VALUE, prop.getPropertyValue());
-                rs.insertRow();
-                rs.last();
-                rs.updateRow();
+                stmt.setString(1, prop.getSuiteResultId());
+                stmt.setString(2, prop.getPropertyName());
+                stmt.setString(3, prop.getPropertyValue());
+                stmt.executeUpdate();
             }
         }
     }
@@ -253,7 +249,7 @@ public abstract class DbHandler {
     public boolean acquireTestCaseResult(TestResult tcr) throws SQLException {
         LOG.info("Acquire test case {}", tcr.getTestCase().format());
         final String sql = "SELECT * FROM " + TestResult.TABLE_NAME + " WHERE "
-            + TestResult.TEST_RESULT_ID+ " = ? LIMIT 1;";
+            + TestResult.TEST_RESULT_ID + " = ? LIMIT 1;";
 
         try (Connection conn = this.getConnection()) {
             PreparedStatement stmt = conn.prepareStatement(sql,
@@ -395,8 +391,7 @@ public abstract class DbHandler {
                 + SuiteResult.SUITE_RESULT_ID + " = ?;";
             try (Connection conn = this.getConnection(); PreparedStatement stmt = conn.prepareStatement(sql)) {
                 stmt.setString(1, execId);
-                ResultSet rs = stmt.executeQuery();
-                List<Map<String, Object>> l = dumpResultSetToList(rs);
+                List<Map<String, Object>> l = dumpResultSetToList(stmt.executeQuery());
                 if (l.isEmpty()) {
                     LOG.error("No test suite result of exec id {}", execId);
 
@@ -407,16 +402,15 @@ public abstract class DbHandler {
                 });
             }
         }
-        JSONArray trs = new JSONArray();
         {
+            JSONArray trs = new JSONArray();
             final String sql = "SELECT * FROM " + TestResult.TABLE_NAME + " tr JOIN "
                 + TestCase.TABLE_NAME + " tc ON "
                 + "tr." + TestResult.TEST_CASE_ID + " = tc." + TestCase.TEST_CASE_ID
                 + " WHERE " + TestResult.SUITE_RESULT + " = ?;";
             try (Connection conn = this.getConnection(); PreparedStatement stmt = conn.prepareStatement(sql)) {
                 stmt.setString(1, execId);
-                ResultSet rs1 = stmt.executeQuery();
-                List<Map<String, Object>> l = dumpResultSetToList(rs1);
+                List<Map<String, Object>> l = dumpResultSetToList(stmt.executeQuery());
                 l.forEach(row -> {
                     JSONObject j = new JSONObject();
                     row.entrySet().forEach(col -> {
@@ -425,8 +419,25 @@ public abstract class DbHandler {
                     trs.put(trs.length(), j);
                 });
             }
+            sr.put("test_results", trs);
         }
-        sr.put("test_results", trs);
+        {
+            JSONArray sps = new JSONArray();
+            final String sql = "SELECT * FROM " + SuiteProperty.TABLE_NAME
+                + " WHERE " + SuiteProperty.SUITE_RESULT_ID + " = ?;";
+            try (Connection conn = this.getConnection(); PreparedStatement stmt = conn.prepareStatement(sql)) {
+                stmt.setString(1, execId);
+                List<Map<String, Object>> l = dumpResultSetToList(stmt.executeQuery());
+                l.forEach(row -> {
+                    JSONObject j = new JSONObject();
+                    row.entrySet().forEach(col -> {
+                        j.put(col.getKey(), col.getValue());
+                    });
+                    sps.put(sps.length(), j);
+                });
+            }
+            sr.put("suite_properties", sps);
+        }
         FileUtils.write(path.toFile(), new JSONObject().put("suite_result", sr).toString(2));
     }
 
@@ -521,27 +532,23 @@ public abstract class DbHandler {
     }
 
     public void saveTestResultMetrics(String trid, List<TestResultMetric> resultMetrics) throws SQLException {
-        final String sql = "SELECT * FROM " + TABLES.test_result_metric.name() + " WHERE "
-            + Test_Result_Metric.TEST_RESULT_ID.name() + " = ?;";
-        try (Connection conn = this.getConnection();
-            PreparedStatement stmt = conn.prepareStatement(sql,
-                ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE)) {
-            stmt.setMaxRows(1);
-            stmt.setString(1, trid);
-            LOG.trace("save metric data {}", resultMetrics);
-            ResultSet rs = stmt.executeQuery();
-
+        if (resultMetrics.isEmpty()) {
+            return;
+        }
+        final String sql = "INSERT INTO " + TABLES.test_result_metric.name() + " ("
+            + Test_Result_Metric.TEST_RESULT_ID.name() + ", "
+            + Test_Result_Metric.METRIC_GROUP.name() + ", "
+            + Test_Result_Metric.METRIC_NAME.name() + ", "
+            + Test_Result_Metric.METRIC_VALUE.name() + ") VALUES (?,?,?,?)";
+        try (Connection conn = this.getConnection()) {
+            PreparedStatement stmt = conn.prepareStatement(sql);
+            LOG.trace("save metric data for {}", trid);
             for (TestResultMetric metric : resultMetrics) {
-                rs.moveToInsertRow();
-
-                rs.updateString(Test_Result_Metric.TEST_RESULT_ID.name(), trid);
-                rs.updateString(Test_Result_Metric.METRIC_GROUP.name(), metric.getMetricGroup());
-                rs.updateString(Test_Result_Metric.METRIC_NAME.name(), metric.getMetricName());
-                rs.updateDouble(Test_Result_Metric.METRIC_VALUE.name(), metric.getMetricValue());
-
-                rs.insertRow();
-                rs.last();
-                rs.updateRow();
+                stmt.setString(1, trid);
+                stmt.setString(2, metric.getMetricGroup());
+                stmt.setString(3, metric.getMetricName());
+                stmt.setDouble(4, metric.getMetricValue());
+                stmt.executeUpdate();
             }
         }
     }
