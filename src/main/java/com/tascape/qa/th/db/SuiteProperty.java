@@ -39,7 +39,7 @@ public class SuiteProperty implements Serializable {
 
     public static final String TABLE_NAME = "suite_property";
 
-    public static final String SUITE_PROPTERTY_ID = "SUITE_PROPTERTY_ID";
+    public static final String SUITE_PROPERTY_ID = "SUITE_PROPERTY_ID";
 
     public static final String SUITE_RESULT_ID = "SUITE_RESULT_ID";
 
