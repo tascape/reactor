@@ -38,6 +38,18 @@ public class TestResultMetric implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
+    public static final String TABLE_NAME = "test_result_metric";
+
+    public static final String TEST_RESULT_METRIC_ID = "TEST_RESULT_METRIC_ID";
+
+    public static final String TEST_RESULT_ID = "TEST_RESULT_ID";
+
+    public static final String METRIC_GROUP = "METRIC_GROUP";
+
+    public static final String METRIC_NAME = "METRIC_NAME";
+
+    public static final String METRIC_VALUE = "METRIC_VALUE";
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Basic(optional = false)

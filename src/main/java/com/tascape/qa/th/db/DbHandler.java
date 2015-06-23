@@ -64,18 +64,6 @@ public abstract class DbHandler {
 
     public static final String SYSPROP_DATABASE_PASS = "qa.th.db.pass";
 
-    public enum TABLES {
-        test_result_metric,
-    }
-
-    public enum Test_Result_Metric {
-        TEST_RESULT_METRIC_ID,
-        TEST_RESULT_ID,
-        METRIC_GROUP,
-        METRIC_NAME,
-        METRIC_VALUE,
-    }
-
     public static DbHandler getInstance() {
         String type = SystemConfiguration.getInstance().getDatabaseType();
         DbHandler dbh;
@@ -535,11 +523,11 @@ public abstract class DbHandler {
         if (resultMetrics.isEmpty()) {
             return;
         }
-        final String sql = "INSERT INTO " + TABLES.test_result_metric.name() + " ("
-            + Test_Result_Metric.TEST_RESULT_ID.name() + ", "
-            + Test_Result_Metric.METRIC_GROUP.name() + ", "
-            + Test_Result_Metric.METRIC_NAME.name() + ", "
-            + Test_Result_Metric.METRIC_VALUE.name() + ") VALUES (?,?,?,?)";
+        final String sql = "INSERT INTO " + TestResultMetric.TABLE_NAME + " ("
+            + TestResultMetric.TEST_RESULT_ID + ", "
+            + TestResultMetric.METRIC_GROUP + ", "
+            + TestResultMetric.METRIC_NAME + ", "
+            + TestResultMetric.METRIC_VALUE + ") VALUES (?,?,?,?)";
         try (Connection conn = this.getConnection()) {
             PreparedStatement stmt = conn.prepareStatement(sql);
             LOG.trace("save metric data for {}", trid);
