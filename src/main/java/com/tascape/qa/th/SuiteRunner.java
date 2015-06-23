@@ -140,7 +140,7 @@ public class SuiteRunner {
 
         List<SuiteProperty> sps = new ArrayList<>();
         SYS_CONFIG.getProperties().entrySet().stream()
-            .filter(entry -> !DbHandler.SYSPROP_DATABASE_PASS.equals(entry.getKey()))
+            .filter(key -> !key.toString().startsWith("qa.th.db."))
             .forEach(entry -> {
                 SuiteProperty sp = new SuiteProperty();
                 sp.setSuiteResultId(this.execId);

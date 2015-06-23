@@ -30,7 +30,6 @@ import java.util.regex.Pattern;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import static com.tascape.qa.th.db.DbHandler.SYSPROP_DATABASE_PASS;
 
 /**
  *
@@ -279,7 +278,7 @@ public final class SystemConfiguration {
         List<String> keys = new ArrayList<>(this.properties.stringPropertyNames());
         Collections.sort(keys);
         keys.stream()
-            .filter(key -> !SYSPROP_DATABASE_PASS.equals(key))
+            .filter(key -> !key.startsWith("qa.th.db."))
             .forEach((key) -> {
                 LOG.debug(String.format("%50s : %s", key, this.properties.getProperty(key)));
             });
