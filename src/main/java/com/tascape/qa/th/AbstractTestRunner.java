@@ -85,8 +85,6 @@ public abstract class AbstractTestRunner {
             pw.println("<html><body><pre>");
             pw.println("<a href='../'>Suite Log Directory</a><br /><a href='./'>Test Log Directory</a>");
             pw.println();
-            pw.println(logFile);
-            pw.println();
             List<String> lines = FileUtils.readLines(logFile.toFile());
             List<File> files = new ArrayList<>(Arrays.asList(logFile.getParent().toFile().listFiles()));
 

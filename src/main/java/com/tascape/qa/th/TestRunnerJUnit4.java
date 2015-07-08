@@ -24,6 +24,7 @@ import com.tascape.qa.th.driver.EntityDriver;
 import com.tascape.qa.th.suite.AbstractSuite;
 import java.io.IOException;
 import java.nio.file.Path;
+import java.time.Instant;
 import java.util.Map;
 import java.util.concurrent.Callable;
 import org.junit.runner.JUnitCore;
@@ -107,6 +108,7 @@ public class TestRunnerJUnit4 extends AbstractTestRunner implements Callable<Tes
         final Path logFile = testLogPath.resolve("test.log");
         Utils.addLog4jFileAppender(logFile.toFile().getAbsolutePath());
 
+        LOG.info("{}", Instant.now());
         LOG.info("Loading test case {}", tc.format());
         TestRunListener trl = new TestRunListener(this.db, this.tcr);
         try {
