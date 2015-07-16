@@ -225,6 +225,7 @@ public abstract class DbHandler {
 
                 tcr.setTestStation(rs.getString(TestResult.TEST_STATION));
                 tcr.setLogDir(rs.getString(TestResult.LOG_DIR));
+                tcr.setExternalId(rs.getString(TestResult.EXTERNAL_ID));
                 tcrs.add(tcr);
             }
         }
@@ -286,6 +287,7 @@ public abstract class DbHandler {
                 rs.updateInt(TestResult.RETRY, tcr.getRetry());
                 rs.updateString(TestResult.TEST_STATION, tcr.getTestStation());
                 rs.updateString(TestResult.LOG_DIR, tcr.getLogDir());
+                rs.updateString(TestResult.EXTERNAL_ID, tcr.getExternalId());
                 rs.updateRow();
             } else {
                 LOG.warn("Cannot update test result");

@@ -161,6 +161,7 @@ public class TestRunListener extends RunListener {
             return;
         }
 
+        this.tcr.setExternalId(test.getExternalId());
         test.cleanBackgoundTasks();
 
         List<TestResultMetric> resultMetrics = test.getTestResultMetrics();

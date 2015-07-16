@@ -60,6 +60,8 @@ public class TestResult {
 
     public static final String LOG_DIR = "LOG_DIR";
 
+    public static final String EXTERNAL_ID = "EXTERNAL_ID";
+
     @Id
     @Basic(optional = false)
     @Column(name = "TEST_RESULT_ID")
@@ -83,6 +85,9 @@ public class TestResult {
 
     @Column(name = "LOG_DIR")
     private String logDir;
+
+    @Column(name = "EXTERNAL_ID")
+    private String externalId;
 
     @JoinColumn(name = "SUITE_RESULT", referencedColumnName = "SUITE_RESULT_ID")
     @ManyToOne
@@ -174,6 +179,14 @@ public class TestResult {
 
     public void setLogDir(String logDir) {
         this.logDir = logDir;
+    }
+
+    public String getExternalId() {
+        return externalId;
+    }
+
+    public void setExternalId(String externalId) {
+        this.externalId = externalId;
     }
 
     public SuiteResult getSuiteResult() {

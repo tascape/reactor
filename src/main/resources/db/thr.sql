@@ -1,8 +1,9 @@
--- MySQL dump 10.13  Distrib 5.1.73, for apple-darwin10.3.0 (i386)
+-- mysqldump -u root testharness --no-data
+-- MySQL dump 10.13  Distrib 5.6.25, for osx10.8 (x86_64)
 --
--- Host: 127.0.0.1    Database: testharness
+-- Host: localhost    Database: testharness
 -- ------------------------------------------------------
--- Server version	5.5.37
+-- Server version	5.6.25
 
 /*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
 /*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
@@ -14,6 +15,24 @@
 /*!40014 SET @OLD_FOREIGN_KEY_CHECKS=@@FOREIGN_KEY_CHECKS, FOREIGN_KEY_CHECKS=0 */;
 /*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
+
+--
+-- Table structure for table `suite_property`
+--
+
+DROP TABLE IF EXISTS `suite_property`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `suite_property` (
+  `SUITE_PROPERTY_ID` int(11) NOT NULL AUTO_INCREMENT,
+  `SUITE_RESULT_ID` varchar(63) NOT NULL,
+  `PROPERTY_NAME` varchar(63) DEFAULT NULL,
+  `PROPERTY_VALUE` varchar(127) DEFAULT NULL,
+  PRIMARY KEY (`SUITE_PROPERTY_ID`),
+  KEY `fk_suite_result_idx` (`SUITE_RESULT_ID`),
+  CONSTRAINT `fk_script_result` FOREIGN KEY (`SUITE_RESULT_ID`) REFERENCES `suite_result` (`SUITE_RESULT_ID`) ON DELETE CASCADE ON UPDATE CASCADE
+) ENGINE=InnoDB AUTO_INCREMENT=1756 DEFAULT CHARSET=utf8;
+/*!40101 SET character_set_client = @saved_cs_client */;
 
 --
 -- Table structure for table `suite_result`
@@ -40,24 +59,6 @@ CREATE TABLE `suite_result` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
--- Table structure for table `suite_property`
---
-
-DROP TABLE IF EXISTS `suite_property`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
-CREATE TABLE `suite_property` (
-  `SUITE_PROPERTY_ID` int(11) NOT NULL AUTO_INCREMENT,
-  `SUITE_RESULT_ID` varchar(63) NOT NULL,
-  `PROPERTY_NAME` varchar(63) DEFAULT NULL,
-  `PROPERTY_VALUE` varchar(127) DEFAULT NULL,
-  PRIMARY KEY (`SUITE_PROPERTY_ID`),
-  KEY `fk_suite_result_idx` (`SUITE_RESULT_ID`),
-  CONSTRAINT `fk_script_result` FOREIGN KEY (`SUITE_RESULT_ID`) REFERENCES `suite_result` (`SUITE_RESULT_ID`) ON DELETE CASCADE ON UPDATE CASCADE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
-/*!40101 SET character_set_client = @saved_cs_client */;
-
---
 -- Table structure for table `test_case`
 --
 
@@ -69,11 +70,11 @@ CREATE TABLE `test_case` (
   `SUITE_CLASS` varchar(200) NOT NULL,
   `TEST_CLASS` varchar(200) NOT NULL,
   `TEST_METHOD` varchar(200) NOT NULL,
-  `TEST_DATA_INFO` varchar(200) NOT NULL,
+  `TEST_DATA_INFO` varchar(200) DEFAULT '',
   `TEST_DATA` varchar(200) DEFAULT '',
   `TEST_ISSUES` varchar(45) DEFAULT '',
   PRIMARY KEY (`TEST_CASE_ID`)
-) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=101 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -94,6 +95,7 @@ CREATE TABLE `test_result` (
   `RETRY` int(11) DEFAULT NULL,
   `TEST_STATION` varchar(125) DEFAULT NULL,
   `LOG_DIR` varchar(200) DEFAULT NULL,
+  `EXTERNAL_ID` varchar(63) DEFAULT NULL,
   PRIMARY KEY (`TEST_RESULT_ID`),
   KEY `suite-test_idx` (`SUITE_RESULT`),
   KEY `fk_test_case_idx` (`TEST_CASE_ID`),
@@ -101,8 +103,6 @@ CREATE TABLE `test_result` (
   CONSTRAINT `fk_test_case` FOREIGN KEY (`TEST_CASE_ID`) REFERENCES `test_case` (`TEST_CASE_ID`) ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
-/*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
-
 
 --
 -- Table structure for table `test_result_metric`
@@ -120,9 +120,9 @@ CREATE TABLE `test_result_metric` (
   PRIMARY KEY (`TEST_RESULT_METRIC_ID`),
   KEY `fk_test_result_idx` (`TEST_RESULT_ID`),
   CONSTRAINT `fk_test_result` FOREIGN KEY (`TEST_RESULT_ID`) REFERENCES `test_result` (`TEST_RESULT_ID`) ON DELETE CASCADE ON UPDATE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=25 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
-
+/*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
 
 /*!40101 SET SQL_MODE=@OLD_SQL_MODE */;
 /*!40014 SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS */;
@@ -132,4 +132,4 @@ CREATE TABLE `test_result_metric` (
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2014-08-05 17:47:01
+-- Dump completed on 2015-07-15 23:38:30

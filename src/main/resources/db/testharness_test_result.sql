@@ -1,10 +1,9 @@
-CREATE DATABASE  IF NOT EXISTS `testharness` /*!40100 DEFAULT CHARACTER SET utf8 */;
-USE `testharness`;
--- MySQL dump 10.13  Distrib 5.6.19, for osx10.7 (i386)
+-- mysqldump -u root testharness test_result --no-data
+-- MySQL dump 10.13  Distrib 5.6.25, for osx10.8 (x86_64)
 --
--- Host: 127.0.0.1    Database: testharness
+-- Host: localhost    Database: testharness
 -- ------------------------------------------------------
--- Server version	5.6.21
+-- Server version	5.6.25
 
 /*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
 /*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
@@ -35,6 +34,7 @@ CREATE TABLE `test_result` (
   `RETRY` int(11) DEFAULT NULL,
   `TEST_STATION` varchar(125) DEFAULT NULL,
   `LOG_DIR` varchar(200) DEFAULT NULL,
+  `EXTERNAL_ID` varchar(63) DEFAULT NULL,
   PRIMARY KEY (`TEST_RESULT_ID`),
   KEY `suite-test_idx` (`SUITE_RESULT`),
   KEY `fk_test_case_idx` (`TEST_CASE_ID`),
@@ -52,4 +52,4 @@ CREATE TABLE `test_result` (
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2015-02-11 10:39:22
+-- Dump completed on 2015-07-15 23:43:19

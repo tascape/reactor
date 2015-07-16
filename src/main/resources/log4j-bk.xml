@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>  
+<!--
+Copyright 2015.
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+     http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+-->
+<!DOCTYPE log4j:configuration SYSTEM "log4j.dtd">
+<log4j:configuration>
+    <appender name="CONSOLE" class="org.apache.log4j.ConsoleAppender">
+        <param name="threshold" value="DEBUG" />
+        <layout class="org.apache.log4j.PatternLayout">
+            <param name="ConversionPattern" value="%d{HH:mm:ss.SSS} %-4t %-5p %C{1}.%M:%L - %m%n" />
+        </layout>
+    </appender>
+
+    <appender name="LOGFILE" class="org.apache.log4j.RollingFileAppender">
+        <param name="threshold" value="TRACE" />
+        <param name="append" value="false" />
+        <param name="maxFileSize" value="10MB" />
+        <param name="maxBackupIndex" value="100" />
+        <param name="file" value="./logs/th.log" />
+        <layout class="org.apache.log4j.PatternLayout">
+            <param name="ConversionPattern" value="%d{yyyy-MM-dd HH:mm:ss.SSS} %-4t %-5p %C.%M:%L - %m%n" />
+        </layout>
+    </appender>
+
+    <category name="org.apache.http">
+        <priority value="DEBUG" />
+    </category>
+    <category name="org.apache.http.impl.conn">
+        <priority value="DEBUG" />
+    </category>
+    <category name="org.apache.http.wire">
+        <priority value="DEBUG" />
+    </category>
+    <category name="org.openqa.jetty">
+        <priority value="DEBUG" />
+    </category>
+
+    <root>
+        <priority value="TRACE" />
+        <appender-ref ref="CONSOLE" />
+        <appender-ref ref="LOGFILE" />
+    </root>
+</log4j:configuration>

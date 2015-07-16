@@ -55,6 +55,8 @@ public class JUnit4Test extends AbstractTest {
     @Priority(level = 0)
     public void testPositive() throws Exception {
         LOG.info("Sample positive test");
+        LOG.debug("Sample positive test");
+        LOG.trace("Sample positive test");
         this.doSomethingGood();
     }
 
@@ -68,6 +70,13 @@ public class JUnit4Test extends AbstractTest {
     }
 
     @Test
+    public void testExternalId() throws Exception {
+        LOG.info("Sample external id test, set to aaa");
+        this.setExternalId("aaa");
+        this.doSomethingGood();
+    }
+
+    @Test
     @Priority(level = 1)
     public void testNegativeAgain() throws Exception {
         LOG.info("Sample negative test again");
@@ -77,14 +86,17 @@ public class JUnit4Test extends AbstractTest {
     }
 
     private void doSomethingGood() throws IOException {
+        LOG.info("Do something good");
         assertTrue(true);
     }
 
     private void doSomethingBad() throws Exception {
+        LOG.info("Do something bad");
         throw new Exception("something bad");
     }
 
     private void doSomethingBadAgain() throws Exception {
+        LOG.info("Do something bad again");
         throw new Exception("something bad again");
     }
 }

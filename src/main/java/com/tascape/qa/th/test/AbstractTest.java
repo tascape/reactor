@@ -86,6 +86,8 @@ public abstract class AbstractTest {
 
     private final List<TestResultMetric> resultMetrics = new LinkedList<>();
 
+    private String externalId = "";
+
     public abstract String getApplicationUnderTest();
 
     public AbstractTest() {
@@ -142,6 +144,14 @@ public abstract class AbstractTest {
             td = clazz.newInstance();
         }
         return clazz.cast(td);
+    }
+
+    public String getExternalId() {
+        return externalId;
+    }
+
+    protected void setExternalId(String externalId) {
+        this.externalId = externalId;
     }
 
     public ExecutionResult getExecutionResult() {
