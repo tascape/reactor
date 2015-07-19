@@ -31,6 +31,15 @@ public interface TestData {
     String getValue();
 
     /**
+     * For data-driven test cases, the test case external id is defined in corresponding test data. Please implement
+     * this method to provide external id based on the test case management system, such as TestRail, that is used for
+     * result reporting.
+     *
+     * @return value
+     */
+    String getExternalId();
+
+    /**
      * Sets value for updating test method name. The final test method name will look like testMethod(value).
      *
      * @param value the value for display

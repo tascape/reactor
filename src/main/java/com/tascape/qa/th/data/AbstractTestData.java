@@ -104,4 +104,14 @@ public abstract class AbstractTestData implements TestData {
         }
         return data;
     }
+
+    /**
+     * The default external id is empty string. Please override this method to provide external id for your test data.
+     *
+     * @return empty string
+     */
+    @Override
+    public String getExternalId() {
+        return "";
+    }
 }

@@ -146,10 +146,21 @@ public abstract class AbstractTest {
         return clazz.cast(td);
     }
 
+    /**
+     * External id is for exporting test result into other test case management system, such as TestRail.
+     *
+     * @return
+     */
     public String getExternalId() {
         return externalId;
     }
 
+    /**
+     * This is called in test method to register external id (if any). Do not call this if test result will not be
+     * exported into other test case management system, such as TestRail.
+     *
+     * @param externalId
+     */
     protected void setExternalId(String externalId) {
         this.externalId = externalId;
     }
