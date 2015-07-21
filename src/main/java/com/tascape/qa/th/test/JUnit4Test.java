@@ -48,7 +48,7 @@ public class JUnit4Test extends AbstractTest {
     @Override
     public String getApplicationUnderTest() {
         LOG.debug("Please override");
-        return "NA";
+        return "testharness";
     }
 
     @Test

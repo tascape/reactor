@@ -117,6 +117,7 @@ public class TestRunListener extends RunListener {
             this.tcr.setAut(aut);
             this.db.updateTestExecutionResult(this.tcr);
         }
+        LOG.info("Application under test: {}", this.tcr.getAut());
     }
 
     /**
