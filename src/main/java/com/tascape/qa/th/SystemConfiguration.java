@@ -56,6 +56,8 @@ public final class SystemConfiguration {
 
     public static final String SYSPROP_TEST_SUITE = "qa.th.test.suite";
 
+    public static final String SYSPROP_RESULT_VISIBILITY = "qa.th.result.visibility";
+
     public static final String SYSPROP_DEBUG_CLASS_REGEX = "qa.th.debug.class.regex";
 
     public static final String SYSPROP_DEBUG_METHOD_RESGX = "qa.th.debug.method.regex";
@@ -147,6 +149,10 @@ public final class SystemConfiguration {
             return defaultValue;
         }
         return Boolean.parseBoolean(v);
+    }
+    
+    public boolean getResultVisibility() {
+        return this.getBooleanProperty(SYSPROP_RESULT_VISIBILITY, true);
     }
 
     public Path getLogPath() {

@@ -127,6 +127,7 @@ public class SuiteResult implements Serializable {
         this.numberOfFailure = testSuite.getTests().size();
         this.invisibleEntry = false;
         this.productUnderTest = SYS_CONFIG.getProdUnderTest();
+        this.invisibleEntry=!SYS_CONFIG.getResultVisibility();
     }
 
     public SuiteResult(ResultSet rs) throws SQLException {
