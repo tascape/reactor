@@ -149,7 +149,7 @@ public abstract class AbstractTest {
     /**
      * External id is for exporting test result into other test case management system, such as TestRail.
      *
-     * @return
+     * @return external id for test result export
      */
     public String getExternalId() {
         return externalId;
@@ -159,7 +159,7 @@ public abstract class AbstractTest {
      * This is called in test method to register external id (if any). Do not call this if test result will not be
      * exported into other test case management system, such as TestRail.
      *
-     * @param externalId
+     * @param externalId external id for test result export
      */
     protected void setExternalId(String externalId) {
         this.externalId = externalId;
