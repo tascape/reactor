@@ -9,7 +9,7 @@
 
     <groupId>com.tascape.qa</groupId>
     <artifactId>testharness</artifactId>
-    <version>1.0.13</version>
+    <version>1.0.14</version>
     <packaging>jar</packaging>
 
     <name>testharness</name>
@@ -177,11 +177,6 @@
             <groupId>org.eclipse.persistence</groupId>
             <artifactId>eclipselink</artifactId>
             <version>2.6.0</version>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.httpcomponents</groupId>
-            <artifactId>httpclient</artifactId>
-            <version>4.4.1</version>
         </dependency>
     </dependencies>
 </project>
