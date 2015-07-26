@@ -81,6 +81,11 @@ public abstract class EntityDriver {
         return Utils.getKeepAliveFile(f);
     }
 
+    /**
+     * Name of the entity driver, max length 200 chars.
+     *
+     * @return name
+     */
     public abstract String getName();
 
     public abstract void reset() throws Exception;
