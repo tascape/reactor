@@ -200,6 +200,7 @@ public abstract class AbstractTest {
         metric.setMetricGroup(group);
         metric.setMetricName(name);
         metric.setMetricValue(value);
+        LOG.info("Test result metric '{}' - '{}' - {}", group, name, value);
         this.resultMetrics.add(metric);
     }
 
