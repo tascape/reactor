@@ -16,6 +16,7 @@
 package com.tascape.qa.th.test;
 
 import java.io.IOException;
+import java.util.Random;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -57,6 +58,9 @@ public class JUnit4Test extends AbstractTest {
         LOG.info("Sample positive test");
         LOG.debug("Sample positive test");
         LOG.trace("Sample positive test");
+        Random r = new Random();
+        this.putResultMetric("JUnit4", "positive-1", r.nextInt(100));
+        this.putResultMetric("JUnit4", "positive-2", r.nextInt(200));
         this.doSomethingGood();
     }
 
@@ -66,6 +70,7 @@ public class JUnit4Test extends AbstractTest {
         LOG.info("Sample negative test");
         expectedException.expect(Exception.class);
         expectedException.expectMessage("something bad");
+        this.putResultMetric("JUnit4", "negative", new Random().nextInt(100));
         this.doSomethingBad();
     }
 
@@ -73,6 +78,15 @@ public class JUnit4Test extends AbstractTest {
     public void testExternalId() throws Exception {
         LOG.info("Sample external id test, set to aaa");
         this.setExternalId("aaa");
+        Random r = new Random();
+        this.putResultMetric("JUnit4", "external-id-1", r.nextInt(100));
+        this.putResultMetric("JUnit4", "external-id-2", r.nextInt(100));
+        this.putResultMetric("JUnit4", "external-id-3", r.nextInt(100));
+        this.putResultMetric("JUnit4", "external-id-4", r.nextInt(400));
+        this.putResultMetric("JUnit4", "external-id-5", r.nextInt(100));
+        this.putResultMetric("JUnit4", "external-id-6", r.nextInt(100));
+        this.putResultMetric("JUnit4", "external-id-7", r.nextInt(100));
+        this.putResultMetric("JUnit4", "external-id-8", r.nextInt(800));
         this.doSomethingGood();
     }
 

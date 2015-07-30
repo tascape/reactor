@@ -392,11 +392,22 @@ public abstract class DbHandler {
                 });
             }
         }
+        List<Map<String, Object>> metrics;
+        {
+            final String sql = "SELECT trm.* FROM " + TestResultMetric.TABLE_NAME + " trm JOIN "
+                + TestResult.TABLE_NAME + " tr ON"
+                + " trm." + TestResultMetric.TEST_RESULT_ID + " = tr." + TestResult.TEST_RESULT_ID
+                + " WHERE " + TestResult.SUITE_RESULT + " = ?;";
+            try (Connection conn = this.getConnection(); PreparedStatement stmt = conn.prepareStatement(sql)) {
+                stmt.setString(1, execId);
+                metrics = dumpResultSetToList(stmt.executeQuery());
+            }
+        }
         {
             JSONArray trs = new JSONArray();
             final String sql = "SELECT * FROM " + TestResult.TABLE_NAME + " tr JOIN "
-                + TestCase.TABLE_NAME + " tc ON "
-                + "tr." + TestResult.TEST_CASE_ID + " = tc." + TestCase.TEST_CASE_ID
+                + TestCase.TABLE_NAME + " tc ON"
+                + " tr." + TestResult.TEST_CASE_ID + " = tc." + TestCase.TEST_CASE_ID
                 + " WHERE " + TestResult.SUITE_RESULT + " = ?;";
             try (Connection conn = this.getConnection(); PreparedStatement stmt = conn.prepareStatement(sql)) {
                 stmt.setString(1, execId);
@@ -407,6 +418,18 @@ public abstract class DbHandler {
                         j.put(col.getKey(), col.getValue());
                     });
                     trs.put(trs.length(), j);
+
+                    JSONArray trms = new JSONArray();
+                    metrics.stream()
+                        .filter(r -> j.getString(TestResult.TEST_RESULT_ID).equals(r.get(TestResult.TEST_RESULT_ID)))
+                        .forEach(r -> {
+                            JSONObject jm = new JSONObject();
+                            r.entrySet().forEach(c -> {
+                                jm.put(c.getKey(), c.getValue());
+                            });
+                            trms.put(jm);
+                        });
+                    j.put("test_result_metrics", trms);
                 });
             }
             sr.put("test_results", trs);
@@ -547,7 +570,6 @@ public abstract class DbHandler {
         List<Map<String, Object>> rsml = new ArrayList<>();
         ResultSetMetaData rsmd = rs.getMetaData();
 
-        int row = 1;
         while (rs.next()) {
             Map<String, Object> d = new LinkedHashMap<>();
             for (int col = 1; col <= rsmd.getColumnCount(); col++) {
