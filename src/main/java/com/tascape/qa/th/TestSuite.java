@@ -45,7 +45,7 @@ public class TestSuite {
 
     public TestSuite(String suiteClass, Pattern testClassRegex, Pattern testMethodRegex, int priority)
         throws Exception {
-        LOG.info("Find test cases in target test suite");
+        LOG.info("Find test cases in target test suite {}", suiteClass);
         AbstractSuite suite = AbstractSuite.class.cast(Class.forName(suiteClass).newInstance());
         this.name = suite.getName();
         if (this.name == null || this.name.isEmpty()) {
