@@ -195,7 +195,7 @@ public class MysqlHandler extends DbHandler {
                     rs.updateString(TestResult.TEST_RESULT_ID, Utils.getUniqueId());
                     rs.updateString(TestResult.SUITE_RESULT, execId);
                     rs.updateInt(TestResult.TEST_CASE_ID, tcid);
-                    rs.updateString(TestResult.EXECUTION_RESULT, ExecutionResult.QUEUED.name());
+                    rs.updateString(TestResult.EXECUTION_RESULT, ExecutionResult.QUEUED.getName());
                     rs.updateLong(TestResult.START_TIME, System.currentTimeMillis());
                     rs.updateLong(TestResult.STOP_TIME, System.currentTimeMillis());
                     rs.updateString(TestResult.TEST_STATION, "?");
@@ -239,7 +239,7 @@ public class MysqlHandler extends DbHandler {
                 while (rs.next()) {
                     total++;
                     String result = rs.getString(TestResult.EXECUTION_RESULT);
-                    if (!result.equals(ExecutionResult.PASS.name()) && !result.endsWith("/0")) {
+                    if (!result.equals(ExecutionResult.PASS.getName()) && !result.endsWith("/0")) {
                         fail++;
                     }
                 }

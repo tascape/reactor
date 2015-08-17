@@ -15,8 +15,10 @@
  */
 package com.tascape.qa.th.test;
 
+import com.tascape.qa.th.ExecutionResult;
 import java.io.IOException;
 import java.util.Random;
+import javax.xml.xpath.XPathException;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -38,11 +40,13 @@ public class JUnit4Test extends AbstractTest {
 
     @Before
     public void setUp() throws Exception {
+        LOG.debug("Run something before test case");
         LOG.debug("Please override");
     }
 
     @After
     public void tearDown() throws Exception {
+        LOG.debug("Run something after test case");
         LOG.debug("Please override");
     }
 
@@ -65,16 +69,6 @@ public class JUnit4Test extends AbstractTest {
     }
 
     @Test
-    @Priority(level = 0)
-    public void testNegative() throws Exception {
-        LOG.info("Sample negative test");
-        expectedException.expect(Exception.class);
-        expectedException.expectMessage("something bad");
-        this.putResultMetric("JUnit4", "negative", new Random().nextInt(100));
-        this.doSomethingBad();
-    }
-
-    @Test
     public void testExternalId() throws Exception {
         LOG.info("Sample external id test, set to aaa");
         this.setExternalId("aaa");
@@ -91,12 +85,32 @@ public class JUnit4Test extends AbstractTest {
     }
 
     @Test
+    @Priority(level = 0)
+    public void testNegative() throws Exception {
+        LOG.info("Sample negative test");
+        expectedException.expect(IOException.class);
+        expectedException.expectMessage("something bad");
+        this.putResultMetric("JUnit4", "negative", new Random().nextInt(100));
+        this.doSomethingBad();
+    }
+
+    @Test
     @Priority(level = 1)
     public void testNegativeAgain() throws Exception {
         LOG.info("Sample negative test again");
-        expectedException.expect(Exception.class);
-        expectedException.expectMessage("something bad again");
+        expectedException.expect(XPathException.class);
+        expectedException.expectMessage("Cannot resolve xyz");
         this.doSomethingBadAgain();
+    }
+
+    @Test
+    public void testMultiple() throws IOException {
+        LOG.info("Sample multiple result test");
+        this.doSomethingGood();
+        ExecutionResult er = ExecutionResult.newMultiple();
+        er.setPass(23);
+        er.setFail(11);
+        this.setExecutionResult(er);
     }
 
     private void doSomethingGood() throws IOException {
@@ -104,13 +118,13 @@ public class JUnit4Test extends AbstractTest {
         assertTrue(true);
     }
 
-    private void doSomethingBad() throws Exception {
+    private void doSomethingBad() throws IOException {
         LOG.info("Do something bad");
-        throw new Exception("something bad");
+        throw new IOException("something bad");
     }
 
-    private void doSomethingBadAgain() throws Exception {
+    private void doSomethingBadAgain() throws XPathException {
         LOG.info("Do something bad again");
-        throw new Exception("something bad again");
+        throw new XPathException("Cannot resolve xyz");
     }
 }

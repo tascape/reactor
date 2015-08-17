@@ -101,7 +101,7 @@ public final class H2Handler extends DbHandler {
             stmt.setString(5, SYS_CONFIG.getJobBuildUrl());
             stmt.setLong(6, time);
             stmt.setLong(7, time + 11);
-            stmt.setString(8, ExecutionResult.QUEUED.name());
+            stmt.setString(8, ExecutionResult.QUEUED.getName());
             stmt.setInt(9, suite.getTests().size());
             stmt.setInt(10, suite.getTests().size());
             stmt.setString(11, SYS_CONFIG.getProdUnderTest());
@@ -140,7 +140,7 @@ public final class H2Handler extends DbHandler {
                 stmt.setString(1, Utils.getUniqueId());
                 stmt.setString(2, execId);
                 stmt.setInt(3, tcid);
-                stmt.setString(4, ExecutionResult.QUEUED.name());
+                stmt.setString(4, ExecutionResult.QUEUED.getName());
                 stmt.setLong(5, time);
                 stmt.setLong(6, time + 11);
                 stmt.setString(7, "?");
@@ -238,7 +238,7 @@ public final class H2Handler extends DbHandler {
                 while (rs.next()) {
                     total++;
                     String result = rs.getString(TestResult.EXECUTION_RESULT);
-                    if (!result.equals(ExecutionResult.PASS.name()) && !result.endsWith("/0")) {
+                    if (!result.equals(ExecutionResult.PASS.getName()) && !result.endsWith("/0")) {
                         fail++;
                     }
                 }

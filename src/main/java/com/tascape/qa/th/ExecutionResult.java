@@ -15,6 +15,8 @@
  */
 package com.tascape.qa.th;
 
+import java.security.InvalidParameterException;
+
 /**
  *
  * @author linsong wang
@@ -34,7 +36,7 @@ public class ExecutionResult {
 
     public static final ExecutionResult CANCEL = new ExecutionResult("CANCEL");
 
-    public static synchronized ExecutionResult createMultiple() {
+    public static synchronized ExecutionResult newMultiple() {
         return new ExecutionResult("MULTIPLE");
     }
 
@@ -44,27 +46,38 @@ public class ExecutionResult {
 
     private int fail = 0;
 
-    public ExecutionResult(String name) {
+    private ExecutionResult(String name) {
         this.name = name;
     }
 
-    public String name() {
+    public String getName() {
         return this.name;
     }
 
     public void setPass(int pass) {
+        if (pass < 0) {
+            throw new InvalidParameterException("Negative integer is not supported.");
+        }
         this.pass = pass;
     }
 
     public void setFail(int fail) {
+        if (fail < 0) {
+            throw new InvalidParameterException("Negative integer is not supported.");
+        }
         this.fail = fail;
     }
 
+    /**
+     * For multiple, the format is PASS/FAIL
+     *
+     * @return the execution result
+     */
     public String result() {
         if (this.pass != 0 || this.fail != 0) {
             return this.pass + "/" + this.fail;
         }
-        return this.name();
+        return this.name;
     }
 
     public boolean equals(ExecutionResult er) {

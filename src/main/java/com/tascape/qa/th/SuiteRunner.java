@@ -68,6 +68,7 @@ public class SuiteRunner {
         db.queueSuiteExecution(ts, this.execId);
     }
 
+    @SuppressWarnings("UseSpecificCatch")
     public int startExecution() throws IOException, InterruptedException, SQLException, XMLStreamException {
         File dir = SYS_CONFIG.getLogPath().resolve(execId).toFile();
         LOG.info("Create suite execution log directory {}", dir);
@@ -105,7 +106,7 @@ public class SuiteRunner {
                         }
                         String result = tcr.getResult().result();
                         LOG.info("Get result of test case {} - {}", tcr.getTestCase().format(), result);
-                        if (!ExecutionResult.PASS.name().equals(result) && !result.endsWith("/0")) {
+                        if (!ExecutionResult.PASS.getName().equals(result) && !result.endsWith("/0")) {
                             numberOfFailures++;
                         }
                     } catch (Throwable ex) {

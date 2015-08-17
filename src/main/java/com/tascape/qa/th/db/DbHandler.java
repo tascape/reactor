@@ -202,7 +202,7 @@ public abstract class DbHandler {
 
         try (Connection conn = this.getConnection()) {
             PreparedStatement stmt = conn.prepareStatement(sql);
-            stmt.setString(1, ExecutionResult.QUEUED.name());
+            stmt.setString(1, ExecutionResult.QUEUED.getName());
             stmt.setString(2, execId);
             stmt.setInt(3, limit);
             ResultSet rs = stmt.executeQuery();

@@ -68,7 +68,7 @@ public class TestResult {
     private String testResultId;
 
     @Column(name = "EXECUTION_RESULT")
-    private String executionResult = ExecutionResult.NA.name();
+    private String executionResult = ExecutionResult.NA.getName();
 
     private String aut;
 

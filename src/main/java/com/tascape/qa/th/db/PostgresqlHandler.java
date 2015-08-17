@@ -125,7 +125,7 @@ public class PostgresqlHandler extends DbHandler {
                 rs.updateString(SuiteResult.JOB_BUILD_URL, SYS_CONFIG.getJobBuildUrl());
                 rs.updateLong(SuiteResult.START_TIME, time);
                 rs.updateLong(SuiteResult.STOP_TIME, time);
-                rs.updateString(SuiteResult.EXECUTION_RESULT, ExecutionResult.QUEUED.name());
+                rs.updateString(SuiteResult.EXECUTION_RESULT, ExecutionResult.QUEUED.getName());
                 rs.updateInt(SuiteResult.NUMBER_OF_TESTS, suite.getTests().size());
                 rs.updateInt(SuiteResult.NUMBER_OF_FAILURE, suite.getTests().size());
                 rs.updateNString(SuiteResult.PRODUCT_UNDER_TEST, SYS_CONFIG.getProdUnderTest());
@@ -207,7 +207,7 @@ public class PostgresqlHandler extends DbHandler {
                     rs.updateString(TestResult.TEST_RESULT_ID, Utils.getUniqueId());
                     rs.updateString(TestResult.SUITE_RESULT, execId);
                     rs.updateInt(TestResult.TEST_CASE_ID, tcid);
-                    rs.updateString(TestResult.EXECUTION_RESULT, ExecutionResult.QUEUED.name());
+                    rs.updateString(TestResult.EXECUTION_RESULT, ExecutionResult.QUEUED.getName());
                     rs.updateLong(TestResult.START_TIME, System.currentTimeMillis());
                     rs.updateLong(TestResult.STOP_TIME, System.currentTimeMillis());
                     rs.updateString(TestResult.TEST_STATION, "?");
@@ -251,7 +251,7 @@ public class PostgresqlHandler extends DbHandler {
                 while (rs.next()) {
                     total++;
                     String result = rs.getString(TestResult.EXECUTION_RESULT);
-                    if (!result.equals(ExecutionResult.PASS.name()) && !result.endsWith("/0")) {
+                    if (!result.equals(ExecutionResult.PASS.getName()) && !result.endsWith("/0")) {
                         fail++;
                     }
                 }

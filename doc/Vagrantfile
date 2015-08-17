@@ -1,0 +1,79 @@
+# All Vagrant configuration is done below. The "2" in Vagrant.configure
+# configures the configuration version (we support older styles for
+# backwards compatibility). Please don't change it unless you know what
+# you're doing.
+Vagrant.configure(2) do |config|
+
+  config.vm.box = "ubuntu/trusty64"
+
+
+  config.vm.provider "virtualbox" do |v|
+    v.memory = 4096
+    v.cpus = 4
+    v.gui = false
+  end
+
+
+  config.vm.network "forwarded_port", guest: 3306, host: 13306
+  config.vm.network "forwarded_port", guest: 8088, host: 18088
+
+
+  config.vm.synced_folder ".", "/vagrant", disabled: true
+  config.vm.synced_folder "~/qa/th", "/home/vagrant/qa/th"
+
+
+  config.vm.provision "shell", inline: <<-SHELL
+    sudo apt-get update
+
+    echo "install oracle java8"
+    sudo add-apt-repository ppa:webupd8team/java
+    sudo apt-get update
+    echo debconf shared/accepted-oracle-license-v1-1 select true | sudo debconf-set-selections
+    echo debconf shared/accepted-oracle-license-v1-1 seen true | sudo debconf-set-selections
+    sudo apt-get install -y oracle-java8-installer
+    sudo apt-get install oracle-java8-set-default
+    java -version
+
+
+    echo "install mysql"
+    sudo DEBIAN_FRONTEND=noninteractive apt-get -y --force-yes install mysql-server
+    sudo service mysql stop
+    sudo sed -i '/bind-address/d' /etc/mysql/my.cnf
+
+    echo "CREATE DATABASE testharness;" > mysql-th.txt
+    echo "CREATE USER 'th'@'localhost' IDENTIFIED BY 'p@ssword';" >> mysql-th.txt
+    echo "GRANT ALL ON testharness.* TO 'th'@'localhost';" >> mysql-th.txt
+    echo "CREATE USER 'th'@'%' IDENTIFIED BY 'p@ssword';" >> mysql-th.txt
+    echo "GRANT ALL ON testharness.* TO 'th'@'%';" >> mysql-th.txt
+    mysql -u root < mysql-th.txt
+
+    wget "https://raw.githubusercontent.com/tascape/testharness/master/src/main/resources/db/thr.sql" -O thr.sql
+    echo "USE testharness;" > thr.txt
+    cat thr.sql >> thr.txt
+    mysql -u th -pp@ssword < thr.txt
+    sudo service mysql start
+
+
+    echo "tomee +"
+    wget "https://repository.apache.org/service/local/artifact/maven/redirect?r=snapshots&g=org.apache.openejb&a=apache-tomee&v=7.0.0-SNAPSHOT&c=plus&p=tar.gz" -O /home/vagrant/tomee.tar.gz
+    tar zxvf /home/vagrant/tomee.tar.gz -C /home/vagrant/
+    pushd /home/vagrant/apache-tomee-plus-7.0.0-SNAPSHOT/conf
+        sed '/tomcat-users>/d' tomcat-users.xml > aa.txt
+        echo '  <role rolename="tomee-admin" />' >> aa.txt
+        echo '  <user username="tomee" password="tomee" roles="tomee-admin,manager-gui" />' >> aa.txt
+        rm tomcat-users.xml
+        mv aa.txt tomcat-users.xml
+        wget "http://central.maven.org/maven2/com/tascape/qa/thr/1.0.15/thr-1.0.15.war" -O ../webapps/thr.war
+        ../bin/startup.sh
+    popd
+
+
+    echo "install nginx"
+    sudo apt-get install -y --force-yes nginx
+    echo "server {listen 8088;root /home/vagrant/qa/th/;index index.html index.htm;autoindex on;autoindex_localtime on; location /thr/ {proxy_pass http://127.0.0.1:8080/thr/;}}" > th-logs
+    sudo mv th-logs /etc/nginx/sites-enabled/th-logs
+    sudo service nginx restart
+
+  SHELL
+
+end
