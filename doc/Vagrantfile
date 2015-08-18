@@ -37,7 +37,6 @@ Vagrant.configure(2) do |config|
 
     echo "install mysql"
     sudo DEBIAN_FRONTEND=noninteractive apt-get -y --force-yes install mysql-server
-    sudo service mysql stop
     sudo sed -i '/bind-address/d' /etc/mysql/my.cnf
 
     echo "CREATE DATABASE testharness;" > mysql-th.txt
@@ -51,7 +50,7 @@ Vagrant.configure(2) do |config|
     echo "USE testharness;" > thr.txt
     cat thr.sql >> thr.txt
     mysql -u th -pp@ssword < thr.txt
-    sudo service mysql start
+    sudo service mysql restart
 
 
     echo "tomee +"

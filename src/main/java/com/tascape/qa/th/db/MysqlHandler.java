@@ -237,10 +237,20 @@ public class MysqlHandler extends DbHandler {
                 stmt.setFetchSize(Integer.MIN_VALUE);
                 ResultSet rs = stmt.executeQuery();
                 while (rs.next()) {
-                    total++;
                     String result = rs.getString(TestResult.EXECUTION_RESULT);
-                    if (!result.equals(ExecutionResult.PASS.getName()) && !result.endsWith("/0")) {
-                        fail++;
+                    String[] pf = result.split("/");
+                    if (pf.length == 1) {
+                        total++;
+                        if (!result.equals(ExecutionResult.PASS.getName())) {
+                            fail++;
+                        }
+                    } else if (pf.length == 2) {
+                        int p = Integer.parseInt(pf[0]);
+                        int f = Integer.parseInt(pf[1]);
+                        total += p + f;
+                        fail += f;
+                    } else {
+                        throw new RuntimeException("Cannot parse test execution result " + result);
                     }
                 }
             }

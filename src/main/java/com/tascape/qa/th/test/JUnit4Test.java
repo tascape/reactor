@@ -90,6 +90,7 @@ public class JUnit4Test extends AbstractTest {
         LOG.info("Sample negative test");
         expectedException.expect(IOException.class);
         expectedException.expectMessage("something bad");
+        Thread.sleep(3000);
         this.putResultMetric("JUnit4", "negative", new Random().nextInt(100));
         this.doSomethingBad();
     }
@@ -100,14 +101,16 @@ public class JUnit4Test extends AbstractTest {
         LOG.info("Sample negative test again");
         expectedException.expect(XPathException.class);
         expectedException.expectMessage("Cannot resolve xyz");
+        Thread.sleep(5000);
         this.doSomethingBadAgain();
     }
 
     @Test
-    public void testMultiple() throws IOException {
+    public void testMultiple() throws Exception {
         LOG.info("Sample multiple result test");
         this.doSomethingGood();
         ExecutionResult er = ExecutionResult.newMultiple();
+        Thread.sleep(6000);
         er.setPass(23);
         er.setFail(11);
         this.setExecutionResult(er);

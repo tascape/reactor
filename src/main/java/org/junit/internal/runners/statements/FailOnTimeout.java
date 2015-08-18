@@ -161,7 +161,7 @@ public class FailOnTimeout extends Statement {
         threadGroup = new ThreadGroup("FailOnTimeoutGroup");
         Thread thread = new Thread(threadGroup, task, "Time-limited test");
         // update the following line, so that thread-based log4j can work
-        thread.setName(Thread.currentThread().getName() + "    ");
+        thread.setName(Thread.currentThread().getName() + thread.getId());
         thread.setDaemon(true);
         thread.start();
         callable.awaitStarted();
