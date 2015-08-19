@@ -106,8 +106,9 @@ public abstract class AbstractTest {
         return testLogPath;
     }
 
-    protected <T extends EntityDriver> T getEntityDriver(String name, Class<T> clazz) {
-        String key = this.getClass().getName() + "." + name;
+    @Deprecated
+    protected <D extends EntityDriver> D getEntityDriver(TestDriver testDriver, Class<D> clazz) {
+        String key = testDriver.toString();
         LOG.debug("Getting runtime driver (name={}, type={}) from suite test environment", key, clazz.getName());
 
         String suiteClass = this.tcr.getTestCase().getSuiteClass();
@@ -126,8 +127,28 @@ public abstract class AbstractTest {
         return clazz.cast(driver);
     }
 
-    protected <D extends EntityDriver> D getEntityDriver(TestDriver name, Class<D> clazz) {
-        return this.getEntityDriver(name.getName(), clazz);
+    protected <D extends EntityDriver> D getEntityDriver(TestDriver testDriver) {
+        String key = testDriver.toString();
+        Class<? extends EntityDriver> clazz = testDriver.getDriverClass();
+        if (clazz == null) {
+            throw new RuntimeException("EntityDriver type was not specified in TestDriver instance.");
+        }
+        LOG.debug("Getting runtime driver (name={}, type={}) from suite test environment", key, clazz.getName());
+
+        String suiteClass = this.tcr.getTestCase().getSuiteClass();
+        if (suiteClass.isEmpty()) {
+            return null;
+        }
+
+        Map<String, EntityDriver> env = AbstractSuite.getEnvionment(suiteClass);
+        EntityDriver driver = env.get(key);
+        if (driver == null) {
+            LOG.error("Cannot find driver of name={} and type={}, please check suite test environemnt",
+                key, clazz.getName());
+            return null;
+        }
+        driver.setTest(this);
+        return (D) driver;
     }
 
     protected TestData getTestData() {

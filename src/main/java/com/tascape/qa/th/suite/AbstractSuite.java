@@ -96,10 +96,14 @@ public abstract class AbstractSuite {
         return testClasses;
     }
 
-    @Deprecated
-    protected <T extends AbstractTest> void putDirver(Class<T> testClazz, String name, EntityDriver driver) {
-        String key = testClazz.getName() + "." + name;
+    protected void putTestDirver(TestDriver testDriver, EntityDriver driver) {
+        String key = testDriver.toString();
         LOG.debug("Putting runtime driver {}={} into suite test environment", key, driver);
+        Class<? extends EntityDriver> clazz = testDriver.getDriverClass();
+        if (clazz != null && !clazz.isInstance(driver)) {
+            throw new RuntimeException("wrong driver type, " + key + " vs " + driver);
+        }
+
         EntityDriver d = this.suiteEnvironment.get(key);
         if (d == null) {
             this.suiteEnvironment.put(key, driver);
@@ -114,10 +118,6 @@ public abstract class AbstractSuite {
             return;
         }
         throw new UnsupportedOperationException("Cannot add non-poolable driver with the same key " + key);
-    }
-
-    protected void putTestDirver(TestDriver name, EntityDriver driver) {
-        this.putDirver(name.getTestClass(), name.getName(), driver);
     }
 
     protected <T extends AbstractTest> void addTestClass(Class<T> clazz) {
