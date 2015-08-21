@@ -8,9 +8,10 @@ if (type vagrant) && (type virtualbox) then
     vagrant up
 
 
+    mkdir -p $HOME/.th
     mkdir -p $HOME/qa/th
 
-    export PROP=$HOME/qa/th/th.properties
+    export PROP=$HOME/.th/th.properties
     echo "# testharness system properties" > $PROP
     echo "# user -Dkey=value to override in commandline " >> $PROP
     echo "qa.th.db.type=mysql" >> $PROP
@@ -18,7 +19,6 @@ if (type vagrant) && (type virtualbox) then
     echo "qa.th.log.path=$HOME/qa/th/logs" >> $PROP
     cat $PROP
 
-    echo "run testharness with -Dqa.th.conf.file=$PROP"
     echo "check report at http://localhost:18088/thr/suites_result.xhtml"
     open "http://localhost:18088/thr/suites_result.xhtml" || echo "OK"
 
