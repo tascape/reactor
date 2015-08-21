@@ -12,8 +12,9 @@ if (type vagrant) && (type virtualbox) then
     mkdir -p $HOME/qa/th
 
     export PROP=$HOME/.th/th.properties
+    echo "create testharness system properties file" $PROP
     echo "# testharness system properties" > $PROP
-    echo "# user -Dkey=value to override in commandline " >> $PROP
+    echo "# use -Dkey=value to override or add in commandline " >> $PROP
     echo "qa.th.db.type=mysql" >> $PROP
     echo "qa.th.db.host=localhost:13306" >> $PROP
     echo "qa.th.log.path=$HOME/qa/th/logs" >> $PROP
