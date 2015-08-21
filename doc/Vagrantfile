@@ -62,7 +62,7 @@ Vagrant.configure(2) do |config|
         echo '  <user username="tomee" password="tomee" roles="tomee-admin,manager-gui" />' >> aa.txt
         rm tomcat-users.xml
         mv aa.txt tomcat-users.xml
-        wget "http://central.maven.org/maven2/com/tascape/qa/thr/1.0.15/thr-1.0.15.war" -O ../webapps/thr.war
+        wget "https://oss.sonatype.org/content/repositories/releases/com/tascape/qa/thr/1.0.16/thr-1.0.16.war" -O ../webapps/thr.war
         ../bin/startup.sh
     popd
 
