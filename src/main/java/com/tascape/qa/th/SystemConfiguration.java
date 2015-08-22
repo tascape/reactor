@@ -17,6 +17,7 @@ package com.tascape.qa.th;
 
 import com.tascape.qa.th.db.DbHandler;
 import com.tascape.qa.th.test.Priority;
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -27,6 +28,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Properties;
 import java.util.regex.Pattern;
+import java.util.stream.Stream;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -42,7 +44,10 @@ public final class SystemConfiguration {
 
     public static final String CONSTANT_EXEC_ID_PREFIX = "th_";
 
+    @Deprecated
     public static final String SYSPROP_CONF_FILE = "qa.th.conf.file";
+
+    public static final String SYSPROP_CONF_FILES = "qa.th.conf.files";
 
     public static final String SYSPROP_EXECUTION_ID = "qa.th.exec.id";
 
@@ -91,20 +96,24 @@ public final class SystemConfiguration {
         }
 
         Path conf = Paths.get(System.getProperty("user.home"), ".th", "th.properties");
-        String confFile = System.getProperty(SYSPROP_CONF_FILE);
-        if (confFile != null) {
-            conf = Paths.get(confFile);
+        this.loadSystemPropertiesFromPath(conf);
+
+        String confFile = System.getProperty(SYSPROP_CONF_FILE, "").trim();
+        if (!confFile.isEmpty()) {
+            String[] paths = confFile.split(System.getProperty("path.separator"));
+            Stream.of(paths).forEach(path -> {
+                this.loadSystemPropertiesFromPath(Paths.get(path));
+            });
         }
-        LOG.info("Loading system configuration from {}", conf);
-        if (conf.toFile().exists()) {
-            try (InputStream is = new FileInputStream(conf.toFile())) {
-                Properties p = new Properties();
-                p.load(is);
-                this.properties.putAll(p);
-            } catch (IOException ex) {
-                throw new RuntimeException("Cannot load system configuration from " + conf, ex);
-            }
+
+        String confFiles = System.getProperty(SYSPROP_CONF_FILES, "").trim();
+        if (!confFiles.isEmpty()) {
+            String[] paths = confFiles.split(System.getProperty("path.separator"));
+            Stream.of(paths).forEach(path -> {
+                this.loadSystemPropertiesFromPath(Paths.get(path));
+            });
         }
+
         List<String> keys = new ArrayList<>(System.getProperties().stringPropertyNames());
         keys.stream()
             .filter((key) -> (key.startsWith("qa.th.")))
@@ -150,7 +159,7 @@ public final class SystemConfiguration {
         }
         return Boolean.parseBoolean(v);
     }
-    
+
     public boolean getResultVisibility() {
         return this.getBooleanProperty(SYSPROP_RESULT_VISIBILITY, true);
     }
@@ -307,6 +316,22 @@ public final class SystemConfiguration {
         LOG.debug("Java environment properties");
         for (String key : keys) {
             LOG.debug(String.format("%50s : %s", key, System.getenv().get(key)));
+        }
+    }
+
+    private void loadSystemPropertiesFromPath(Path path) {
+        LOG.info("Loading system properties from {}", path);
+        File f = path.toFile();
+        if (!f.exists()) {
+            LOG.warn("Cannot find system properties file {}", path);
+            return;
+        }
+        try (InputStream is = new FileInputStream(f)) {
+            Properties p = new Properties();
+            p.load(is);
+            this.properties.putAll(p);
+        } catch (IOException ex) {
+            throw new RuntimeException("Cannot load system properties from " + path, ex);
         }
     }
 }
