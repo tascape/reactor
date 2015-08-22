@@ -9,7 +9,7 @@ apt-get update
 debconf shared/accepted-oracle-license-v1-1 select true | debconf-set-selections
 debconf shared/accepted-oracle-license-v1-1 seen true | debconf-set-selections
 apt-get install -y oracle-java8-installer
-apt-get install oracle-java8-set-default
+apt-get install -y oracle-java8-set-default
 java -version
 
 
