@@ -1,3 +1,7 @@
+#!/bin/bash
+
+apt-get update
+
 
 echo "install oracle java8"
 add-apt-repository ppa:webupd8team/java
