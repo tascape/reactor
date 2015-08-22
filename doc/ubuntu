@@ -1,13 +1,13 @@
 #!/bin/bash
 
-apt-get update
+sudo apt-get update
 
 
 echo "install oracle java8"
 add-apt-repository ppa:webupd8team/java
 apt-get update
-debconf shared/accepted-oracle-license-v1-1 select true | sudo debconf-set-selections
-debconf shared/accepted-oracle-license-v1-1 seen true | sudo debconf-set-selections
+echo debconf shared/accepted-oracle-license-v1-1 select true | debconf-set-selections
+echo debconf shared/accepted-oracle-license-v1-1 seen true | debconf-set-selections
 apt-get install -y oracle-java8-installer
 apt-get install -y oracle-java8-set-default
 java -version
