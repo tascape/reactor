@@ -6,9 +6,9 @@ To setup test development environment, run the following line in console:
 To start this environment after reboot, run the following in console:  
 
 `cd && vagrant up`
-
-
-
-
-
+  
+  
+  
+  
+  
 (tested on OS X Yosemite 10.10.5, with Vagrant 1.7.4 and VirtualBox 5.0.2)  
