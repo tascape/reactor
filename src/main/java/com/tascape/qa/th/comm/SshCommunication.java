@@ -38,15 +38,15 @@ import org.slf4j.LoggerFactory;
 public class SshCommunication extends EntityCommunication {
     private static final Logger LOG = LoggerFactory.getLogger(SshCommunication.class);
 
-    public static final String SYSPROP_SSH_HOST = "qa.th.comm.ssh.HOST";
+    public static final String SYSPROP_HOST = "qa.th.comm.ssh.HOST";
 
-    public static final String SYSPROP_SSH_PORT = "qa.th.comm.ssh.PORT";
+    public static final String SYSPROP_PORT = "qa.th.comm.ssh.PORT";
 
-    public static final String SYSPROP_SSH_KEY = "qa.th.comm.ssh.KEY";
+    public static final String SYSPROP_KEY = "qa.th.comm.ssh.KEY";
 
-    public static final String SYSPROP_SSH_USER = "qa.th.comm.ssh.USER";
+    public static final String SYSPROP_USER = "qa.th.comm.ssh.USER";
 
-    public static final String SYSPROP_SSH_PASS = "qa.th.comm.ssh.PASS";
+    public static final String SYSPROP_PASS = "qa.th.comm.ssh.PASS";
 
     private final JSch jSch;
 
