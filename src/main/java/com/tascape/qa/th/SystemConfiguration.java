@@ -142,6 +142,20 @@ public final class SystemConfiguration {
         return v;
     }
 
+    /**
+     *
+     * @param name name of the system property
+     *
+     * @return integer, or Integer.MIN_VALUE if no corresponding system property found
+     */
+    public int getIntProperty(String name) {
+        String v = this.properties.getProperty(name);
+        if (v == null) {
+            return Integer.MIN_VALUE;
+        }
+        return Integer.parseInt(v);
+    }
+
     public int getIntProperty(String name, int defaultValue) {
         String v = this.getProperty(name);
         if (v == null) {
