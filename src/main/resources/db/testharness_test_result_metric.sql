@@ -33,7 +33,7 @@ CREATE TABLE `test_result_metric` (
   PRIMARY KEY (`TEST_RESULT_METRIC_ID`),
   KEY `fk_test_result_idx` (`TEST_RESULT_ID`),
   CONSTRAINT `fk_test_result` FOREIGN KEY (`TEST_RESULT_ID`) REFERENCES `test_result` (`TEST_RESULT_ID`) ON DELETE CASCADE ON UPDATE CASCADE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
 /*!40101 SET character_set_client = @saved_cs_client */;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
 

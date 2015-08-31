@@ -31,7 +31,7 @@ CREATE TABLE `suite_property` (
   PRIMARY KEY (`SUITE_PROPERTY_ID`),
   KEY `fk_suite_result_idx` (`SUITE_RESULT_ID`),
   CONSTRAINT `fk_script_result` FOREIGN KEY (`SUITE_RESULT_ID`) REFERENCES `suite_result` (`SUITE_RESULT_ID`) ON DELETE CASCADE ON UPDATE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=1756 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=1756 DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -55,7 +55,7 @@ CREATE TABLE `suite_result` (
   `INVISIBLE_ENTRY` tinyint(4) DEFAULT '0',
   `PRODUCT_UNDER_TEST` varchar(200) DEFAULT NULL,
   PRIMARY KEY (`SUITE_RESULT_ID`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -74,7 +74,7 @@ CREATE TABLE `test_case` (
   `TEST_DATA` varchar(200) DEFAULT '',
   `TEST_ISSUES` varchar(45) DEFAULT '',
   PRIMARY KEY (`TEST_CASE_ID`)
-) ENGINE=InnoDB AUTO_INCREMENT=101 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=101 DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -101,7 +101,7 @@ CREATE TABLE `test_result` (
   KEY `fk_test_case_idx` (`TEST_CASE_ID`),
   CONSTRAINT `fk_suite_result` FOREIGN KEY (`SUITE_RESULT`) REFERENCES `suite_result` (`SUITE_RESULT_ID`) ON DELETE CASCADE ON UPDATE CASCADE,
   CONSTRAINT `fk_test_case` FOREIGN KEY (`TEST_CASE_ID`) REFERENCES `test_case` (`TEST_CASE_ID`) ON UPDATE CASCADE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -120,7 +120,7 @@ CREATE TABLE `test_result_metric` (
   PRIMARY KEY (`TEST_RESULT_METRIC_ID`),
   KEY `fk_test_result_idx` (`TEST_RESULT_ID`),
   CONSTRAINT `fk_test_result` FOREIGN KEY (`TEST_RESULT_ID`) REFERENCES `test_result` (`TEST_RESULT_ID`) ON DELETE CASCADE ON UPDATE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=25 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=25 DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
 /*!40101 SET character_set_client = @saved_cs_client */;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
 

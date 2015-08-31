@@ -33,7 +33,7 @@ CREATE TABLE `test_case` (
   `TEST_DATA` varchar(200) DEFAULT '',
   `TEST_ISSUES` varchar(45) DEFAULT '',
   PRIMARY KEY (`TEST_CASE_ID`)
-) ENGINE=InnoDB AUTO_INCREMENT=27 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=27 DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
 /*!40101 SET character_set_client = @saved_cs_client */;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
 

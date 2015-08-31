@@ -32,7 +32,7 @@ CREATE TABLE `suite_property` (
   PRIMARY KEY (`SUITE_PROPERTY_ID`),
   KEY `fk_suite_result_idx` (`SUITE_RESULT_ID`),
   CONSTRAINT `fk_script_result` FOREIGN KEY (`SUITE_RESULT_ID`) REFERENCES `suite_result` (`SUITE_RESULT_ID`) ON DELETE CASCADE ON UPDATE CASCADE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
