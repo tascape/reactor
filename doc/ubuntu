@@ -28,7 +28,7 @@ wget "https://raw.githubusercontent.com/tascape/testharness/master/src/main/reso
 mysql -u th -pp@ssword testharness < thr.sql
 service mysql restart
 
-(crontab -l 2>/dev/null; echo "*/5 * * * * mysqldump -u root testharness > /home/vagrant/qa/th/th.sql") | crontab -
+(crontab -l 2>/dev/null; echo "*/5 * * * * mysqldump -u root --no-create-info testharness > /home/vagrant/qa/th/th.sql") | crontab -
 if [[ -e /home/vagrant/qa/th/th.sql ]]; then
   echo "restore testharness db"
   mysql -u root testharness < /home/vagrant/qa/th/th.sql || echo "error restoring tesharness db"
