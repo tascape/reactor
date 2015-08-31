@@ -21,6 +21,7 @@ if (type vagrant) && (type virtualbox) then
     cat $PROP
 
     echo "check report at http://localhost:18088/thr/suites_result.xhtml"
+    open "http://localhost:18080/" || echo "OK"
     open "http://localhost:18088/thr/suites_result.xhtml" || echo "OK"
 
 else
