@@ -22,37 +22,19 @@ import com.tascape.qa.th.test.AbstractTest;
  * @author linsong wang
  */
 public class TestDriver {
-    public static final String ONLY_INSTANCE = "ONLY_DRIVER_INSTANCE_IN_TEST";
 
     private final Class<? extends AbstractTest> testClass;
 
     private final Class<? extends EntityDriver> driverClass;
 
-    private final String name;
-
-    @Deprecated
-    public TestDriver(Class<? extends AbstractTest> testClazz) {
-        this(testClazz, ONLY_INSTANCE);
-    }
-
-    @Deprecated
-    public TestDriver(Class<? extends AbstractTest> testClazz, String name) {
-        this(testClazz, null, name);
-    }
-
     public TestDriver(Class<? extends AbstractTest> testClazz, Class<? extends EntityDriver> driverClazz) {
-        this(testClazz, driverClazz, ONLY_INSTANCE);
-    }
-
-    public TestDriver(Class<? extends AbstractTest> testClazz, Class<? extends EntityDriver> driverClazz, String name) {
         this.testClass = testClazz;
         this.driverClass = driverClazz;
-        this.name = name;
     }
 
     @Override
     public String toString() {
-        return testClass + "+" + driverClass + "+" + name;
+        return testClass.getName() + "+" + driverClass.getName() + "+" + this.hashCode();
     }
 
     public Class<? extends AbstractTest> getTestClass() {
@@ -61,9 +43,5 @@ public class TestDriver {
 
     public Class<? extends EntityDriver> getDriverClass() {
         return driverClass;
-    }
-
-    public String getName() {
-        return name;
     }
 }
