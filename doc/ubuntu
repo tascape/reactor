@@ -46,7 +46,7 @@ pushd /usr/share/tomee7/conf
   echo '</tomcat-users>' >> aa.txt
   mv tomcat-users.xml tomcat-users.xml.bk
   mv aa.txt tomcat-users.xml
-  wget "https://oss.sonatype.org/content/repositories/releases/com/tascape/qa/thr/1.0.17/thr-1.0.17.war" -O ../webapps/thr.war
+  wget "https://oss.sonatype.org/content/repositories/releases/com/tascape/qa/thr/1.0.18/thr-1.0.18.war" -O ../webapps/thr.war
   ../bin/startup.sh
 popd
 wget "https://raw.githubusercontent.com/tascape/testharness/master/doc/tomee7" -O /etc/init.d/tomee7
