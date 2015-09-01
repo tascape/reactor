@@ -102,6 +102,7 @@ public class SuiteRunner {
                         Future<TestResult> future = completionService.take();
                         TestResult tcr = future.get();
                         if (tcr == null) {
+                            numberOfFailures++;
                             continue;
                         }
                         String result = tcr.getResult().result();
