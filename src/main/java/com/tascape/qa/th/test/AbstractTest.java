@@ -37,6 +37,7 @@ import java.util.Map;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
+import org.apache.commons.io.FileUtils;
 import org.junit.Rule;
 import org.junit.rules.ExpectedException;
 import org.junit.rules.TestName;
@@ -223,6 +224,14 @@ public abstract class AbstractTest {
         metric.setMetricValue(value);
         LOG.info("Test result metric '{}' - '{}' - {}", group, name, value);
         this.resultMetrics.add(metric);
+    }
+
+    public File saveAsTextFile(String filePrefix, CharSequence data) throws IOException {
+        Path path = this.getTestLogPath();
+        File f = File.createTempFile(filePrefix, ".txt", path.toFile());
+        FileUtils.write(f, data);
+        LOG.debug("Save data into file {}", f.getAbsolutePath());
+        return f;
     }
 
     /**
