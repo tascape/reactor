@@ -24,7 +24,6 @@ import com.tascape.qa.th.driver.EntityDriver;
 import com.tascape.qa.th.suite.AbstractSuite;
 import java.io.IOException;
 import java.nio.file.Path;
-import java.time.Instant;
 import java.util.Map;
 import java.util.concurrent.Callable;
 import org.junit.runner.JUnitCore;
@@ -47,25 +46,45 @@ public class TestRunnerJUnit4 extends AbstractTestRunner implements Callable<Tes
 
     @Override
     public TestResult call() throws Exception {
+        Path logFile = this.newLogFile();
         try {
-            if (this.db != null) {
-                if (!db.acquireTestCaseResult(this.tcr)) {
-                    return null;
-                }
+            if (!db.acquireTestCaseResult(this.tcr)) {
+                return null;
             }
 
             AbstractTestRunner.setTestCaseResult(this.tcr);
             this.injectTestEnvironment();
 
             this.runTestCase();
-        } catch (Exception ex) {
+        } catch (Throwable ex) {
             LOG.error("Cannot execute test case {}", this.tcr.getTestCase().format(), ex);
             this.tcr.setResult(ExecutionResult.FAIL);
             this.tcr.setException(ex);
             this.db.updateTestExecutionResult(this.tcr);
             return null;
+        } finally {
+            Utils.removeLog4jAppender(logFile.toFile().getAbsolutePath());
+            this.generateHtml(logFile);
         }
         return this.tcr;
+    }
+
+    @Override
+    public void runTestCase() throws Exception {
+        AbstractTestData.setTestData(null);
+        String testDataInfo = this.tcr.getTestCase().getTestDataInfo();
+        if (!testDataInfo.isEmpty()) {
+            TestData testData = AbstractTestData.getTestData(testDataInfo);
+            LOG.info("Injecting test data: {} = {}", testDataInfo, testData.getValue());
+            AbstractTestData.setTestData(testData);
+        }
+
+        TestCase tc = this.tcr.getTestCase();
+        LOG.info("Loading test case {}", tc.format());
+        TestRunListener trl = new TestRunListener(this.db, this.tcr);
+        JUnitCore core = new JUnitCore();
+        core.addListener(trl);
+        core.run(Request.method(Class.forName(tc.getTestClass()), tc.getTestMethod()));
     }
 
     private void injectTestEnvironment() throws Exception {
@@ -81,16 +100,7 @@ public class TestRunnerJUnit4 extends AbstractTestRunner implements Callable<Tes
         }
     }
 
-    @Override
-    public void runTestCase() throws Exception {
-        AbstractTestData.setTestData(null);
-        String testDataInfo = this.tcr.getTestCase().getTestDataInfo();
-        if (!testDataInfo.isEmpty()) {
-            TestData testData = AbstractTestData.getTestData(testDataInfo);
-            LOG.info("Injecting test data: {} = {}", testDataInfo, testData.getValue());
-            AbstractTestData.setTestData(testData);
-        }
-
+    private Path newLogFile() throws IOException {
         TestCase tc = this.tcr.getTestCase();
         Path testLogPath = sysConfig.getLogPath().resolve(this.execId)
             .resolve(tc.formatForLogPath() + "." + System.currentTimeMillis() + "."
@@ -105,20 +115,8 @@ public class TestRunnerJUnit4 extends AbstractTestRunner implements Callable<Tes
         this.tcr.setLogDir(path.substring(path.indexOf(this.execId)));
 
         LOG.info("Creating log file");
-        final Path logFile = testLogPath.resolve("test.log");
+        Path logFile = testLogPath.resolve("test.log");
         Utils.addLog4jFileAppender(logFile.toFile().getAbsolutePath());
-
-        LOG.info("{}", Instant.now());
-        LOG.info("Loading test case {}", tc.format());
-        TestRunListener trl = new TestRunListener(this.db, this.tcr);
-        try {
-            JUnitCore core = new JUnitCore();
-            core.addListener(trl);
-            core.run(Request.method(Class.forName(tc.getTestClass()), tc.getTestMethod()));
-        } finally {
-            Utils.removeLog4jAppender(logFile.toFile().getAbsolutePath());
-        }
-
-        this.generateHtml(logFile);
+        return logFile;
     }
 }
