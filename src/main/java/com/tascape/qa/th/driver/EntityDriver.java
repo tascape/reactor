@@ -15,11 +15,11 @@
  */
 package com.tascape.qa.th.driver;
 
+import com.tascape.qa.th.AbstractTestResource;
 import com.tascape.qa.th.SystemConfiguration;
 import com.tascape.qa.th.Utils;
 import com.tascape.qa.th.comm.EntityCommunication;
 import com.tascape.qa.th.test.AbstractTest;
-import java.awt.AWTException;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Path;
@@ -31,20 +31,19 @@ import org.slf4j.LoggerFactory;
  *
  * @author linsong wang
  */
-public abstract class EntityDriver {
+public abstract class EntityDriver extends AbstractTestResource {
     private static final Logger LOG = LoggerFactory.getLogger(EntityDriver.class);
-
-    protected static final SystemConfiguration SYS_CONFIG = SystemConfiguration.getInstance();
 
     private EntityCommunication entityCommunication;
 
     private AbstractTest test;
 
+    @Override
     public Path getLogPath() {
         if (this.test == null) {
             return Paths.get(System.getProperty("user.home"), "test");
         }
-        return this.test.getTestLogPath();
+        return this.test.getLogPath();
     }
 
     public EntityCommunication getEntityCommunication() {
@@ -89,18 +88,4 @@ public abstract class EntityDriver {
     public abstract String getName();
 
     public abstract void reset() throws Exception;
-
-    /**
-     * @return png file
-     */
-    protected File captureScreen() {
-        Path path = this.getLogPath();
-        File png = path.resolve("screen-" + System.currentTimeMillis() + ".png").toFile();
-        try {
-            Utils.captureScreen(png);
-        } catch (AWTException | IOException ex) {
-            LOG.warn("Cannot take screenshot", ex);
-        }
-        return png;
-    }
 }

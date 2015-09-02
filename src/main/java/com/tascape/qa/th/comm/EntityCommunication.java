@@ -15,19 +15,21 @@
  */
 package com.tascape.qa.th.comm;
 
+import com.tascape.qa.th.AbstractTestResource;
 import com.tascape.qa.th.SystemConfiguration;
 import com.tascape.qa.th.driver.EntityDriver;
 import com.tascape.qa.th.test.AbstractTest;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  *
  * @author linsong wang
  */
-public abstract class EntityCommunication {
-
-    protected static final SystemConfiguration SYSCONFIG = SystemConfiguration.getInstance();
+public abstract class EntityCommunication extends AbstractTestResource {
+    private static final Logger LOG = LoggerFactory.getLogger(EntityCommunication.class);
 
     private EntityDriver driver;
 
@@ -53,10 +55,11 @@ public abstract class EntityCommunication {
         return test;
     }
 
+    @Override
     public Path getLogPath() {
         if (this.test == null) {
             return Paths.get(System.getProperty("user.home"), "test");
         }
-        return this.test.getTestLogPath();
+        return this.test.getLogPath();
     }
 }

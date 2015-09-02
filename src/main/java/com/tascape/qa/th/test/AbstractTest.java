@@ -18,18 +18,15 @@ package com.tascape.qa.th.test;
 import com.tascape.qa.th.AbstractTestRunner;
 import com.tascape.qa.th.ExecutionResult;
 import com.tascape.qa.th.SystemConfiguration;
-import com.tascape.qa.th.Utils;
 import com.tascape.qa.th.data.AbstractTestData;
 import com.tascape.qa.th.data.TestData;
 import com.tascape.qa.th.db.TestResult;
 import com.tascape.qa.th.driver.EntityDriver;
 import com.tascape.qa.th.suite.AbstractSuite;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
+import com.tascape.qa.th.AbstractTestResource;
 import com.tascape.qa.th.db.TestResultMetric;
 import com.tascape.qa.th.driver.TestDriver;
-import java.awt.AWTException;
-import java.io.File;
-import java.io.IOException;
 import java.nio.file.Path;
 import java.util.LinkedList;
 import java.util.List;
@@ -37,7 +34,6 @@ import java.util.Map;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
-import org.apache.commons.io.FileUtils;
 import org.junit.Rule;
 import org.junit.rules.ExpectedException;
 import org.junit.rules.TestName;
@@ -49,7 +45,7 @@ import org.slf4j.LoggerFactory;
  *
  * @author linsong wang
  */
-public abstract class AbstractTest {
+public abstract class AbstractTest extends AbstractTestResource {
     private static final Logger LOG = LoggerFactory.getLogger(AbstractTest.class);
 
     private static final ThreadLocal<AbstractTest> ABSTRACT_TEST = new ThreadLocal<>();
@@ -70,8 +66,6 @@ public abstract class AbstractTest {
 
     @Rule
     public Timeout globalTimeout = new Timeout(15, TimeUnit.MINUTES);
-
-    protected SystemConfiguration sysConfig = SystemConfiguration.getInstance();
 
     protected String execId = sysConfig.getExecId();
 
@@ -103,7 +97,8 @@ public abstract class AbstractTest {
         AbstractTest.setTest(this); // TODO: move this to somewhere else
     }
 
-    public Path getTestLogPath() {
+    @Override
+    public Path getLogPath() {
         return testLogPath;
     }
 
@@ -224,29 +219,6 @@ public abstract class AbstractTest {
         metric.setMetricValue(value);
         LOG.info("Test result metric '{}' - '{}' - {}", group, name, value);
         this.resultMetrics.add(metric);
-    }
-
-    public File saveAsTextFile(String filePrefix, CharSequence data) throws IOException {
-        Path path = this.getTestLogPath();
-        File f = File.createTempFile(filePrefix, ".txt", path.toFile());
-        FileUtils.write(f, data);
-        LOG.debug("Save data into file {}", f.getAbsolutePath());
-        return f;
-    }
-
-    /**
-     * @return png file
-     */
-    public File captureScreen() {
-        Path path = this.getTestLogPath();
-        File png = path.resolve("screen-" + System.currentTimeMillis() + ".png").toFile();
-        png = Utils.getKeepAliveFile(png);
-        try {
-            Utils.captureScreen(png);
-        } catch (AWTException | IOException ex) {
-            LOG.warn("Cannot take screenshot", ex);
-        }
-        return png;
     }
 
     protected void captureScreens(final long intervalMillis) {
