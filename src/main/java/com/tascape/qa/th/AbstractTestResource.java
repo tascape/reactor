@@ -30,7 +30,7 @@ import org.slf4j.LoggerFactory;
 public abstract class AbstractTestResource {
     private static final Logger LOG = LoggerFactory.getLogger(AbstractTestResource.class);
 
-    protected final SystemConfiguration sysConfig  = SystemConfiguration.getInstance();
+    protected final SystemConfiguration sysConfig = SystemConfiguration.getInstance();
 
     public abstract Path getLogPath();
 

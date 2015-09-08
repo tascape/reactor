@@ -16,7 +16,6 @@
 package com.tascape.qa.th.comm;
 
 import com.tascape.qa.th.AbstractTestResource;
-import com.tascape.qa.th.SystemConfiguration;
 import com.tascape.qa.th.driver.EntityDriver;
 import com.tascape.qa.th.test.AbstractTest;
 import java.nio.file.Path;

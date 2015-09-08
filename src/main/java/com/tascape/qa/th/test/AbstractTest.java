@@ -17,7 +17,6 @@ package com.tascape.qa.th.test;
 
 import com.tascape.qa.th.AbstractTestRunner;
 import com.tascape.qa.th.ExecutionResult;
-import com.tascape.qa.th.SystemConfiguration;
 import com.tascape.qa.th.data.AbstractTestData;
 import com.tascape.qa.th.data.TestData;
 import com.tascape.qa.th.db.TestResult;
