@@ -40,6 +40,7 @@ import javax.xml.stream.XMLOutputFactory;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamWriter;
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.slf4j.Logger;
@@ -146,8 +147,8 @@ public abstract class DbHandler {
             PreparedStatement stmt = conn.prepareStatement(sql);
             for (SuiteProperty prop : properties) {
                 stmt.setString(1, prop.getSuiteResultId());
-                stmt.setString(2, prop.getPropertyName());
-                stmt.setString(3, prop.getPropertyValue());
+                stmt.setString(2, StringUtils.left(prop.getPropertyName(), 255));
+                stmt.setString(3, StringUtils.left(prop.getPropertyValue(), 255));
                 stmt.executeUpdate();
             }
         }
