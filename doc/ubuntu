@@ -28,7 +28,7 @@ wget "https://raw.githubusercontent.com/tascape/testharness/master/src/main/reso
 mysql -u th -pp@ssword testharness < thr.sql
 service mysql restart
 
-(crontab -l 2>/dev/null; echo "*/5 * * * * mysqldump -u root --no-create-info testharness > /home/vagrant/qa/th/th.sql") | crontab -
+(crontab -l 2>/dev/null; echo "*/17 * * * * mysqldump -u root --no-create-info testharness > /home/vagrant/qa/th/th.sql") | crontab -
 if [[ -e /home/vagrant/qa/th/th.sql ]]; then
   echo "restore testharness db"
   mysql -u root testharness < /home/vagrant/qa/th/th.sql || echo "error restoring tesharness db"
@@ -46,7 +46,7 @@ pushd /usr/share/tomee7/conf
   echo '</tomcat-users>' >> aa.txt
   mv tomcat-users.xml tomcat-users.xml.bk
   mv aa.txt tomcat-users.xml
-  wget "https://oss.sonatype.org/content/repositories/releases/com/tascape/qa/thr/1.0.21/thr-1.0.21.war" -O ../webapps/thr.war
+  wget "https://oss.sonatype.org/content/repositories/releases/com/tascape/qa/thr/1.0.22/thr-1.0.22.war" -O ../webapps/thr.war
   ../bin/startup.sh
 popd
 wget "https://raw.githubusercontent.com/tascape/testharness/master/doc/tomee7" -O /etc/init.d/tomee7

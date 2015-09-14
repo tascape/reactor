@@ -80,7 +80,7 @@ public class SuiteRunner {
         int threadCount = SYS_CONFIG.getExecutionThreadCount();
         LOG.info("Start execution engine with {} thread(s)", threadCount);
         int len = (threadCount + "").length();
-        ThreadFactory namedThreadFactory = new ThreadFactoryBuilder().setNameFormat("t%0" + len + "d").build();
+        ThreadFactory namedThreadFactory = new ThreadFactoryBuilder().setNameFormat("th%0" + len + "d").build();
         ExecutorService executorService = Executors.newFixedThreadPool(threadCount, namedThreadFactory);
         CompletionService<TestResult> completionService = new ExecutorCompletionService<>(executorService);
 

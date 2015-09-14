@@ -111,8 +111,8 @@ public class JUnit4Test extends AbstractTest {
         this.doSomethingGood();
         ExecutionResult er = ExecutionResult.newMultiple();
         Thread.sleep(6000);
-        er.setPass(23);
-        er.setFail(11);
+        er.setPass(new Random().nextInt(20) + 100);
+        er.setFail(new Random().nextInt(20));
         this.setExecutionResult(er);
     }
 

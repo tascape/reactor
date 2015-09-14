@@ -298,6 +298,73 @@ public abstract class DbHandler {
 
     public abstract void updateSuiteExecutionResult(String execId) throws SQLException;
 
+    public void updateSuiteExecutionResult(String execId, String productUnderTest) throws SQLException {
+        LOG.info("Update test suite execution result with execution id {}", execId);
+        String lock = "testharness." + execId;
+
+        int total = 0, fail = 0;
+        try (Connection conn = this.getConnection()) {
+            try {
+                if (!this.acquireExecutionLock(conn, lock)) {
+                    throw new SQLException("Cannot acquire lock of name " + lock);
+                }
+
+                {
+                    final String sql1 = "SELECT " + TestResult.EXECUTION_RESULT + " FROM "
+                        + TestResult.TABLE_NAME + " WHERE " + TestResult.SUITE_RESULT
+                        + " = ?;";
+                    try (PreparedStatement stmt = this.getConnection().prepareStatement(sql1,
+                        ResultSet.TYPE_FORWARD_ONLY,
+                        ResultSet.CONCUR_READ_ONLY)) {
+                        stmt.setString(1, execId);
+                        stmt.setFetchSize(Integer.MIN_VALUE);
+                        ResultSet rs = stmt.executeQuery();
+                        while (rs.next()) {
+                            String result = rs.getString(TestResult.EXECUTION_RESULT);
+                            String[] pf = result.split("/");
+                            if (pf.length == 1) {
+                                total++;
+                                if (!result.equals(ExecutionResult.PASS.getName())) {
+                                    fail++;
+                                }
+                            } else if (pf.length == 2) {
+                                int p = Integer.parseInt(pf[0]);
+                                int f = Integer.parseInt(pf[1]);
+                                total += p + f;
+                                fail += f;
+                            } else {
+                                throw new RuntimeException("Cannot parse test execution result " + result);
+                            }
+                        }
+                    }
+                }
+                {
+                    final String sql = "SELECT * FROM " + SuiteResult.TABLE_NAME
+                        + " WHERE " + SuiteResult.SUITE_RESULT_ID + " = ?;";
+                    try (PreparedStatement stmt = this.getConnection().prepareStatement(sql,
+                        ResultSet.TYPE_SCROLL_SENSITIVE,
+                        ResultSet.CONCUR_UPDATABLE)) {
+                        stmt.setString(1, execId);
+                        ResultSet rs = stmt.executeQuery();
+                        if (rs.first()) {
+                            rs.updateInt(SuiteResult.NUMBER_OF_TESTS, total);
+                            rs.updateInt(SuiteResult.NUMBER_OF_FAILURE, fail);
+                            rs.updateString(SuiteResult.EXECUTION_RESULT, fail == 0 ? "PASS" : "FAIL");
+                            rs.updateLong(SuiteResult.STOP_TIME, System.currentTimeMillis());
+                            if (rs.getNString(SuiteResult.PRODUCT_UNDER_TEST).isEmpty()
+                                && !StringUtils.isEmpty(productUnderTest)) {
+                                rs.updateString(SuiteResult.PRODUCT_UNDER_TEST, productUnderTest);
+                            }
+                            rs.updateRow();
+                        }
+                    }
+                }
+            } finally {
+                this.releaseExecutionLock(conn, lock);
+            }
+        }
+    }
+
     public void saveJunitXml(String execId) throws IOException, SQLException, XMLStreamException {
         Path path = SYS_CONFIG.getLogPath().resolve(execId).resolve("result.xml");
         Path html = SYS_CONFIG.getLogPath().resolve(execId).resolve("result.html");

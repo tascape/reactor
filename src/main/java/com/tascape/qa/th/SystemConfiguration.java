@@ -265,7 +265,7 @@ public final class SystemConfiguration {
     }
 
     public String getProdUnderTest() {
-        return this.getProperty(SYSPROP_PRODUCT_UNDER_TEST, SYSPROP_PRODUCT_UNDER_TEST + " was not set");
+        return this.getProperty(SYSPROP_PRODUCT_UNDER_TEST, "");
     }
 
     public String getJobName() {
