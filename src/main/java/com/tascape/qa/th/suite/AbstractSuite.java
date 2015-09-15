@@ -57,11 +57,11 @@ public abstract class AbstractSuite {
         return drivers;
     }
 
-    private static final Set<AbstractSuite> SUITES = new HashSet<>();
+    private static final List<AbstractSuite> SUITES = new ArrayList<>();
 
     private final List<Class<? extends AbstractTest>> testClasses = new ArrayList<>();
 
-    protected Map<String, EntityDriver> suiteEnvironment = new HashMap<>();
+    private final Map<String, EntityDriver> suiteEnvironment = new HashMap<>();
 
     protected final SystemConfiguration SYSCONFIG = SystemConfiguration.getInstance();
 
@@ -69,7 +69,7 @@ public abstract class AbstractSuite {
         SUITES.add(suite);
     }
 
-    public static Set<AbstractSuite> getSuites() {
+    public static List<AbstractSuite> getSuites() {
         return SUITES;
     }
 
@@ -142,6 +142,14 @@ public abstract class AbstractSuite {
     public abstract void setUpTestClasses();
 
     protected abstract void setUpEnvironment() throws Exception;
+
+    /**
+     * Gets the info of product-under-test. This method is called at the end of your test suite, before the suite
+     * environment is torn down automatically.
+     *
+     * @return
+     */
+    public abstract String getProductUnderTest();
 
     protected abstract void tearDownEnvironment();
 

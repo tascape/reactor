@@ -35,4 +35,9 @@ public class JUnit4Suite extends AbstractSuite {
     @Override
     protected void tearDownEnvironment() {
     }
+
+    @Override
+    public String getProductUnderTest() {
+        return "JUnit4 Sample 1.1";
+    }
 }

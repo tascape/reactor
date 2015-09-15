@@ -317,7 +317,7 @@ public abstract class DbHandler {
                         ResultSet.TYPE_FORWARD_ONLY,
                         ResultSet.CONCUR_READ_ONLY)) {
                         stmt.setString(1, execId);
-                        stmt.setFetchSize(Integer.MIN_VALUE);
+                        // stmt.setFetchSize(Integer.MIN_VALUE); // mysql only
                         ResultSet rs = stmt.executeQuery();
                         while (rs.next()) {
                             String result = rs.getString(TestResult.EXECUTION_RESULT);

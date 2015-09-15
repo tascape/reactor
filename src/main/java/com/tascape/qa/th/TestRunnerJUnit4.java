@@ -62,7 +62,7 @@ public class TestRunnerJUnit4 extends AbstractTestRunner implements Callable<Tes
             this.tcr.setException(ex);
             this.db.updateTestExecutionResult(this.tcr);
             return null;
-            
+
             // todo need to throw exception
         } finally {
             Utils.removeLog4jAppender(logFile.toFile().getAbsolutePath());

@@ -179,7 +179,7 @@ public final class SystemConfiguration {
     }
 
     public Path getLogPath() {
-        return Paths.get(this.getProperty(SYSPROP_LOG_PATH, "/qa/logs"));
+        return Paths.get(this.getProperty(SYSPROP_LOG_PATH, System.getProperty("user.home")));
     }
 
     public int getTestRetry() {

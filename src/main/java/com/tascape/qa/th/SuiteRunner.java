@@ -86,8 +86,9 @@ public class SuiteRunner {
 
         LOG.info("Start to acquire test cases to execute");
         int numberOfFailures = 0;
+        String productUnderTest = null;
         try {
-            List<TestResult> tcrs = this.filter(this.db.getQueuedTestCaseResults(this.execId, 100));
+            List<TestResult> tcrs = this.filter(this.db.getQueuedTestCaseResults(this.execId, 100 * threadCount));
             while (!tcrs.isEmpty()) {
                 List<Future<TestResult>> futures = new ArrayList<>();
 
@@ -119,18 +120,19 @@ public class SuiteRunner {
                 tcrs = this.filter(this.db.getQueuedTestCaseResults(this.execId, 100));
             }
         } finally {
+            productUnderTest = AbstractSuite.getSuites().get(0).getProductUnderTest();
             AbstractSuite.getSuites().stream().forEach((suite) -> {
                 try {
                     suite.tearDown();
                 } catch (Exception ex) {
-                    LOG.warn("Error tearing down suite {} -  {}", suite.getClass(), ex.getMessage());
+                    LOG.warn("Error tearing down suite {}", suite.getClass(), ex);
                 }
             });
         }
         executorService.shutdown();
 
         LOG.info("No more test case to run on this host, updating suite execution result");
-        this.db.updateSuiteExecutionResult(this.execId);
+        this.db.updateSuiteExecutionResult(this.execId, productUnderTest);
         this.db.saveJunitXml(this.execId);
         this.db.exportToJson(this.execId);
         return numberOfFailures;
