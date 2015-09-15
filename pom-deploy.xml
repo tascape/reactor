@@ -9,7 +9,7 @@
 
     <groupId>com.tascape.qa</groupId>
     <artifactId>testharness</artifactId>
-    <version>1.0.30</version>
+    <version>1.0.31</version>
     <packaging>jar</packaging>
 
     <dependencies>

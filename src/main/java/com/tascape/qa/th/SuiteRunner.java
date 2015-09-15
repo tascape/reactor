@@ -86,7 +86,7 @@ public class SuiteRunner {
 
         LOG.info("Start to acquire test cases to execute");
         int numberOfFailures = 0;
-        String productUnderTest = null;
+        String productUnderTest = "";
         try {
             List<TestResult> tcrs = this.filter(this.db.getQueuedTestCaseResults(this.execId, 100 * threadCount));
             while (!tcrs.isEmpty()) {
@@ -119,8 +119,13 @@ public class SuiteRunner {
 
                 tcrs = this.filter(this.db.getQueuedTestCaseResults(this.execId, 100));
             }
+            try {
+                LOG.debug("Getting product-under-test");
+                productUnderTest = AbstractSuite.getSuites().get(0).getProductUnderTest();
+            } catch (Exception ex) {
+                LOG.warn("Cannot get product-under-test", ex);
+            }
         } finally {
-            productUnderTest = AbstractSuite.getSuites().get(0).getProductUnderTest();
             AbstractSuite.getSuites().stream().forEach((suite) -> {
                 try {
                     suite.tearDown();
