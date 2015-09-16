@@ -13,8 +13,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.tascape.qa.th;
+package com.tascape.qa.junit4;
 
+import com.tascape.qa.th.AbstractTestRunner;
+import com.tascape.qa.th.ExecutionResult;
+import com.tascape.qa.th.Utils;
 import com.tascape.qa.th.data.AbstractTestData;
 import com.tascape.qa.th.data.TestData;
 import com.tascape.qa.th.db.DbHandler;
@@ -35,10 +38,10 @@ import org.slf4j.LoggerFactory;
  *
  * @author linsong wang
  */
-public class TestRunnerJUnit4 extends AbstractTestRunner implements Callable<TestResult> {
-    private static final Logger LOG = LoggerFactory.getLogger(TestRunnerJUnit4.class);
+public class TestRunner extends AbstractTestRunner implements Callable<TestResult> {
+    private static final Logger LOG = LoggerFactory.getLogger(TestRunner.class);
 
-    public TestRunnerJUnit4(DbHandler db, TestResult tcr) {
+    public TestRunner(DbHandler db, TestResult tcr) {
         this.db = db;
         this.tcr = tcr;
         this.execId = this.tcr.getSuiteResultId();

@@ -46,7 +46,7 @@ import org.slf4j.LoggerFactory;
 public class SuiteRunner {
     private static final Logger LOG = LoggerFactory.getLogger(SuiteRunner.class);
 
-    private TestSuite ts = null;
+    private AbstractTestSuite ts = null;
 
     private DbHandler db = null;
 
@@ -60,7 +60,7 @@ public class SuiteRunner {
         UNSUPPORTED_TESTS.put(tc.format(), tc);
     }
 
-    public SuiteRunner(TestSuite testSuite) throws Exception {
+    public SuiteRunner(AbstractTestSuite testSuite) throws Exception {
         LOG.info("Run suite with execution id {}", execId);
         this.ts = testSuite;
 
@@ -94,7 +94,13 @@ public class SuiteRunner {
 
                 for (TestResult tcr : tcrs) {
                     LOG.info("Submit test case {}", tcr.getTestCase().format());
-                    futures.add(completionService.submit(new TestRunnerJUnit4(db, tcr)));
+                    if (this.ts instanceof com.tascape.qa.junit4.TestSuite) {
+                        futures.add(completionService.submit(new com.tascape.qa.junit4.TestRunner(db, tcr)));
+                    } else if (this.ts instanceof com.tascape.qa.testng.TestSuite) {
+                        futures.add(completionService.submit(new com.tascape.qa.testng.TestRunner(db, tcr)));
+                    } else {
+                        throw new RuntimeException("Unknow test suite " + this.ts);
+                    }
                 }
                 LOG.debug("Total {} test cases submitted", futures.size());
 
@@ -161,10 +167,10 @@ public class SuiteRunner {
     }
 
     private List<TestResult> filter(List<TestResult> tcrs) {
-        List<TestResult> tcrs0 = new ArrayList<>();
+        List<TestResult> rs = new ArrayList<>();
         tcrs.stream().filter((tcr) -> (UNSUPPORTED_TESTS.get(tcr.getTestCase().format()) == null)).forEach((tcr) -> {
-            tcrs0.add(tcr);
+            rs.add(tcr);
         });
-        return tcrs0;
+        return rs;
     }
 }

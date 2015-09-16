@@ -13,9 +13,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.tascape.qa.th.test;
+package com.tascape.qa.sample;
 
 import com.tascape.qa.th.ExecutionResult;
+import com.tascape.qa.th.test.AbstractTest;
+import com.tascape.qa.th.test.Priority;
 import java.io.IOException;
 import java.util.Random;
 import javax.xml.xpath.XPathException;

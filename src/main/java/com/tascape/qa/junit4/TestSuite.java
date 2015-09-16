@@ -13,8 +13,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.tascape.qa.th;
+package com.tascape.qa.junit4;
 
+import com.tascape.qa.th.test.Priority;
+import com.tascape.qa.th.AbstractTestSuite;
 import com.tascape.qa.th.data.AbstractTestData;
 import com.tascape.qa.th.data.TestData;
 import com.tascape.qa.th.data.TestDataInfo;
@@ -22,7 +24,6 @@ import com.tascape.qa.th.data.TestDataProvider;
 import com.tascape.qa.th.db.TestCase;
 import com.tascape.qa.th.suite.AbstractSuite;
 import com.tascape.qa.th.test.AbstractTest;
-import com.tascape.qa.th.test.Priority;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
@@ -36,7 +37,7 @@ import org.slf4j.LoggerFactory;
  *
  * @author linsong wang
  */
-public class TestSuite {
+public class TestSuite implements AbstractTestSuite {
     private static final Logger LOG = LoggerFactory.getLogger(TestSuite.class);
 
     private String name;
@@ -53,13 +54,16 @@ public class TestSuite {
         }
         suite.setUpTestClasses();
         for (Class<? extends AbstractTest> clazz : suite.getTestClasses()) {
-            for (Method method : this.getTestMethods(clazz)) {
-                TestCase tc = new TestCase();
-                tc.setSuiteClass(suiteClass);
-                tc.setTestClass(clazz.getName());
-                tc.setTestMethod(method.getName());
-                this.tests.add(tc);
-            }
+            this.getTestMethods(clazz).stream()
+                .map(method -> {
+                    TestCase tc = new TestCase();
+                    tc.setSuiteClass(suiteClass);
+                    tc.setTestClass(clazz.getName());
+                    tc.setTestMethod(method.getName());
+                    return tc;
+                }).forEach(tc -> {
+                    this.tests.add(tc);
+                });
         }
 
         this.tests = this.processTestAnnotations();
@@ -69,10 +73,12 @@ public class TestSuite {
         this.tests = this.filter(priority);
     }
 
+    @Override
     public List<TestCase> getTests() {
         return tests;
     }
 
+    @Override
     public String getName() {
         return name;
     }

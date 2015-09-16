@@ -17,7 +17,7 @@ package com.tascape.qa.th.db;
 
 import com.tascape.qa.th.ExecutionResult;
 import com.tascape.qa.th.SystemConfiguration;
-import com.tascape.qa.th.TestSuite;
+import com.tascape.qa.th.AbstractTestSuite;
 import com.tascape.qa.th.Utils;
 import java.io.File;
 import java.io.IOException;
@@ -75,7 +75,7 @@ public final class H2Handler extends DbHandler {
     }
 
     @Override
-    public boolean queueTestSuite(TestSuite suite, String execId) throws SQLException {
+    public boolean queueTestSuite(AbstractTestSuite suite, String execId) throws SQLException {
         LOG.info("Queueing test suite result with execution id {} ", execId);
         final String sql = "INSERT INTO " + SuiteResult.TABLE_NAME + " ("
             + SuiteResult.SUITE_RESULT_ID + ", "

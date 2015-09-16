@@ -24,12 +24,8 @@ import com.tascape.qa.th.test.AbstractTest;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
-import org.junit.runner.JUnitCore;
-import org.junit.runner.Request;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -59,7 +55,7 @@ public abstract class AbstractSuite {
 
     private static final List<AbstractSuite> SUITES = new ArrayList<>();
 
-    private final List<Class<? extends AbstractTest>> testClasses = new ArrayList<>();
+    protected final List<Class<? extends AbstractTest>> testClasses = new ArrayList<>();
 
     private final Map<String, EntityDriver> suiteEnvironment = new HashMap<>();
 
@@ -72,6 +68,9 @@ public abstract class AbstractSuite {
     public static List<AbstractSuite> getSuites() {
         return SUITES;
     }
+    
+    public AbstractSuite() {
+    }
 
     public void setUp() throws Exception {
         Map<String, EntityDriver> env = AbstractSuite.getEnvionment(this.getClass().getName());
@@ -82,10 +81,7 @@ public abstract class AbstractSuite {
     }
 
     public void runByClass() throws Exception {
-        for (Class<? extends AbstractTest> clazz : this.testClasses) {
-            JUnitCore core = new JUnitCore();
-            core.run(Request.classWithoutSuiteMethod(clazz));
-        }
+        throw new UnsupportedOperationException();
     }
 
     public void tearDown() throws Exception {
@@ -147,7 +143,7 @@ public abstract class AbstractSuite {
      * Gets the info of product-under-test. This method is called at the end of your test suite, before the suite
      * environment is torn down automatically.
      *
-     * @return
+     * @return the name (possible with version info) of the product
      */
     public abstract String getProductUnderTest();
 

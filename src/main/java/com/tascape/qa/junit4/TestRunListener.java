@@ -13,8 +13,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.tascape.qa.th;
+package com.tascape.qa.junit4;
 
+import com.tascape.qa.th.ExecutionResult;
+import com.tascape.qa.th.SystemConfiguration;
 import com.tascape.qa.th.db.DbHandler;
 import com.tascape.qa.th.db.TestResult;
 import com.tascape.qa.th.db.TestResultMetric;

@@ -15,7 +15,7 @@
  */
 package com.tascape.qa.th.db;
 
-import com.tascape.qa.th.TestSuite;
+import com.tascape.qa.th.AbstractTestSuite;
 import java.io.Serializable;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -113,7 +113,7 @@ public class SuiteResult implements Serializable {
     public SuiteResult() {
     }
 
-    public SuiteResult(TestSuite testSuite, String execId) {
+    public SuiteResult(AbstractTestSuite testSuite, String execId) {
         Long time = System.currentTimeMillis();
         this.suiteResultId = execId;
         this.suiteName = testSuite.getName();

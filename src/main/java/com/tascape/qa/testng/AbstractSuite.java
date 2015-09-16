@@ -13,31 +13,16 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.tascape.qa.th.suite;
-
-import com.tascape.qa.th.test.JUnit4Test;
+package com.tascape.qa.testng;
 
 /**
  *
  * @author linsong wang
  */
-public class JUnit4Suite extends AbstractSuite {
+public abstract class AbstractSuite extends com.tascape.qa.th.suite.AbstractSuite {
 
     @Override
-    public void setUpTestClasses() {
-        this.addTestClass(JUnit4Test.class);
-    }
-
-    @Override
-    protected void setUpEnvironment() throws Exception {
-    }
-
-    @Override
-    protected void tearDownEnvironment() {
-    }
-
-    @Override
-    public String getProductUnderTest() {
-        return "JUnit4 Sample 1.1";
+    public void runByClass() throws Exception {
+        throw new UnsupportedOperationException();
     }
 }

@@ -40,14 +40,23 @@ public class TestHarness {
             Pattern testMethodRegex = config.getTestMethodRegex();
             int priority = config.getTestPriority();
             LOG.info("Running test suite class: {}", suiteClass);
-            TestSuite ts = new TestSuite(suiteClass, testClassRegex, testMethodRegex, priority);
-
-            if (ts.getTests().isEmpty()) {
-                throw new RuntimeException("No test cases found based on system properties");
+            Object c = Class.forName(suiteClass).newInstance();
+            AbstractTestSuite ts = null;
+            if (c instanceof com.tascape.qa.junit4.AbstractSuite) {
+                ts = new com.tascape.qa.junit4.TestSuite(suiteClass, testClassRegex, testMethodRegex, priority);
+            } else if (c instanceof com.tascape.qa.testng.AbstractSuite) {
+                ts = new com.tascape.qa.testng.TestSuite(suiteClass, testClassRegex, testMethodRegex, priority);
+            }
+            if (ts != null) {
+                if (ts.getTests().isEmpty()) {
+                    throw new RuntimeException("No test cases found based on system properties");
+                }
+                SuiteRunner sr = new SuiteRunner(ts);
+                exitCode = sr.startExecution();
+            } else {
+                throw new RuntimeException("null test suite");
             }
 
-            SuiteRunner sr = new SuiteRunner(ts);
-            exitCode = sr.startExecution();
         } catch (Throwable t) {
             LOG.error("TestHarness finishes with exception", t);
             exitCode = -1;

@@ -17,7 +17,8 @@ package com.tascape.qa.th.db;
 
 import com.tascape.qa.th.ExecutionResult;
 import com.tascape.qa.th.SystemConfiguration;
-import com.tascape.qa.th.TestSuite;
+import com.tascape.qa.junit4.TestSuite;
+import com.tascape.qa.th.AbstractTestSuite;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -117,7 +118,7 @@ public abstract class DbHandler {
         }
     }
 
-    public void queueSuiteExecution(TestSuite suite, String execId) throws SQLException {
+    public void queueSuiteExecution(AbstractTestSuite suite, String execId) throws SQLException {
         LOG.info("Queue test suite for execution with execution id {}", execId);
         String lock = "testharness." + execId;
         try (Connection conn = this.getConnection()) {
@@ -154,7 +155,7 @@ public abstract class DbHandler {
         }
     }
 
-    public abstract boolean queueTestSuite(TestSuite suite, String execId) throws SQLException;
+    public abstract boolean queueTestSuite(AbstractTestSuite suite, String execId) throws SQLException;
 
     protected abstract int getTestCaseId(TestCase test) throws SQLException;
 

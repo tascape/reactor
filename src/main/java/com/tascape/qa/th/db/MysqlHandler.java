@@ -16,10 +16,10 @@
 package com.tascape.qa.th.db;
 
 import com.tascape.qa.th.ExecutionResult;
-import com.tascape.qa.th.TestSuite;
 import com.tascape.qa.th.Utils;
 import com.jolbox.bonecp.BoneCP;
 import com.jolbox.bonecp.BoneCPConfig;
+import com.tascape.qa.th.AbstractTestSuite;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -78,7 +78,7 @@ public class MysqlHandler extends DbHandler {
     }
 
     @Override
-    public void queueSuiteExecution(TestSuite suite, String execId) throws SQLException {
+    public void queueSuiteExecution(AbstractTestSuite suite, String execId) throws SQLException {
         LOG.info("Queue test suite for execution with execution id {}", execId);
         String lock = "testharness." + execId;
         try (Connection conn = this.getConnection()) {
@@ -97,7 +97,7 @@ public class MysqlHandler extends DbHandler {
     }
 
     @Override
-    public boolean queueTestSuite(TestSuite suite, String execId) throws SQLException {
+    public boolean queueTestSuite(AbstractTestSuite suite, String execId) throws SQLException {
         LOG.info("Queueing test suite result with execution id {} ", execId);
         final String sql = "SELECT * FROM " + SuiteResult.TABLE_NAME + " WHERE "
             + SuiteResult.SUITE_RESULT_ID + " = ?";

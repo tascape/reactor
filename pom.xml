@@ -9,7 +9,7 @@
 
     <groupId>com.tascape.qa</groupId>
     <artifactId>testharness</artifactId>
-    <version>1.0.31</version>
+    <version>1.1.0</version>
     <packaging>jar</packaging>
 
     <dependencies>
@@ -62,6 +62,11 @@
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
             <version>4.12</version>
+        </dependency>
+        <dependency>
+            <groupId>org.testng</groupId>
+            <artifactId>testng</artifactId>
+            <version>6.9.6</version>
         </dependency>
         <dependency>
             <groupId>mysql</groupId>
