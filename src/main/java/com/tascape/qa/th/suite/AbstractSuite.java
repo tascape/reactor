@@ -24,10 +24,8 @@ import com.tascape.qa.th.test.AbstractTest;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import org.junit.runner.JUnitCore;
 import org.junit.runner.Request;
 import org.slf4j.Logger;
@@ -147,7 +145,7 @@ public abstract class AbstractSuite {
      * Gets the info of product-under-test. This method is called at the end of your test suite, before the suite
      * environment is torn down automatically.
      *
-     * @return
+     * @return name and version of product
      */
     public abstract String getProductUnderTest();
 
