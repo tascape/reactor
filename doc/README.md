@@ -1,20 +1,20 @@
 ### Test development environment
 
-1. first time setup, run the following line in console
+* first time setup, run the following line in console
 
 ```
 cd && wget https://raw.githubusercontent.com/tascape/testharness/master/doc/th.sh -O th.sh && bash th.sh
 ```
 
 
-2. after host machine reboot, run the following in console
+* restart environment, after host machine reboot
 
 ```
 cd && vagrant up
 ```
 
 
-3. destroy environment (for re-setup)
+* destroy environment (for re-setup)
 
 ```
 cd && vagrant destroy
