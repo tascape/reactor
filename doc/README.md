@@ -1,14 +1,24 @@
-To setup test development environment, run the following line in console:  
+### Test development environment
 
-`cd && wget https://raw.githubusercontent.com/tascape/testharness/master/doc/th.sh -O th.sh && bash th.sh`  
+1. first time setup, run the following line in console
+
+```
+cd && wget https://raw.githubusercontent.com/tascape/testharness/master/doc/th.sh -O th.sh && bash th.sh
+```
 
 
-To start this environment after reboot, run the following in console:  
+2. after host machine reboot, run the following in console
 
-`cd && vagrant up`  
-  
-  
-  
-    
-  
+```
+cd && vagrant up
+```
+
+
+3. destroy environment (for re-setup)
+
+```
+cd && vagrant destroy
+```
+
+
 (tested on OS X Yosemite 10.10.5, with Vagrant 1.7.4 and VirtualBox 5.0.2)  
