@@ -20,6 +20,7 @@ import com.tascape.qa.th.db.DbHandler;
 import com.tascape.qa.th.db.SuiteProperty;
 import com.tascape.qa.th.db.TestCase;
 import com.tascape.qa.th.db.TestResult;
+import com.tascape.qa.th.exception.SuiteEnvironmentException;
 import com.tascape.qa.th.suite.AbstractSuite;
 import java.io.File;
 import java.io.IOException;
@@ -76,19 +77,17 @@ public class SuiteRunner {
             throw new IOException("Cannot create directory " + dir);
         }
         this.saveExectionProperties(dir);
-
-        int threadCount = SYS_CONFIG.getExecutionThreadCount();
-        LOG.info("Start execution engine with {} thread(s)", threadCount);
-        int len = (threadCount + "").length();
-        ThreadFactory namedThreadFactory = new ThreadFactoryBuilder().setNameFormat("th%0" + len + "d").build();
-        ExecutorService executorService = Executors.newFixedThreadPool(threadCount, namedThreadFactory);
+        ExecutorService executorService = this.getExecutorService();
         CompletionService<TestResult> completionService = new ExecutorCompletionService<>(executorService);
 
         LOG.info("Start to acquire test cases to execute");
+        int loadLimit = SYS_CONFIG.getTestLoadLimit();
+        LOG.info("Load queued test cases {} per round", loadLimit);
+
         int numberOfFailures = 0;
         String productUnderTest = "";
         try {
-            List<TestResult> tcrs = this.filter(this.db.getQueuedTestCaseResults(this.execId, 100 * threadCount));
+            List<TestResult> tcrs = this.filter(this.db.getQueuedTestCaseResults(this.execId, loadLimit));
             while (!tcrs.isEmpty()) {
                 List<Future<TestResult>> futures = new ArrayList<>();
 
@@ -121,6 +120,9 @@ public class SuiteRunner {
             }
             try {
                 LOG.debug("Getting product-under-test");
+                if (AbstractSuite.getSuites().isEmpty()) {
+                    throw new SuiteEnvironmentException("Cannot setup suite environment");
+                }
                 productUnderTest = AbstractSuite.getSuites().get(0).getProductUnderTest();
             } catch (Exception ex) {
                 LOG.warn("Cannot get product-under-test", ex);
@@ -138,8 +140,8 @@ public class SuiteRunner {
 
         LOG.info("No more test case to run on this host, updating suite execution result");
         this.db.updateSuiteExecutionResult(this.execId, productUnderTest);
-        this.db.saveJunitXml(this.execId);
         this.db.exportToJson(this.execId);
+        this.db.saveJunitXml(this.execId);
         return numberOfFailures;
     }
 
@@ -158,6 +160,15 @@ public class SuiteRunner {
                 sps.add(sp);
             });
         this.db.setSuiteExecutionProperties(sps);
+    }
+
+    private ExecutorService getExecutorService() {
+        int threadCount = SYS_CONFIG.getExecutionThreadCount();
+        LOG.info("Start execution engine with {} thread(s)", threadCount);
+        int len = (threadCount + "").length();
+        ThreadFactory namedThreadFactory = new ThreadFactoryBuilder().setNameFormat("th%0" + len + "d").build();
+        ExecutorService executorService = Executors.newFixedThreadPool(threadCount, namedThreadFactory);
+        return executorService;
     }
 
     private List<TestResult> filter(List<TestResult> tcrs) {

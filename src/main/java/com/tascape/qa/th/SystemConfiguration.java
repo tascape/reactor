@@ -44,14 +44,13 @@ public final class SystemConfiguration {
 
     public static final String CONSTANT_EXEC_ID_PREFIX = "th_";
 
-    @Deprecated
-    public static final String SYSPROP_CONF_FILE = "qa.th.conf.file";
-
     public static final String SYSPROP_CONF_FILES = "qa.th.conf.files";
 
     public static final String SYSPROP_EXECUTION_ID = "qa.th.exec.id";
 
     public static final String SYSPROP_EXECUTION_THREAD_COUNT = "qa.th.exec.thread.count";
+
+    public static final String SYSPROP_TEST_LOAD_LIMIT = "qa.th.test.load.limit";
 
     public static final String SYSPROP_TEST_STATION = "qa.th.test.station";
 
@@ -98,14 +97,6 @@ public final class SystemConfiguration {
         Path conf = Paths.get(System.getProperty("user.home"), ".th", "th.properties");
         this.loadSystemPropertiesFromPath(conf);
 
-        String confFile = System.getProperty(SYSPROP_CONF_FILE, "").trim();
-        if (!confFile.isEmpty()) {
-            String[] paths = confFile.split(System.getProperty("path.separator"));
-            Stream.of(paths).forEach(path -> {
-                this.loadSystemPropertiesFromPath(Paths.get(path));
-            });
-        }
-
         String confFiles = System.getProperty(SYSPROP_CONF_FILES, "").trim();
         if (!confFiles.isEmpty()) {
             String[] paths = confFiles.split(System.getProperty("path.separator"));
@@ -122,7 +113,7 @@ public final class SystemConfiguration {
             });
 
         String execId = this.properties.getProperty(SYSPROP_EXECUTION_ID);
-        if (execId == null || execId.trim().isEmpty()) {
+        if (StringUtils.isEmpty(execId)) {
             execId = Utils.getUniqueId(CONSTANT_EXEC_ID_PREFIX);
             LOG.warn("There is no execution id specified, using local new UUID: {}", execId);
             this.properties.setProperty(SYSPROP_EXECUTION_ID, execId);
@@ -183,16 +174,20 @@ public final class SystemConfiguration {
     }
 
     public int getTestRetry() {
-        return Integer.parseInt(this.getProperty(SYSPROP_TEST_RETRY, "0"));
+        return this.getIntProperty(SYSPROP_TEST_RETRY, 0);
     }
 
     public int getExecutionThreadCount() {
-        return Integer.parseInt(this.getProperty(SYSPROP_EXECUTION_THREAD_COUNT, "1"));
+        return this.getIntProperty(SYSPROP_EXECUTION_THREAD_COUNT, 1);
+    }
+
+    public int getTestLoadLimit() {
+        return this.getIntProperty(SYSPROP_TEST_LOAD_LIMIT, 100);
     }
 
     public String getHostName() {
         String hn = this.getProperty(SYSPROP_TEST_STATION);
-        if (hn == null || hn.isEmpty()) {
+        if (StringUtils.isEmpty(hn)) {
             try {
                 hn = Utils.cmd("hostname").get(0);
             } catch (IOException | InterruptedException ex) {
