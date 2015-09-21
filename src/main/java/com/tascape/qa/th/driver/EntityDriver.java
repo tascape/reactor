@@ -16,12 +16,9 @@
 package com.tascape.qa.th.driver;
 
 import com.tascape.qa.th.AbstractTestResource;
-import com.tascape.qa.th.SystemConfiguration;
 import com.tascape.qa.th.Utils;
 import com.tascape.qa.th.comm.EntityCommunication;
 import com.tascape.qa.th.test.AbstractTest;
-import java.io.File;
-import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import org.slf4j.Logger;
@@ -41,7 +38,7 @@ public abstract class EntityDriver extends AbstractTestResource {
     @Override
     public Path getLogPath() {
         if (this.test == null) {
-            return Paths.get(System.getProperty("user.home"), "test");
+            return Paths.get(System.getProperty("user.home"), Utils.getUniqueId("test"));
         }
         return this.test.getLogPath();
     }
@@ -66,22 +63,8 @@ public abstract class EntityDriver extends AbstractTestResource {
         return test;
     }
 
-    protected File createDataFile(String prefix) throws IOException {
-        return this.createDataFile(prefix, "txt");
-    }
-
-    protected File createDataFile(String prefix, String extension) throws IOException {
-        File f = File.createTempFile(prefix + "-", "." + extension, this.getLogPath().toFile());
-        return f;
-    }
-
-    protected File createKeepAliveLogFile(String prefix, String extension) throws IOException {
-        File f = File.createTempFile(prefix + "-", "." + extension, this.getLogPath().toFile());
-        return Utils.getKeepAliveFile(f);
-    }
-
     /**
-     * Name of the entity driver, max length 200 chars.
+     * Name of the entity driver, max length 255 chars.
      *
      * @return name
      */

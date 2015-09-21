@@ -36,6 +36,9 @@ public abstract class AbstractTestResource {
 
     public File saveAsTextFile(String filePrefix, CharSequence data) throws IOException {
         Path path = this.getLogPath();
+        if (!path.toFile().mkdirs()) {
+            throw new IOException("Cannot create test log directory " + path);
+        }
         File f = File.createTempFile(filePrefix, ".txt", path.toFile());
         FileUtils.write(f, data);
         LOG.debug("Save data into file {}", f.getAbsolutePath());
@@ -64,5 +67,19 @@ public abstract class AbstractTestResource {
             LOG.warn("Cannot take screenshot", ex);
         }
         return png;
+    }
+
+    protected File createDataFile(String prefix) throws IOException {
+        return this.createDataFile(prefix, "txt");
+    }
+
+    protected File createDataFile(String prefix, String extension) throws IOException {
+        File f = File.createTempFile(prefix + "-", "." + extension, this.getLogPath().toFile());
+        return f;
+    }
+
+    protected File createKeepAliveLogFile(String prefix, String extension) throws IOException {
+        File f = File.createTempFile(prefix + "-", "." + extension, this.getLogPath().toFile());
+        return Utils.getKeepAliveFile(f);
     }
 }

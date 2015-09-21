@@ -135,7 +135,7 @@ public class SshCommunication extends EntityCommunication {
         }
     }
 
-    public static class ChanneOperationTimer extends Thread {
+    private static class ChanneOperationTimer extends Thread {
         private final Channel channel;
 
         private final long timeout;
