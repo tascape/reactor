@@ -36,10 +36,11 @@ public abstract class AbstractTestResource {
 
     public File saveAsTextFile(String filePrefix, CharSequence data) throws IOException {
         Path path = this.getLogPath();
-        if (!path.toFile().mkdirs()) {
-            throw new IOException("Cannot create test log directory " + path);
+        File p = path.toFile();
+        if (!p.exists() && !p.mkdirs()) {
+            throw new IOException("Cannot create test log directory " + p);
         }
-        File f = File.createTempFile(filePrefix, ".txt", path.toFile());
+        File f = File.createTempFile(filePrefix, ".txt", p);
         FileUtils.write(f, data);
         LOG.debug("Save data into file {}", f.getAbsolutePath());
         return f;
