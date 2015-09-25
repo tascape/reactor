@@ -20,7 +20,6 @@ import com.tascape.qa.th.Utils;
 import com.tascape.qa.th.comm.EntityCommunication;
 import com.tascape.qa.th.test.AbstractTest;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -38,7 +37,7 @@ public abstract class EntityDriver extends AbstractTestResource {
     @Override
     public Path getLogPath() {
         if (this.test == null) {
-            return Paths.get(System.getProperty("user.home"), Utils.getUniqueId("test"));
+            return sysConfig.getLogPath().resolve(Utils.getUniqueId("driver-"));
         }
         return this.test.getLogPath();
     }
