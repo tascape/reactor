@@ -57,7 +57,8 @@ public class TestIterationData extends AbstractTestData {
 
     @Override
     public String getValue() {
-        return (this.iteration + 1) + "/" + this.iterations;
+        int len = (this.iterations + "").length();
+        return String.format("%0" + len + "d/%d", this.iteration + 1, this.iterations);
     }
 
     public int getIteration() {
