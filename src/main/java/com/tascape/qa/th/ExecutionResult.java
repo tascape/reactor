@@ -83,4 +83,12 @@ public class ExecutionResult {
     public boolean equals(ExecutionResult er) {
         return this.result().equals(er.result());
     }
+
+    public int getPass() {
+        return pass;
+    }
+
+    public int getFail() {
+        return fail;
+    }
 }
