@@ -96,11 +96,11 @@ public class TestCase {
 
     public TestCase(Map<String, Object> row) {
         this.testCaseId = (int) row.get(TestCase.TEST_CASE_ID);
-        this.suiteClass = row.get(TestCase.SUITE_CLASS).toString();
-        this.testClass = row.get(TestCase.TEST_CLASS).toString();
-        this.testMethod = row.get(TestCase.TEST_METHOD).toString();
-        this.testDataInfo = row.get(TestCase.TEST_DATA_INFO).toString();
-        this.testData = row.get(TestCase.TEST_DATA).toString();
+        this.suiteClass = row.get(TestCase.SUITE_CLASS) + "";
+        this.testClass = row.get(TestCase.TEST_CLASS) + "";
+        this.testMethod = row.get(TestCase.TEST_METHOD) + "";
+        this.testDataInfo = row.get(TestCase.TEST_DATA_INFO) + "";
+        this.testData = row.get(TestCase.TEST_DATA) + "";
     }
 
     public TestCase() {
