@@ -19,12 +19,15 @@ import com.tascape.qa.th.test.Priority;
 import java.lang.reflect.Method;
 import java.util.HashMap;
 import java.util.Map;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  *
  * @author linsong wang
  */
 public abstract class AbstractTestData implements TestData {
+    private static final Logger LOG = LoggerFactory.getLogger(AbstractTestData.class);
     private static final ThreadLocal<TestData> TEST_DATA = new ThreadLocal<>();
 
     public static void setTestData(TestData data) {
@@ -53,6 +56,10 @@ public abstract class AbstractTestData implements TestData {
 
     @Override
     public String getValue() {
+        if (value == null) {
+            LOG.warn("Value of test data is not specified.");
+            return this.toString();
+        }
         return this.value;
     }
 

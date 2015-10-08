@@ -9,7 +9,7 @@
 
     <groupId>com.tascape.qa</groupId>
     <artifactId>testharness</artifactId>
-    <version>1.0.33</version>
+    <version>1.0.34</version>
     <packaging>jar</packaging>
 
     <dependencies>
@@ -78,6 +78,12 @@
             <groupId>com.jcraft</groupId>
             <artifactId>jsch</artifactId>
             <version>0.1.53</version>
+        </dependency>
+        <dependency>
+            <groupId>org.mongodb</groupId>
+            <artifactId>mongo-java-driver</artifactId>
+            <version>3.0.4</version>
+            <type>jar</type>
         </dependency>
     </dependencies>
 
