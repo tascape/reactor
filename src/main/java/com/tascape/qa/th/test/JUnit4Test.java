@@ -16,6 +16,7 @@
 package com.tascape.qa.th.test;
 
 import com.tascape.qa.th.ExecutionResult;
+import com.tascape.qa.th.data.TestDataProvider;
 import java.io.IOException;
 import java.util.Random;
 import javax.xml.xpath.XPathException;
@@ -110,10 +111,18 @@ public class JUnit4Test extends AbstractTest {
         LOG.info("Sample multiple result test");
         this.doSomethingGood();
         ExecutionResult er = ExecutionResult.newMultiple();
-        Thread.sleep(6000);
+        Thread.sleep(2000);
         er.setPass(new Random().nextInt(20) + 100);
         er.setFail(new Random().nextInt(20));
         this.setExecutionResult(er);
+    }
+
+    @Test
+    @TestDataProvider(klass = SampleData.class)
+    public void testDataProvider() throws Exception {
+        SampleData d = this.getTestData(SampleData.class);
+        LOG.debug("test data '{}'", d.testParameter);
+        Thread.sleep(2000);
     }
 
     private void doSomethingGood() throws IOException {

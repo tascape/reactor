@@ -28,6 +28,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import org.apache.commons.lang3.StringEscapeUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -127,7 +129,11 @@ public class TestSuite {
                         TestCase t = new TestCase(tc);
                         TestDataInfo tdi = new TestDataInfo(tdp.klass(), tdp.method(), tdp.parameter(), i);
                         t.setTestDataInfo(tdi.format(length));
-                        t.setTestData(data[i].getValue());
+                        String value = data[i].getValue();
+                        if (StringUtils.isEmpty(value)) {
+                            value = String.format("%s-%0" + length + "d", data[i].getClassName(), i);
+                        }
+                        t.setTestData(value);
                         t.setPriority(Math.min(t.getPriority(), data[i].getPriority()));
 
                         LOG.debug("Adding test case {}", t.format());
