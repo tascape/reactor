@@ -15,6 +15,7 @@
  */
 package com.tascape.qa.th.suite;
 
+import com.tascape.qa.th.ExecutionResult;
 import com.tascape.qa.th.SystemConfiguration;
 import com.tascape.qa.th.TestHarness;
 import com.tascape.qa.th.driver.EntityDriver;
@@ -70,6 +71,8 @@ public abstract class AbstractSuite {
     public static List<AbstractSuite> getSuites() {
         return SUITES;
     }
+
+    protected ExecutionResult executionResult;
 
     public void setUp() throws Exception {
         Map<String, EntityDriver> env = AbstractSuite.getEnvionment(this.getClass().getName());
@@ -150,6 +153,14 @@ public abstract class AbstractSuite {
     public abstract String getProductUnderTest();
 
     protected abstract void tearDownEnvironment();
+
+    public void setExecutionResult(ExecutionResult executionResult) {
+        this.executionResult = executionResult;
+    }
+
+    public ExecutionResult getExecutionResult() {
+        return ExecutionResult.NA;
+    }
 
     /**
      * This is used to launch TestHarness from within individual test suite classes.

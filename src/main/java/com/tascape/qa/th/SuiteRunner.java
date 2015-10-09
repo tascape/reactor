@@ -85,7 +85,6 @@ public class SuiteRunner {
         LOG.info("Load queued test cases {} per round", loadLimit);
 
         int numberOfFailures = 0;
-        String productUnderTest = "";
         try {
             List<TestResult> tcrs = this.filter(this.db.getQueuedTestCaseResults(this.execId, loadLimit));
             while (!tcrs.isEmpty()) {
@@ -119,11 +118,17 @@ public class SuiteRunner {
                 tcrs = this.filter(this.db.getQueuedTestCaseResults(this.execId, 100));
             }
             try {
-                LOG.debug("Getting product-under-test");
+                LOG.debug("Getting suite-under-test");
                 if (AbstractSuite.getSuites().isEmpty()) {
                     throw new SuiteEnvironmentException("Cannot setup suite environment");
                 }
-                productUnderTest = AbstractSuite.getSuites().get(0).getProductUnderTest();
+                AbstractSuite suiteUnderTest = AbstractSuite.getSuites().get(0);
+
+                LOG.info("No more test case to run on this host, updating suite execution result");
+                ExecutionResult suiteResult = this.db.updateSuiteExecutionResult(this.execId,
+                    suiteUnderTest.getProductUnderTest());
+                suiteUnderTest.setExecutionResult(suiteResult);
+                this.db.overwriteSuiteExecutionResult(this.execId, suiteUnderTest.getExecutionResult());
             } catch (Exception ex) {
                 LOG.warn("Cannot get product-under-test", ex);
             }
@@ -138,8 +143,6 @@ public class SuiteRunner {
         }
         executorService.shutdown();
 
-        LOG.info("No more test case to run on this host, updating suite execution result");
-        this.db.updateSuiteExecutionResult(this.execId, productUnderTest);
         this.db.exportToJson(this.execId);
         this.db.saveJunitXml(this.execId);
         return numberOfFailures;

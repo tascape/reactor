@@ -298,10 +298,11 @@ public abstract class DbHandler {
 
     public abstract void updateSuiteExecutionResult(String execId) throws SQLException;
 
-    public void updateSuiteExecutionResult(String execId, String productUnderTest) throws SQLException {
+    public ExecutionResult updateSuiteExecutionResult(String execId, String productUnderTest) throws SQLException {
         LOG.info("Update test suite execution result with execution id {}", execId);
         String lock = "testharness." + execId;
 
+        ExecutionResult suiteResult = ExecutionResult.newMultiple();
         int total = 0, fail = 0;
         try (Connection conn = this.getConnection()) {
             try {
@@ -356,7 +357,44 @@ public abstract class DbHandler {
                                 rs.updateString(SuiteResult.PRODUCT_UNDER_TEST, productUnderTest);
                             }
                             rs.updateRow();
+                            suiteResult.setPass(total - fail);
+                            suiteResult.setFail(fail);
                         }
+                    }
+                }
+            } finally {
+                this.releaseExecutionLock(conn, lock);
+            }
+        }
+        return suiteResult;
+    }
+
+    public void overwriteSuiteExecutionResult(String execId, ExecutionResult result) throws SQLException {
+        LOG.info("Overwrite test suite execution result with execution id {} with {}", execId, result);
+        int total = result.getPass() + result.getFail();
+        if (total == 0) {
+            return;
+        }
+        int fail = result.getFail();
+
+        String lock = "testharness." + execId;
+        try (Connection conn = this.getConnection()) {
+            try {
+                if (!this.acquireExecutionLock(conn, lock)) {
+                    throw new SQLException("Cannot acquire lock of name " + lock);
+                }
+
+                final String sql = "SELECT * FROM " + SuiteResult.TABLE_NAME
+                    + " WHERE " + SuiteResult.SUITE_RESULT_ID + " = ?;";
+                try (PreparedStatement stmt = this.getConnection().prepareStatement(sql,
+                    ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE)) {
+                    stmt.setString(1, execId);
+                    ResultSet rs = stmt.executeQuery();
+                    if (rs.first()) {
+                        rs.updateInt(SuiteResult.NUMBER_OF_TESTS, total);
+                        rs.updateInt(SuiteResult.NUMBER_OF_FAILURE, fail);
+                        rs.updateString(SuiteResult.EXECUTION_RESULT, fail == 0 ? "PASS" : "FAIL");
+                        rs.updateRow();
                     }
                 }
             } finally {
