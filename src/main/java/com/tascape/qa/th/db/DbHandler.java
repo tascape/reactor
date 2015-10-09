@@ -18,7 +18,6 @@ package com.tascape.qa.th.db;
 import com.tascape.qa.th.ExecutionResult;
 import com.tascape.qa.th.SystemConfiguration;
 import com.tascape.qa.th.TestSuite;
-import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
@@ -369,6 +368,90 @@ public abstract class DbHandler {
         return suiteResult;
     }
 
+    public ExecutionResult adjustSuiteExecutionResult(String execId) throws SQLException {
+        LOG.info("Adjust test suite execution result of execution id {} with test iterations", execId);
+        String lock = "testharness." + execId;
+
+        ExecutionResult suiteResult = ExecutionResult.newMultiple();
+        int total = 0, fail = 0;
+        try (Connection conn = this.getConnection()) {
+            try {
+                if (!this.acquireExecutionLock(conn, lock)) {
+                    throw new SQLException("Cannot acquire lock of name " + lock);
+                }
+
+                {
+                    String iterDataInfo = "com.tascape.qa.th.data.TestIterationData";
+                    Map<String, Boolean> iterationTests = new HashMap<>();
+                    String sql = "SELECT tr.*, tc.* FROM "
+                        + TestResult.TABLE_NAME + " tr JOIN " + TestCase.TABLE_NAME + " tc"
+                        + " ON tr." + TestResult.TEST_CASE_ID + " = tc." + TestCase.TEST_CASE_ID
+                        + " WHERE " + TestResult.SUITE_RESULT + " = ?;";
+                    try (PreparedStatement stmt = this.getConnection().prepareStatement(sql)) {
+                        stmt.setString(1, execId);
+                        LOG.debug("{}", stmt);
+                        ResultSet rs = stmt.executeQuery();
+                        while (rs.next()) {
+                            String result = rs.getString(TestResult.EXECUTION_RESULT);
+                            int p = 0, f = 0;
+                            String[] pf = result.split("/");
+                            if (pf.length == 1) {
+                                if (result.equals(ExecutionResult.PASS.getName())) {
+                                    p = 1;
+                                } else {
+                                    f = 1;
+                                }
+                            } else if (pf.length == 2) {
+                                p = Integer.parseInt(pf[0]);
+                                f = Integer.parseInt(pf[1]);
+                            } else {
+                                throw new RuntimeException("Cannot parse test execution result " + result);
+                            }
+
+                            if (rs.getString(TestCase.TEST_DATA_INFO).startsWith(iterDataInfo)) {
+                                String key = rs.getString(TestCase.SUITE_CLASS) + rs.getString(TestCase.TEST_CLASS)
+                                    + rs.getString(TestCase.TEST_METHOD);
+                                Boolean r = iterationTests.get(key);
+                                if (r == null) {
+                                    iterationTests.put(key, f > 0 ? Boolean.FALSE : Boolean.TRUE);
+                                } else {
+                                    iterationTests.put(key, f > 0 ? Boolean.FALSE : r);
+                                }
+                            } else {
+                                total += p + f;
+                                fail += f;
+                            }
+                        }
+                        LOG.debug("{} {}", total, fail);
+                    }
+                    total += iterationTests.size();
+                    fail += iterationTests.values().stream().filter(v -> v.equals(Boolean.FALSE)).count();
+                    LOG.debug("{} {}", total, fail);
+                    suiteResult.setFail(fail);
+                    suiteResult.setPass(total - fail);
+                }
+                {
+                    final String sql = "SELECT * FROM " + SuiteResult.TABLE_NAME
+                        + " WHERE " + SuiteResult.SUITE_RESULT_ID + " = ?;";
+                    try (PreparedStatement stmt = this.getConnection().prepareStatement(sql,
+                        ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE)) {
+                        stmt.setString(1, execId);
+                        ResultSet rs = stmt.executeQuery();
+                        if (rs.first()) {
+                            rs.updateInt(SuiteResult.NUMBER_OF_TESTS, total);
+                            rs.updateInt(SuiteResult.NUMBER_OF_FAILURE, fail);
+                            rs.updateString(SuiteResult.EXECUTION_RESULT, fail == 0 ? "PASS" : "FAIL");
+                            rs.updateRow();
+                        }
+                    }
+                }
+            } finally {
+                this.releaseExecutionLock(conn, lock);
+            }
+        }
+        return suiteResult;
+    }
+
     public void overwriteSuiteExecutionResult(String execId, ExecutionResult result) throws SQLException {
         LOG.info("Overwrite test suite execution result with execution id {} with {}", execId, result);
         int total = result.getPass() + result.getFail();
@@ -703,7 +786,6 @@ public abstract class DbHandler {
     public static void main(String[] args) throws Exception {
         SystemConfiguration.getInstance();
         DbHandler db = DbHandler.getInstance();
-        String json = FileUtils.readFileToString(new File(args[0]));
-        db.importFromJson(json);
+        db.adjustSuiteExecutionResult("th_f592936e_69b7_46eb_9c76_eaed9bbbeea3");
     }
 }

@@ -125,10 +125,8 @@ public class SuiteRunner {
                 AbstractSuite suiteUnderTest = AbstractSuite.getSuites().get(0);
 
                 LOG.info("No more test case to run on this host, updating suite execution result");
-                ExecutionResult suiteResult = this.db.updateSuiteExecutionResult(this.execId,
-                    suiteUnderTest.getProductUnderTest());
-                suiteUnderTest.setExecutionResult(suiteResult);
-                this.db.overwriteSuiteExecutionResult(this.execId, suiteUnderTest.getExecutionResult());
+                this.db.updateSuiteExecutionResult(this.execId, suiteUnderTest.getProductUnderTest());
+                this.db.adjustSuiteExecutionResult(execId);
             } catch (Exception ex) {
                 LOG.warn("Cannot get product-under-test", ex);
             }

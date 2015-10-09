@@ -17,10 +17,13 @@ package com.tascape.qa.th.test;
 
 import com.tascape.qa.th.ExecutionResult;
 import com.tascape.qa.th.data.TestDataProvider;
+import com.tascape.qa.th.data.TestIterationData;
 import java.io.IOException;
 import java.util.Random;
 import javax.xml.xpath.XPathException;
+import org.apache.commons.lang3.RandomStringUtils;
 import org.junit.After;
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.slf4j.Logger;
@@ -102,7 +105,7 @@ public class JUnit4Test extends AbstractTest {
         LOG.info("Sample negative test again");
         expectedException.expect(XPathException.class);
         expectedException.expectMessage("Cannot resolve xyz");
-        Thread.sleep(5000);
+        Thread.sleep(1000);
         this.doSomethingBadAgain();
     }
 
@@ -111,7 +114,7 @@ public class JUnit4Test extends AbstractTest {
         LOG.info("Sample multiple result test");
         this.doSomethingGood();
         ExecutionResult er = ExecutionResult.newMultiple();
-        Thread.sleep(2000);
+        Thread.sleep(500);
         er.setPass(new Random().nextInt(20) + 100);
         er.setFail(new Random().nextInt(20));
         this.setExecutionResult(er);
@@ -122,7 +125,15 @@ public class JUnit4Test extends AbstractTest {
     public void testDataProvider() throws Exception {
         SampleData d = this.getTestData(SampleData.class);
         LOG.debug("test data '{}'", d.testParameter);
-        Thread.sleep(2000);
+        Thread.sleep(500);
+    }
+
+    @Test
+    @TestDataProvider(klass = TestIterationData.class, method = "useIterations", parameter = "3")
+    public void testIterations() throws Exception {
+        LOG.debug("test iteration {}", RandomStringUtils.randomAlphanumeric(10));
+        Thread.sleep(500);
+        Assert.assertEquals(0, System.currentTimeMillis() % 2);
     }
 
     private void doSomethingGood() throws IOException {
