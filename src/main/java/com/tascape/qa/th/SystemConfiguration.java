@@ -60,6 +60,8 @@ public final class SystemConfiguration {
 
     public static final String SYSPROP_TEST_SUITE = "qa.th.test.suite";
 
+    public static final String SYSPROP_SHUFFLE_TESTS = "qa.th.shuffle.tests";
+
     public static final String SYSPROP_RESULT_VISIBILITY = "qa.th.result.visibility";
 
     public static final String SYSPROP_DEBUG_CLASS_REGEX = "qa.th.debug.class.regex";
@@ -163,6 +165,10 @@ public final class SystemConfiguration {
             return defaultValue;
         }
         return Boolean.parseBoolean(v);
+    }
+
+    public boolean isShuffleTests() {
+        return this.getBooleanProperty(SYSPROP_SHUFFLE_TESTS, false);
     }
 
     public boolean getResultVisibility() {

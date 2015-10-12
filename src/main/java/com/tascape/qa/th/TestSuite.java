@@ -25,10 +25,10 @@ import com.tascape.qa.th.test.AbstractTest;
 import com.tascape.qa.th.test.Priority;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import org.apache.commons.lang3.StringEscapeUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.junit.Test;
 import org.slf4j.Logger;
@@ -69,6 +69,10 @@ public class TestSuite {
         this.tests = this.filter(testClassRegex, testMethodRegex);
 
         this.tests = this.filter(priority);
+
+        if (SystemConfiguration.getInstance().isShuffleTests()) {
+            Collections.shuffle(tests);
+        }
     }
 
     public List<TestCase> getTests() {
