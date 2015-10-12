@@ -61,9 +61,7 @@ public class TestRunnerJUnit4 extends AbstractTestRunner implements Callable<Tes
             this.tcr.setResult(ExecutionResult.FAIL);
             this.tcr.setException(ex);
             this.db.updateTestExecutionResult(this.tcr);
-            return null;
-
-            // todo need to throw exception
+            throw ex;
         } finally {
             Utils.removeLog4jAppender(logFile.toFile().getAbsolutePath());
             this.generateHtml(logFile);

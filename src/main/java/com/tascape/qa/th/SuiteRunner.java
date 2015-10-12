@@ -70,7 +70,7 @@ public class SuiteRunner {
     }
 
     @SuppressWarnings("UseSpecificCatch")
-    public int startExecution() throws IOException, InterruptedException, SQLException, XMLStreamException {
+    public int runTests() throws IOException, InterruptedException, SQLException, XMLStreamException {
         File dir = SYS_CONFIG.getLogPath().resolve(execId).toFile();
         LOG.info("Create suite execution log directory {}", dir);
         if (!dir.exists() && !dir.mkdirs()) {
@@ -100,10 +100,6 @@ public class SuiteRunner {
                     try {
                         Future<TestResult> future = completionService.take();
                         TestResult tcr = future.get();
-                        if (tcr == null) {
-                            numberOfFailures++;
-                            continue;
-                        }
                         String result = tcr.getResult().result();
                         LOG.info("Get result of test case {} - {}", tcr.getTestCase().format(), result);
                         if (!ExecutionResult.PASS.getName().equals(result) && !result.endsWith("/0")) {
@@ -117,18 +113,19 @@ public class SuiteRunner {
 
                 tcrs = this.filter(this.db.getQueuedTestCaseResults(this.execId, 100));
             }
+            String productUnderTest = "NA";
             try {
                 LOG.debug("Getting suite-under-test");
                 if (AbstractSuite.getSuites().isEmpty()) {
                     throw new SuiteEnvironmentException("Cannot setup suite environment");
                 }
-                AbstractSuite suiteUnderTest = AbstractSuite.getSuites().get(0);
-
-                LOG.info("No more test case to run on this host, updating suite execution result");
-                this.db.updateSuiteExecutionResult(this.execId, suiteUnderTest.getProductUnderTest());
-                this.db.adjustSuiteExecutionResult(execId);
+                productUnderTest = AbstractSuite.getSuites().get(0).getProductUnderTest();
             } catch (Exception ex) {
                 LOG.warn("Cannot get product-under-test", ex);
+            } finally {
+                LOG.info("No more test case to run on this host, updating suite execution result");
+                this.db.updateSuiteExecutionResult(this.execId, productUnderTest);
+                this.db.adjustSuiteExecutionResult(execId);
             }
         } finally {
             AbstractSuite.getSuites().stream().forEach((suite) -> {

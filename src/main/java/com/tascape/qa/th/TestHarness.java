@@ -47,7 +47,7 @@ public class TestHarness {
             }
 
             SuiteRunner sr = new SuiteRunner(ts);
-            exitCode = sr.startExecution();
+            exitCode = sr.runTests();
         } catch (Throwable t) {
             LOG.error("TestHarness finishes with exception", t);
             exitCode = -1;
