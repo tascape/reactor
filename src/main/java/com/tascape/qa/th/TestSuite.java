@@ -71,6 +71,7 @@ public class TestSuite {
         this.tests = this.filter(priority);
 
         if (SystemConfiguration.getInstance().isShuffleTests()) {
+            LOG.debug("do test cases shuffle");
             Collections.shuffle(tests);
         }
     }
