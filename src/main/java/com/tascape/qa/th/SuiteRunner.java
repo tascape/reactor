@@ -26,6 +26,7 @@ import java.io.File;
 import java.io.IOException;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -174,6 +175,11 @@ public class SuiteRunner {
         tcrs.stream().filter((tcr) -> (UNSUPPORTED_TESTS.get(tcr.getTestCase().format()) == null)).forEach((tcr) -> {
             tcrs0.add(tcr);
         });
+
+        if (SystemConfiguration.getInstance().isShuffleTests()) {
+            LOG.debug("do test cases shuffle");
+            Collections.shuffle(tcrs0);
+        }
         return tcrs0;
     }
 }
