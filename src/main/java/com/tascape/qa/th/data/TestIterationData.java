@@ -16,12 +16,15 @@
 package com.tascape.qa.th.data;
 
 import com.tascape.qa.th.SystemConfiguration;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  *
  * @author linsong wang
  */
 public class TestIterationData extends AbstractTestData {
+    private static final Logger LOG = LoggerFactory.getLogger(TestIterationData.class);
 
     private static final SystemConfiguration config = SystemConfiguration.getInstance();
 
@@ -47,12 +50,18 @@ public class TestIterationData extends AbstractTestData {
         try {
             iters = Integer.parseInt(n);
         } catch (Exception ex) {
+            LOG.warn(ex.getMessage());
         }
         TestIterationData[] data = new TestIterationData[iters];
         for (int i = 0; i < iters; i++) {
             data[i] = new TestIterationData(i, iters);
         }
         return data;
+    }
+
+    public TestIterationData[] useSystemProperty(String sysPropIterations) {
+        String n = config.getProperty(sysPropIterations);
+        return useIterations(n);
     }
 
     @Override
