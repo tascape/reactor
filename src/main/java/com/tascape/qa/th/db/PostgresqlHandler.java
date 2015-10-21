@@ -120,6 +120,7 @@ public class PostgresqlHandler extends DbHandler {
 
                 rs.updateString(SuiteResult.SUITE_RESULT_ID, execId);
                 rs.updateString(SuiteResult.SUITE_NAME, suite.getName());
+                rs.updateString(SuiteResult.PROJECT_NAME, suite.getProjectName());
                 rs.updateString(SuiteResult.JOB_NAME, SYS_CONFIG.getJobName());
                 rs.updateInt(SuiteResult.JOB_BUILD_NUMBER, SYS_CONFIG.getJobBuildNumber());
                 rs.updateString(SuiteResult.JOB_BUILD_URL, SYS_CONFIG.getJobBuildUrl());

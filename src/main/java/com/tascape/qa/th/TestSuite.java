@@ -43,6 +43,8 @@ public class TestSuite {
 
     private String name;
 
+    private final String projectName;
+
     private List<TestCase> tests = new ArrayList<>();
 
     public TestSuite(String suiteClass, Pattern testClassRegex, Pattern testMethodRegex, int priority)
@@ -50,6 +52,7 @@ public class TestSuite {
         LOG.info("Find test cases in target test suite {}", suiteClass);
         AbstractSuite suite = AbstractSuite.class.cast(Class.forName(suiteClass).newInstance());
         this.name = suite.getName();
+        this.projectName = suite.getProjectName();
         if (this.name == null || this.name.isEmpty()) {
             this.name = suiteClass;
         }
@@ -82,6 +85,10 @@ public class TestSuite {
 
     public String getName() {
         return name;
+    }
+
+    public String getProjectName() {
+        return projectName;
     }
 
     private List<TestCase> filter(Pattern testClassRegex, Pattern testMethodRegex) {

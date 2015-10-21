@@ -506,6 +506,7 @@ public abstract class DbHandler {
 
                     xsw.writeStartElement("testsuite");
                     xsw.writeAttribute("name", rs.getString(SuiteResult.SUITE_NAME));
+                    xsw.writeAttribute("projectname", rs.getString(SuiteResult.PROJECT_NAME) + "");
                     xsw.writeAttribute("tests", rs.getInt(SuiteResult.NUMBER_OF_TESTS) + "");
                     xsw.writeAttribute("failures", rs.getInt(SuiteResult.NUMBER_OF_FAILURE) + "");
                     xsw.writeAttribute("time", (rs.getLong(SuiteResult.STOP_TIME)
@@ -515,6 +516,7 @@ public abstract class DbHandler {
 
                     pwh.println("<html><body>");
                     pwh.printf("<h2>%s</h2>", rs.getString(SuiteResult.SUITE_NAME));
+                    pwh.printf("<h3>%s</h3>", rs.getString(SuiteResult.PROJECT_NAME));
                     pwh.printf("<h4>tests %d, failures %d</h4>",
                         rs.getInt(SuiteResult.NUMBER_OF_TESTS), rs.getInt(SuiteResult.NUMBER_OF_FAILURE));
                     pwh.println("<ol>");

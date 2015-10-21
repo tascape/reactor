@@ -46,6 +46,8 @@ public class SuiteResult implements Serializable {
 
     public static final String SUITE_NAME = "SUITE_NAME";
 
+    public static final String PROJECT_NAME = "PROJECT_NAME";
+
     public static final String JOB_NAME = "JOB_NAME";
 
     public static final String JOB_BUILD_NUMBER = "JOB_BUILD_NUMBER";
@@ -73,6 +75,9 @@ public class SuiteResult implements Serializable {
 
     @Column(name = "SUITE_NAME")
     private String suiteName;
+
+    @Column(name = "PROJECT_NAME")
+    private String projectName;
 
     @Column(name = "JOB_NAME")
     private String jobName;
@@ -117,6 +122,7 @@ public class SuiteResult implements Serializable {
         Long time = System.currentTimeMillis();
         this.suiteResultId = execId;
         this.suiteName = testSuite.getName();
+        this.projectName = testSuite.getProjectName();
         this.jobName = SYS_CONFIG.getJobName();
         this.jobBuildNumber = SYS_CONFIG.getJobBuildNumber();
         this.jobBuildUrl = SYS_CONFIG.getJobBuildUrl();
@@ -127,37 +133,39 @@ public class SuiteResult implements Serializable {
         this.numberOfFailure = testSuite.getTests().size();
         this.invisibleEntry = false;
         this.productUnderTest = SYS_CONFIG.getProdUnderTest();
-        this.invisibleEntry=!SYS_CONFIG.getResultVisibility();
+        this.invisibleEntry = !SYS_CONFIG.getResultVisibility();
     }
 
     public SuiteResult(ResultSet rs) throws SQLException {
-        this.suiteResultId = rs.getString("SUITE_RESULT_ID");
-        this.suiteName = rs.getString("SUITE_NAME");
-        this.jobName = rs.getString("JOB_NAME");
-        this.jobBuildNumber = rs.getInt("JOB_BUILD_NUMBER");
-        this.jobBuildUrl = rs.getString("JOB_BUILD_URL");
-        this.executionResult = rs.getString("EXECUTION_RESULT");
-        this.startTime = rs.getLong("START_TIME");
-        this.stopTime = rs.getLong("STOP_TIME");
-        this.numberOfTests = rs.getInt("NUMBER_OF_TESTS");
-        this.numberOfFailure = rs.getInt("NUMBER_OF_FAILURE");
-        this.invisibleEntry = rs.getBoolean("INVISIBLE_ENTRY");
-        this.productUnderTest = rs.getNString("PRODUCT_UNDER_TEST");
+        this.suiteResultId = rs.getString(SUITE_RESULT_ID);
+        this.suiteName = rs.getString(SUITE_NAME);
+        this.projectName = rs.getNString(PROJECT_NAME);
+        this.jobName = rs.getString(JOB_NAME);
+        this.jobBuildNumber = rs.getInt(JOB_BUILD_NUMBER);
+        this.jobBuildUrl = rs.getString(JOB_BUILD_URL);
+        this.executionResult = rs.getString(EXECUTION_RESULT);
+        this.startTime = rs.getLong(START_TIME);
+        this.stopTime = rs.getLong(STOP_TIME);
+        this.numberOfTests = rs.getInt(NUMBER_OF_TESTS);
+        this.numberOfFailure = rs.getInt(NUMBER_OF_FAILURE);
+        this.invisibleEntry = rs.getBoolean(INVISIBLE_ENTRY);
+        this.productUnderTest = rs.getNString(PRODUCT_UNDER_TEST);
     }
 
     public void update(ResultSet rs) throws SQLException {
-        rs.updateString("SUITE_RESULT_ID", this.getSuiteResultId());
-        rs.updateString("SUITE_NAME", this.getSuiteName());
-        rs.updateString("JOB_NAME", this.getJobName());
-        rs.updateInt("JOB_BUILD_NUMBER", this.getJobBuildNumber());
-        rs.updateString("JOB_BUILD_URL", this.getJobBuildUrl());
-        rs.updateLong("START_TIME", this.getStartTime());
-        rs.updateLong("STOP_TIME", this.getStartTime());
-        rs.updateString("EXECUTION_RESULT", this.getExecutionResult());
-        rs.updateInt("NUMBER_OF_TESTS", this.getNumberOfTests());
-        rs.updateInt("NUMBER_OF_FAILURE", this.getNumberOfFailure());
-        rs.updateBoolean("INVISIBLE_ENTRY", this.getInvisibleEntry());
-        rs.updateNString("PRODUCT_UNDER_TEST", this.getProductUnderTest());
+        rs.updateString(SUITE_RESULT_ID, this.getSuiteResultId());
+        rs.updateString(SUITE_NAME, this.getSuiteName());
+        rs.updateString(PROJECT_NAME, this.getProjectName());
+        rs.updateString(JOB_NAME, this.getJobName());
+        rs.updateInt(JOB_BUILD_NUMBER, this.getJobBuildNumber());
+        rs.updateString(JOB_BUILD_URL, this.getJobBuildUrl());
+        rs.updateLong(START_TIME, this.getStartTime());
+        rs.updateLong(STOP_TIME, this.getStartTime());
+        rs.updateString(EXECUTION_RESULT, this.getExecutionResult());
+        rs.updateInt(NUMBER_OF_TESTS, this.getNumberOfTests());
+        rs.updateInt(NUMBER_OF_FAILURE, this.getNumberOfFailure());
+        rs.updateBoolean(INVISIBLE_ENTRY, this.getInvisibleEntry());
+        rs.updateNString(PRODUCT_UNDER_TEST, this.getProductUnderTest());
     }
 
     public SuiteResult(String suiteResultId) {
@@ -298,5 +306,13 @@ public class SuiteResult implements Serializable {
     @Override
     public String toString() {
         return "com.tascape.qa.th.db1.SuiteResult[ suiteResultId=" + suiteResultId + " ]";
+    }
+
+    public String getProjectName() {
+        return projectName;
+    }
+
+    public void setProjectName(String projectName) {
+        this.projectName = projectName;
     }
 }

@@ -80,6 +80,7 @@ public final class H2Handler extends DbHandler {
         final String sql = "INSERT INTO " + SuiteResult.TABLE_NAME + " ("
             + SuiteResult.SUITE_RESULT_ID + ", "
             + SuiteResult.SUITE_NAME + ", "
+            + SuiteResult.PROJECT_NAME + ", "
             + SuiteResult.JOB_NAME + ", "
             + SuiteResult.JOB_BUILD_NUMBER + ", "
             + SuiteResult.JOB_BUILD_URL + ", "
@@ -89,22 +90,23 @@ public final class H2Handler extends DbHandler {
             + SuiteResult.NUMBER_OF_TESTS + ", "
             + SuiteResult.NUMBER_OF_FAILURE + ", "
             + SuiteResult.PRODUCT_UNDER_TEST
-            + ") VALUES (?,?,?,?,?,?,?,?,?,?,?);";
+            + ") VALUES (?,?,?,?,?,?,?,?,?,?,?,?);";
 
         try (Connection conn = this.getConnection()) {
             PreparedStatement stmt = conn.prepareStatement(sql);
             Long time = System.currentTimeMillis();
             stmt.setString(1, execId);
             stmt.setString(2, suite.getName());
-            stmt.setString(3, SYS_CONFIG.getJobName());
-            stmt.setInt(4, SYS_CONFIG.getJobBuildNumber());
-            stmt.setString(5, SYS_CONFIG.getJobBuildUrl());
-            stmt.setLong(6, time);
-            stmt.setLong(7, time + 11);
-            stmt.setString(8, ExecutionResult.QUEUED.getName());
-            stmt.setInt(9, suite.getTests().size());
+            stmt.setString(3, suite.getProjectName());
+            stmt.setString(4, SYS_CONFIG.getJobName());
+            stmt.setInt(5, SYS_CONFIG.getJobBuildNumber());
+            stmt.setString(6, SYS_CONFIG.getJobBuildUrl());
+            stmt.setLong(7, time);
+            stmt.setLong(8, time + 11);
+            stmt.setString(9, ExecutionResult.QUEUED.getName());
             stmt.setInt(10, suite.getTests().size());
-            stmt.setString(11, SYS_CONFIG.getProdUnderTest());
+            stmt.setInt(11, suite.getTests().size());
+            stmt.setString(12, SYS_CONFIG.getProdUnderTest());
             LOG.debug("{}", stmt);
             int i = stmt.executeUpdate();
             return i == 1;

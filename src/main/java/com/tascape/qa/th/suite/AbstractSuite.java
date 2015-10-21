@@ -140,6 +140,10 @@ public abstract class AbstractSuite {
         return this.getClass().getName();
     }
 
+    public String getProjectName() {
+        return "na";
+    }
+
     public abstract void setUpTestClasses();
 
     protected abstract void setUpEnvironment() throws Exception;

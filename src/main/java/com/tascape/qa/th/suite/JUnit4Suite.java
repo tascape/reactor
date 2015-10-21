@@ -37,6 +37,11 @@ public class JUnit4Suite extends AbstractSuite {
     }
 
     @Override
+    public String getProjectName() {
+        return "JUnit4";
+    }
+
+    @Override
     public String getProductUnderTest() {
         return "JUnit4 Sample 1.1";
     }
