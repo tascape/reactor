@@ -54,7 +54,6 @@ CREATE TABLE `suite_result` (
   `NUMBER_OF_FAILURE` int(11) DEFAULT NULL,
   `INVISIBLE_ENTRY` tinyint(4) DEFAULT '0',
   `PRODUCT_UNDER_TEST` varchar(255) COLLATE utf8_bin DEFAULT NULL,
-  `PROJECT_NAME` varchar(255) COLLATE utf8_bin DEFAULT NULL,
   PRIMARY KEY (`SUITE_RESULT_ID`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
 /*!40101 SET character_set_client = @saved_cs_client */;
