@@ -26,4 +26,12 @@ public class EntityDriverException extends Exception {
     public EntityDriverException(String message) {
         super(message);
     }
+
+    public EntityDriverException(Throwable t) {
+        super(t);
+    }
+
+    public EntityDriverException(String message, Throwable t) {
+        super(message, t);
+    }
 }
