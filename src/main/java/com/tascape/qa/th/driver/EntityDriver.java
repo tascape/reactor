@@ -37,7 +37,9 @@ public abstract class EntityDriver extends AbstractTestResource {
     @Override
     public Path getLogPath() {
         if (this.test == null) {
-            return sysConfig.getLogPath().resolve(Utils.getUniqueId("driver-"));
+            Path p = sysConfig.getLogPath().resolve(Utils.getUniqueId("driver-"));
+            p.toFile().mkdirs();
+            return p;
         }
         return this.test.getLogPath();
     }
