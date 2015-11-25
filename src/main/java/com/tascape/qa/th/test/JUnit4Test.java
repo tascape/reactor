@@ -73,6 +73,12 @@ public class JUnit4Test extends AbstractTest {
     }
 
     @Test
+    public void testFailure() throws Exception {
+        LOG.info("Sample failure test");
+        Assert.fail("test failed");
+    }
+
+    @Test
     public void testExternalId() throws Exception {
         LOG.info("Sample external id test, set to aaa");
         this.setExternalId("aaa");

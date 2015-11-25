@@ -6,7 +6,7 @@
 
     <groupId>com.tascape.qa</groupId>
     <artifactId>testharness</artifactId>
-    <version>1.0.39</version>
+    <version>1.0.40</version>
     <packaging>jar</packaging>
     <name>testharness</name>
 

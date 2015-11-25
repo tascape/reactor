@@ -130,7 +130,7 @@ public class TestRunListener extends RunListener {
     @Override
     public void testFailure(Failure failure) throws Exception {
         this.throwable = failure.getException();
-        LOG.error("{}", failure.getDescription().getDisplayName(), this.throwable);
+        LOG.error("{} {}", failure.getDescription().getDisplayName(), this.throwable.getMessage());
 
         if (this.db == null || this.tcr == null) {
             return;
