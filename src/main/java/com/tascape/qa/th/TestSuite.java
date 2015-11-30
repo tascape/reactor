@@ -1,5 +1,5 @@
 /*
- * Copyright 2015.
+ * Copyright 2015 tascape.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -44,6 +44,8 @@ public class TestSuite {
     private String name;
 
     private final String projectName;
+    
+    private final int numberOfEnvs;
 
     private List<TestCase> tests = new ArrayList<>();
 
@@ -53,6 +55,7 @@ public class TestSuite {
         AbstractSuite suite = AbstractSuite.class.cast(Class.forName(suiteClass).newInstance());
         this.name = suite.getName();
         this.projectName = suite.getProjectName();
+        this.numberOfEnvs = suite.getNumberOfEnvs();
         if (this.name == null || this.name.isEmpty()) {
             this.name = suiteClass;
         }
@@ -89,6 +92,10 @@ public class TestSuite {
 
     public String getProjectName() {
         return projectName;
+    }
+
+    public int getNumberOfEnvs() {
+        return numberOfEnvs;
     }
 
     private List<TestCase> filter(Pattern testClassRegex, Pattern testMethodRegex) {

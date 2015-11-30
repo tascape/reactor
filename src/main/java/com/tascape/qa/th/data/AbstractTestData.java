@@ -1,5 +1,5 @@
 /*
- * Copyright 2015.
+ * Copyright 2015 tascape.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -38,9 +38,9 @@ public abstract class AbstractTestData implements TestData {
         return TEST_DATA.get();
     }
 
-    private static final Map<String, TestData[]> loadedData = new HashMap<>();
+    private static final Map<String, TestData[]> LOADED_DATA = new HashMap<>();
 
-    private static final Map<Class<? extends TestData>, Object> loadedProviders = new HashMap<>();
+    private static final Map<Class<? extends TestData>, Object> LOADED_PROVIDERS = new HashMap<>();
 
     private String value = null;
 
@@ -92,12 +92,12 @@ public abstract class AbstractTestData implements TestData {
     public static synchronized TestData[] getTestData(Class<? extends TestData> klass, String method, String parameter)
         throws Exception {
         String key = klass + "." + method + "." + parameter;
-        TestData[] data = AbstractTestData.loadedData.get(key);
+        TestData[] data = AbstractTestData.LOADED_DATA.get(key);
         if (data == null) {
-            Object provider = AbstractTestData.loadedProviders.get(klass);
+            Object provider = AbstractTestData.LOADED_PROVIDERS.get(klass);
             if (provider == null) {
                 provider = klass.newInstance();
-                AbstractTestData.loadedProviders.put(klass, provider);
+                AbstractTestData.LOADED_PROVIDERS.put(klass, provider);
             }
 
             if (parameter == null || parameter.isEmpty()) {
@@ -107,7 +107,7 @@ public abstract class AbstractTestData implements TestData {
                 Method m = klass.getDeclaredMethod(method, new Class<?>[]{parameter.getClass()});
                 data = (TestData[]) m.invoke(provider, new Object[]{parameter});
             }
-            AbstractTestData.loadedData.put(key, data);
+            AbstractTestData.LOADED_DATA.put(key, data);
         }
         return data;
     }

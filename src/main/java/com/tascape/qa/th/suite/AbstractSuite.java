@@ -1,5 +1,5 @@
 /*
- * Copyright 2015.
+ * Copyright 2015 tascape.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -73,6 +73,10 @@ public abstract class AbstractSuite {
     }
 
     protected ExecutionResult executionResult;
+    
+    public int getNumberOfEnvs() {
+        return 0;
+    }
 
     public void setUp() throws Exception {
         Map<String, EntityDriver> env = AbstractSuite.getEnvionment(this.getClass().getName());

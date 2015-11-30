@@ -1,5 +1,5 @@
 /*
- * Copyright 2015.
+ * Copyright 2015 tascape.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -162,7 +162,20 @@ public class SuiteRunner {
     }
 
     private ExecutorService getExecutorService() {
-        int threadCount = SYS_CONFIG.getExecutionThreadCount();
+        int tc = SYS_CONFIG.getExecutionThreadCount();
+        int env = ts.getNumberOfEnvs();
+        int threadCount = 0;
+        if (tc == 0) {
+            if (env == 0) {
+                threadCount = 1;
+            } else {
+                threadCount = env;
+            }
+        } else if (env == 0) {
+            threadCount = tc;
+        } else {
+            threadCount = Math.min(tc, env);
+        }
         LOG.info("Start execution engine with {} thread(s)", threadCount);
         int len = (threadCount + "").length();
         ThreadFactory namedThreadFactory = new ThreadFactoryBuilder().setNameFormat("th%0" + len + "d").build();

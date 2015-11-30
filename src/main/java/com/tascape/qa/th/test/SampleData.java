@@ -1,5 +1,5 @@
 /*
- * Copyright 2015 v830325.
+ * Copyright 2015 tascape.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -30,16 +30,28 @@ public class SampleData extends AbstractTestData {
             {
                 testParameter = "scenario one";
             }
+
+            public String getValue() {
+                return "scenario one";
+            }
         },
         new SampleData() {
             {
                 testParameter = "scenario two";
+            }
+
+            public String getValue() {
+                return "scenario two";
             }
         },
         new SampleData() {
             {
                 testParameter = "scenario three";
                 setValue(testParameter);
+            }
+
+            public String getValue() {
+                return "scenario three";
             }
         }};
 

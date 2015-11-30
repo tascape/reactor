@@ -1,5 +1,5 @@
 /*
- * Copyright 2015.
+ * Copyright 2015 tascape.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -184,7 +184,7 @@ public final class SystemConfiguration {
     }
 
     public int getExecutionThreadCount() {
-        return this.getIntProperty(SYSPROP_EXECUTION_THREAD_COUNT, 1);
+        return this.getIntProperty(SYSPROP_EXECUTION_THREAD_COUNT, 0);
     }
 
     public int getTestLoadLimit() {
