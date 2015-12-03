@@ -57,7 +57,10 @@ public abstract class EntityCommunication extends AbstractTestResource {
     @Override
     public Path getLogPath() {
         if (this.test == null) {
-            return sysConfig.getLogPath().resolve(Utils.getUniqueId("comm-"));
+            Path p = sysConfig.getLogPath().resolve(sysConfig.getExecId())
+                .resolve(getClass().getSimpleName() + hashCode());
+            p.toFile().mkdirs();
+            return p;
         }
         return this.test.getLogPath();
     }

@@ -16,7 +16,6 @@
 package com.tascape.qa.th.driver;
 
 import com.tascape.qa.th.AbstractTestResource;
-import com.tascape.qa.th.Utils;
 import com.tascape.qa.th.comm.EntityCommunication;
 import com.tascape.qa.th.test.AbstractTest;
 import java.nio.file.Path;
@@ -37,7 +36,8 @@ public abstract class EntityDriver extends AbstractTestResource {
     @Override
     public Path getLogPath() {
         if (this.test == null) {
-            Path p = sysConfig.getLogPath().resolve(Utils.getUniqueId("driver-"));
+            Path p = sysConfig.getLogPath().resolve(sysConfig.getExecId())
+                .resolve(getClass().getSimpleName() + hashCode());
             p.toFile().mkdirs();
             return p;
         }
