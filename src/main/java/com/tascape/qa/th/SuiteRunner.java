@@ -163,19 +163,16 @@ public class SuiteRunner {
 
     private ExecutorService getExecutorService() {
         int tc = SYS_CONFIG.getExecutionThreadCount();
-        int env = ts.getNumberOfEnvs();
-        int threadCount = 0;
-        if (tc == 0) {
-            if (env == 0) {
-                threadCount = 1;
-            } else {
-                threadCount = env;
-            }
-        } else if (env == 0) {
-            threadCount = tc;
-        } else {
-            threadCount = Math.min(tc, env);
+        LOG.debug("nuber of thread(s) {}", tc);
+        if (tc < 0) {
+            throw new RuntimeException("Invalid execution thread number");
         }
+        int env = ts.getNumberOfEnvs();
+        LOG.debug("nuber of environment(s) {}", env);
+        if (env < 0) {
+            throw new RuntimeException("Invalid execution environment number");
+        }
+        int threadCount = (tc == 0) ? (env == 0 ? 1 : env) : (env == 0 ? tc : Math.min(tc, env));
         LOG.info("Start execution engine with {} thread(s)", threadCount);
         int len = (threadCount + "").length();
         ThreadFactory namedThreadFactory = new ThreadFactoryBuilder().setNameFormat("th%0" + len + "d").build();
