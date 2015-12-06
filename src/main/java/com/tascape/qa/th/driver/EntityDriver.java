@@ -71,5 +71,7 @@ public abstract class EntityDriver extends AbstractTestResource {
      */
     public abstract String getName();
 
+    public abstract String getVersion();
+
     public abstract void reset() throws Exception;
 }
