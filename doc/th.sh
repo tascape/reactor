@@ -18,6 +18,8 @@ if (type vagrant) && (type virtualbox) then
     echo "qa.th.db.type=mysql" >> $PROP
     echo "qa.th.db.host=localhost:13306" >> $PROP
     echo "qa.th.log.path=$HOME/qa/th/logs" >> $PROP
+    echo "qa.th.JOB_NAME=local-run" >> $PROP
+    echo "qa.th.test.station=localhost" >> $PROP
     cat $PROP
 
     echo "check report at http://localhost:18088/thr/suites_result.xhtml"
