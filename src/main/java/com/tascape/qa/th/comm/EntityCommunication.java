@@ -1,5 +1,5 @@
 /*
- * Copyright 2015.
+ * Copyright 2015 tascape.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,7 +16,6 @@
 package com.tascape.qa.th.comm;
 
 import com.tascape.qa.th.AbstractTestResource;
-import com.tascape.qa.th.Utils;
 import com.tascape.qa.th.driver.EntityDriver;
 import com.tascape.qa.th.test.AbstractTest;
 import java.nio.file.Path;

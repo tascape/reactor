@@ -77,10 +77,10 @@ public class SuiteRunner {
         if (!dir.exists() && !dir.mkdirs()) {
             throw new IOException("Cannot create directory " + dir);
         }
-        this.saveExectionProperties(dir);
         ExecutorService executorService = this.getExecutorService();
         CompletionService<TestResult> completionService = new ExecutorCompletionService<>(executorService);
 
+        this.saveExectionProperties(dir);
         LOG.info("Start to acquire test cases to execute");
         int loadLimit = SYS_CONFIG.getTestLoadLimit();
         LOG.info("Load queued test cases {} per round", loadLimit);
@@ -174,6 +174,7 @@ public class SuiteRunner {
         }
         int threadCount = (tc == 0) ? (env == 0 ? 1 : env) : (env == 0 ? tc : Math.min(tc, env));
         LOG.info("Start execution engine with {} thread(s)", threadCount);
+        SYS_CONFIG.setExecutionThreadCount(threadCount);
         int len = (threadCount + "").length();
         ThreadFactory namedThreadFactory = new ThreadFactoryBuilder().setNameFormat("th%0" + len + "d").build();
         ExecutorService executorService = Executors.newFixedThreadPool(threadCount, namedThreadFactory);

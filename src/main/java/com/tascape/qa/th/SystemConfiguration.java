@@ -187,6 +187,10 @@ public final class SystemConfiguration {
         return this.getIntProperty(SYSPROP_EXECUTION_THREAD_COUNT, 0);
     }
 
+    public void setExecutionThreadCount(int count) {
+        this.getProperties().setProperty(SYSPROP_EXECUTION_THREAD_COUNT, count + "");
+    }
+
     public int getTestLoadLimit() {
         return this.getIntProperty(SYSPROP_TEST_LOAD_LIMIT, 100);
     }
