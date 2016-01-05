@@ -91,12 +91,14 @@ public abstract class AbstractTestRunner {
             for (String line : lines) {
                 String newline = line.replaceAll(">", "&gt;");
                 newline = newline.replaceAll("<", "&lt;");
-                if (newline.contains(" WARN  ")) {
-                    newline = "<b>" + newline + "</b> ";
+                if (newline.contains(" INFO  ")) {
+                    newline = "<b>" + newline + "</b>";
+                } else if (newline.contains(" WARN  ")) {
+                    newline = "<font color='9F6000'><b>" + newline + "</b></font>";
                 } else if (newline.contains(" ERROR ")
                     || newline.contains("Failure in test")
                     || newline.contains("AssertionError")) {
-                    newline = "<font color='red'><b>" + newline + "</b></font> ";
+                    newline = "<font color='red'><b>" + newline + "</b></font>";
                 } else {
                     Matcher m = http.matcher(line);
                     if (m.find()) {
