@@ -163,12 +163,12 @@ public class SuiteRunner {
 
     private ExecutorService getExecutorService() {
         int tc = SYS_CONFIG.getExecutionThreadCount();
-        LOG.debug("nuber of thread(s) {}", tc);
+        LOG.debug("number of thread(s) {}", tc);
         if (tc < 0) {
             throw new RuntimeException("Invalid execution thread number");
         }
         int env = ts.getNumberOfEnvs();
-        LOG.debug("nuber of environment(s) {}", env);
+        LOG.debug("number of environment(s) {}", env);
         if (env < 0) {
             throw new RuntimeException("Invalid execution environment number");
         }
