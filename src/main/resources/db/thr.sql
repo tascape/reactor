@@ -43,7 +43,7 @@ DROP TABLE IF EXISTS `suite_result`;
 CREATE TABLE `suite_result` (
   `SUITE_RESULT_ID` varchar(63) COLLATE utf8_bin NOT NULL,
   `SUITE_NAME` varchar(255) COLLATE utf8_bin DEFAULT NULL,
-  `PROJECT_NAME` varchar(255) COLLATE utf8_bin DEFAULT NULL,
+  `PROJECT_NAME` varchar(255) COLLATE utf8_bin DEFAULT '',
   `JOB_NAME` varchar(255) COLLATE utf8_bin DEFAULT NULL,
   `JOB_BUILD_NUMBER` int(11) DEFAULT NULL,
   `JOB_BUILD_URL` varchar(255) COLLATE utf8_bin DEFAULT NULL,
