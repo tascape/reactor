@@ -145,7 +145,7 @@ public abstract class AbstractSuite {
     }
 
     public String getProjectName() {
-        return "na";
+        return "";
     }
 
     public abstract void setUpTestClasses();
