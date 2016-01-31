@@ -63,7 +63,7 @@ public class TestRunnerJUnit4 extends AbstractTestRunner implements Callable<Tes
             this.db.updateTestExecutionResult(this.tcr);
             throw ex;
         } finally {
-            Utils.removeLog4jAppender(logFile.toFile().getAbsolutePath());
+            removeLog4jAppender(logFile.toFile().getAbsolutePath());
             this.generateHtml(logFile);
         }
         return this.tcr;
@@ -116,7 +116,7 @@ public class TestRunnerJUnit4 extends AbstractTestRunner implements Callable<Tes
 
         LOG.info("Creating log file");
         Path logFile = testLogPath.resolve("test.log");
-        Utils.addLog4jFileAppender(logFile.toFile().getAbsolutePath());
+        addLog4jFileAppender(logFile.toFile().getAbsolutePath());
         return logFile;
     }
 }

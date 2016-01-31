@@ -105,49 +105,6 @@ public class Utils {
         return formatter.format(new Date());
     }
 
-    public static String addLog4jFileAppender(String file) throws IOException {
-        org.apache.log4j.Logger rootLogger = org.apache.log4j.Logger.getRootLogger();
-
-        String pattern = "%d{HH:mm:ss.SSS} %-5p %t %C{1}.%M:%L - %m%n";
-        final String threadName = Thread.currentThread().getName();
-
-        class ThreadFilter extends Filter {
-            @Override
-            public int decide(LoggingEvent event) {
-                if (event.getThreadName().startsWith(threadName)) {
-                    return Filter.ACCEPT;
-                }
-                return Filter.DENY;
-            }
-        }
-
-        FileAppender fa = new FileAppender(new PatternLayout(pattern), file);
-        fa.addFilter(new ThreadFilter());
-        fa.setThreshold(Level.DEBUG);
-
-        fa.setImmediateFlush(true);
-        fa.setAppend(true);
-        fa.setName(file);
-
-        fa.activateOptions();
-        rootLogger.addAppender(fa);
-
-        return file;
-    }
-
-    public static void removeLog4jAppender(String appenderName) {
-        if (appenderName == null) {
-            LOG.warn("Appender name is null");
-            return;
-        }
-        org.apache.log4j.Logger rootLogger = org.apache.log4j.Logger.getRootLogger();
-        Appender appender = rootLogger.getAppender(appenderName);
-        if (appender != null) {
-            appender.close();
-            rootLogger.removeAppender(appender);
-        }
-    }
-
     /**
      * Executes command, and waits for the expected phrase in console printout.
      *

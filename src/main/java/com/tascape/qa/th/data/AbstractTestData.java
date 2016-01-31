@@ -28,6 +28,7 @@ import org.slf4j.LoggerFactory;
  */
 public abstract class AbstractTestData implements TestData {
     private static final Logger LOG = LoggerFactory.getLogger(AbstractTestData.class);
+
     private static final ThreadLocal<TestData> TEST_DATA = new ThreadLocal<>();
 
     public static void setTestData(TestData data) {

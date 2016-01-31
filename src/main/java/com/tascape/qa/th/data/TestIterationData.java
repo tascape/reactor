@@ -25,8 +25,8 @@ import org.slf4j.LoggerFactory;
  */
 public class TestIterationData extends AbstractTestData {
     private static final Logger LOG = LoggerFactory.getLogger(TestIterationData.class);
-
-    private static final SystemConfiguration config = SystemConfiguration.getInstance();
+    
+    public static final String USE_ITERATIONS = "useIterations";
 
     private int iteration = 1;
 
@@ -41,7 +41,7 @@ public class TestIterationData extends AbstractTestData {
     }
 
     public TestIterationData[] getData(String sysPropIterations) {
-        String n = config.getProperty(sysPropIterations);
+        String n = SystemConfiguration.getInstance().getProperty(sysPropIterations);
         return useIterations(n);
     }
 
@@ -60,7 +60,7 @@ public class TestIterationData extends AbstractTestData {
     }
 
     public TestIterationData[] useSystemProperty(String sysPropIterations) {
-        String n = config.getProperty(sysPropIterations);
+        String n = SystemConfiguration.getInstance().getProperty(sysPropIterations);
         return useIterations(n);
     }
 
