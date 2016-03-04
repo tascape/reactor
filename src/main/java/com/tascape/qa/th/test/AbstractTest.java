@@ -101,27 +101,6 @@ public abstract class AbstractTest extends AbstractTestResource {
         return testLogPath;
     }
 
-    @Deprecated
-    protected <D extends EntityDriver> D getEntityDriver(TestDriver testDriver, Class<D> clazz) {
-        String key = testDriver.toString();
-        LOG.debug("Getting runtime driver (name={}, type={}) from suite test environment", key, clazz.getName());
-
-        String suiteClass = this.tcr.getTestCase().getSuiteClass();
-        if (suiteClass.isEmpty()) {
-            return null;
-        }
-
-        Map<String, EntityDriver> env = AbstractSuite.getEnvionment(suiteClass);
-        EntityDriver driver = env.get(key);
-        if (driver == null) {
-            LOG.error("Cannot find driver of name={} and type={}, please check suite test environemnt",
-                key, clazz.getName());
-            return null;
-        }
-        driver.setTest(this);
-        return clazz.cast(driver);
-    }
-
     protected <D extends EntityDriver> D getEntityDriver(TestDriver testDriver) {
         String key = testDriver.toString();
         Class<? extends EntityDriver> clazz = testDriver.getDriverClass();
