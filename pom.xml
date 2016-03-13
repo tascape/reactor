@@ -125,7 +125,7 @@
             <url>https://oss.sonatype.org/service/local/staging/deploy/maven2/</url>
         </repository>
     </distributionManagement>
-    
+
     <profiles>
         <profile>
             <id>release-sign-artifacts</id>
@@ -192,4 +192,5 @@
             </build>
         </profile>
     </profiles>
+
 </project>
