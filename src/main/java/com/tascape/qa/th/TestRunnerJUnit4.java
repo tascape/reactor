@@ -20,11 +20,10 @@ import com.tascape.qa.th.data.TestData;
 import com.tascape.qa.th.db.DbHandler;
 import com.tascape.qa.th.db.TestCase;
 import com.tascape.qa.th.db.TestResult;
-import com.tascape.qa.th.driver.EntityDriver;
 import com.tascape.qa.th.suite.AbstractSuite;
+import com.tascape.qa.th.suite.Environment;
 import java.io.IOException;
 import java.nio.file.Path;
-import java.util.Map;
 import java.util.concurrent.Callable;
 import org.junit.runner.JUnitCore;
 import org.junit.runner.Request;
@@ -92,7 +91,7 @@ public class TestRunnerJUnit4 extends AbstractTestRunner implements Callable<Tes
         if (suiteClass == null || suiteClass.isEmpty()) {
             return;
         }
-        Map<String, ? extends EntityDriver> env = AbstractSuite.getEnvionment(suiteClass);
+        Environment env = AbstractSuite.getEnvionment(suiteClass);
         if (env == null) {
             AbstractSuite abstractSuite = AbstractSuite.class.cast(Class.forName(suiteClass).newInstance());
             abstractSuite.setUp();

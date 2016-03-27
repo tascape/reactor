@@ -39,28 +39,28 @@ import org.slf4j.LoggerFactory;
 public abstract class AbstractSuite {
     private static final Logger LOG = LoggerFactory.getLogger(AbstractSuite.class);
 
-    private static final ThreadLocal<Map<String, Map<String, EntityDriver>>> ENVIRONMENTS
-        = new ThreadLocal<Map<String, Map<String, EntityDriver>>>() {
-            @Override
-            protected Map<String, Map<String, EntityDriver>> initialValue() {
-                return new HashMap<>();
-            }
-        };
+    private static final ThreadLocal<Map<String, Environment>> ENVIRONMENTS
+        = new ThreadLocal<Map<String, Environment>>() {
+        @Override
+        protected Map<String, Environment> initialValue() {
+            return new HashMap<>();
+        }
+    };
 
-    public static void putEnvionment(String suiteClass, Map<String, EntityDriver> drivers) {
-        ENVIRONMENTS.get().put(suiteClass, drivers);
+    public static void putEnvionment(String suiteClass, Environment env) {
+        ENVIRONMENTS.get().put(suiteClass, env);
     }
 
-    public static Map<String, EntityDriver> getEnvionment(String suiteClass) {
-        Map<String, EntityDriver> drivers = ENVIRONMENTS.get().get(suiteClass);
-        return drivers;
+    public static Environment getEnvionment(String suiteClass) {
+        Environment env = ENVIRONMENTS.get().get(suiteClass);
+        return env;
     }
 
     private static final List<AbstractSuite> SUITES = new ArrayList<>();
 
     private final List<Class<? extends AbstractTest>> testClasses = new ArrayList<>();
 
-    private final Map<String, EntityDriver> suiteEnvironment = new HashMap<>();
+    private final Environment suiteEnvironment = new Environment();
 
     protected final SystemConfiguration SYSCONFIG = SystemConfiguration.getInstance();
 
@@ -73,13 +73,13 @@ public abstract class AbstractSuite {
     }
 
     protected ExecutionResult executionResult;
-    
+
     public int getNumberOfEnvs() {
         return 0;
     }
 
     public void setUp() throws Exception {
-        Map<String, EntityDriver> env = AbstractSuite.getEnvionment(this.getClass().getName());
+        Environment env = AbstractSuite.getEnvionment(this.getClass().getName());
         if (env == null || env.isEmpty()) {
             this.setUpEnvironment();
             AbstractSuite.putEnvionment(this.getClass().getName(), this.suiteEnvironment);

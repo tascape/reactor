@@ -26,10 +26,10 @@ import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import com.tascape.qa.th.AbstractTestResource;
 import com.tascape.qa.th.db.TestResultMetric;
 import com.tascape.qa.th.driver.TestDriver;
+import com.tascape.qa.th.suite.Environment;
 import java.nio.file.Path;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
@@ -114,7 +114,7 @@ public abstract class AbstractTest extends AbstractTestResource {
             return null;
         }
 
-        Map<String, EntityDriver> env = AbstractSuite.getEnvionment(suiteClass);
+        Environment env = AbstractSuite.getEnvionment(suiteClass);
         EntityDriver driver = env.get(key);
         if (driver == null) {
             LOG.error("Cannot find driver of name={} and type={}, please check suite test environemnt",
