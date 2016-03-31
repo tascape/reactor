@@ -224,6 +224,7 @@ public abstract class DbHandler {
                 tcr.setTestCase(tc);
 
                 tcr.setTestStation(rs.getString(TestResult.TEST_STATION));
+                tcr.setTestEnv(rs.getString(TestResult.TEST_ENV));
                 tcr.setLogDir(rs.getString(TestResult.LOG_DIR));
                 tcr.setExternalId(rs.getString(TestResult.EXTERNAL_ID));
                 tcrs.add(tcr);
@@ -236,7 +237,7 @@ public abstract class DbHandler {
     }
 
     public boolean acquireTestCaseResult(TestResult tcr) throws SQLException {
-        LOG.info("Acquire test case {}", tcr.getTestCase().format());
+        LOG.info("Try to acquire test case {}", tcr.getTestCase().format());
         final String sql = "SELECT * FROM " + TestResult.TABLE_NAME + " WHERE "
             + TestResult.TEST_RESULT_ID + " = ? LIMIT 1;";
 
@@ -286,6 +287,7 @@ public abstract class DbHandler {
                 rs.updateLong(TestResult.STOP_TIME, tcr.getStopTime());
                 rs.updateInt(TestResult.RETRY, tcr.getRetry());
                 rs.updateString(TestResult.TEST_STATION, tcr.getTestStation());
+                rs.updateString(TestResult.TEST_ENV, tcr.getTestEnv());
                 rs.updateString(TestResult.LOG_DIR, tcr.getLogDir());
                 rs.updateString(TestResult.EXTERNAL_ID, tcr.getExternalId());
                 rs.updateRow();

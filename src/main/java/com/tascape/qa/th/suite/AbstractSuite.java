@@ -80,7 +80,8 @@ public abstract class AbstractSuite {
 
     public void setUp() throws Exception {
         Environment env = AbstractSuite.getEnvionment(this.getClass().getName());
-        if (env == null || env.isEmpty()) {
+        env.setName(Thread.currentThread().getName());
+        if (env.isEmpty()) {
             this.setUpEnvironment();
             AbstractSuite.putEnvionment(this.getClass().getName(), this.suiteEnvironment);
         }

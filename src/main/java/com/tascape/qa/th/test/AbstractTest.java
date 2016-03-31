@@ -80,6 +80,10 @@ public abstract class AbstractTest extends AbstractTestResource {
 
     private final List<TestResultMetric> resultMetrics = new LinkedList<>();
 
+    private final Environment env;
+
+    private final String suiteClass;
+
     private String externalId = "";
 
     public abstract String getApplicationUnderTest();
@@ -92,6 +96,9 @@ public abstract class AbstractTest extends AbstractTestResource {
         builder.setDaemon(true);
         builder.setNameFormat(Thread.currentThread().getName() + "-%d");
         this.backgroundExecutorService = Executors.newCachedThreadPool(builder.build());
+
+        suiteClass = this.tcr.getTestCase().getSuiteClass();
+        env = AbstractSuite.getEnvionment(suiteClass);
 
         AbstractTest.setTest(this); // TODO: move this to somewhere else
     }
@@ -109,12 +116,10 @@ public abstract class AbstractTest extends AbstractTestResource {
         }
         LOG.debug("Getting runtime driver (name={}, type={}) from suite test environment", key, clazz.getName());
 
-        String suiteClass = this.tcr.getTestCase().getSuiteClass();
         if (suiteClass.isEmpty()) {
             return null;
         }
 
-        Environment env = AbstractSuite.getEnvionment(suiteClass);
         EntityDriver driver = env.get(key);
         if (driver == null) {
             LOG.error("Cannot find driver of name={} and type={}, please check suite test environemnt",

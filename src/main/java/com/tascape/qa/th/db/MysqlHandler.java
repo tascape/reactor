@@ -199,6 +199,7 @@ public class MysqlHandler extends DbHandler {
                     rs.updateLong(TestResult.START_TIME, System.currentTimeMillis());
                     rs.updateLong(TestResult.STOP_TIME, System.currentTimeMillis());
                     rs.updateString(TestResult.TEST_STATION, "?");
+                    rs.updateString(TestResult.TEST_ENV, "?");
                     rs.updateString(TestResult.LOG_DIR, "?");
 
                     rs.insertRow();

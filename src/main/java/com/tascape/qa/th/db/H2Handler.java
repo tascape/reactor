@@ -124,8 +124,9 @@ public final class H2Handler extends DbHandler {
             + TestResult.START_TIME + ", "
             + TestResult.STOP_TIME + ", "
             + TestResult.TEST_STATION + ", "
+            + TestResult.TEST_ENV + ", "
             + TestResult.LOG_DIR
-            + ") VALUES (?,?,?,?,?,?,?,?);";
+            + ") VALUES (?,?,?,?,?,?,?,?,?);";
         Map<String, Integer> idMap = this.getTestCaseIds(tests);
 
         try (Connection conn = this.getConnection()) {

@@ -36,8 +36,6 @@ import org.slf4j.LoggerFactory;
 public class TestResult {
     private static final Logger LOG = LoggerFactory.getLogger(TestResult.class);
 
-    private static final long serialVersionUID = 1L;
-
     public static final String TABLE_NAME = "test_result";
 
     public static final String TEST_RESULT_ID = "TEST_RESULT_ID";
@@ -61,6 +59,8 @@ public class TestResult {
     public static final String LOG_DIR = "LOG_DIR";
 
     public static final String EXTERNAL_ID = "EXTERNAL_ID";
+
+    public static final String TEST_ENV = "TEST_ENV";
 
     @Id
     @Basic(optional = false)
@@ -88,6 +88,9 @@ public class TestResult {
 
     @Column(name = "EXTERNAL_ID")
     private String externalId;
+
+    @Column(name = "TEST_ENV")
+    private String testEnv;
 
     @JoinColumn(name = "SUITE_RESULT", referencedColumnName = "SUITE_RESULT_ID")
     @ManyToOne
@@ -187,6 +190,14 @@ public class TestResult {
 
     public void setExternalId(String externalId) {
         this.externalId = externalId;
+    }
+
+    public String getTestEnv() {
+        return testEnv;
+    }
+
+    public void setTestEnv(String testEnv) {
+        this.testEnv = testEnv;
     }
 
     public SuiteResult getSuiteResult() {
