@@ -80,18 +80,18 @@ public abstract class AbstractSuite {
 
     public void setUp() throws Exception {
         Environment env = AbstractSuite.getEnvionment(this.getClass().getName());
-        env.setName(Thread.currentThread().getName());
-        if (env.isEmpty()) {
+        if (env == null || env.isEmpty()) {
             this.setUpEnvironment();
             AbstractSuite.putEnvionment(this.getClass().getName(), this.suiteEnvironment);
+            this.suiteEnvironment.setName(Thread.currentThread().getName() + " " + this.getEnvironmentName());
         }
     }
 
     public void runByClass() throws Exception {
-        for (Class<? extends AbstractTest> clazz : this.testClasses) {
+        this.testClasses.forEach((clazz) -> {
             JUnitCore core = new JUnitCore();
             core.run(Request.classWithoutSuiteMethod(clazz));
-        }
+        });
     }
 
     public void tearDown() throws Exception {
@@ -152,6 +152,10 @@ public abstract class AbstractSuite {
     public abstract void setUpTestClasses();
 
     protected abstract void setUpEnvironment() throws Exception;
+
+    protected String getEnvironmentName() {
+        return "";
+    }
 
     /**
      * Gets the info of product-under-test. This method is called at the end of your test suite, before the suite
