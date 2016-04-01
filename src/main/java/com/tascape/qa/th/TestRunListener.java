@@ -18,8 +18,6 @@ package com.tascape.qa.th;
 import com.tascape.qa.th.db.DbHandler;
 import com.tascape.qa.th.db.TestResult;
 import com.tascape.qa.th.db.TestResultMetric;
-import com.tascape.qa.th.suite.AbstractSuite;
-import com.tascape.qa.th.suite.Environment;
 import com.tascape.qa.th.test.AbstractTest;
 import java.lang.reflect.Field;
 import java.sql.SQLException;
@@ -117,8 +115,7 @@ public class TestRunListener extends RunListener {
                 return;
             }
             this.tcr.setAut(aut);
-            Environment env = AbstractSuite.getEnvionment(tcr.getTestCase().getSuiteClass());
-            this.tcr.setTestEnv(env.getName());
+            this.tcr.setTestEnv(Thread.currentThread().getName());
 
             this.db.updateTestExecutionResult(this.tcr);
         }

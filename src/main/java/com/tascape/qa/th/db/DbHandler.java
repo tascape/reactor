@@ -138,18 +138,22 @@ public abstract class DbHandler {
         if (properties.isEmpty()) {
             return;
         }
+        for (SuiteProperty prop : properties) {
+            this.addSuiteExecutionProperty(prop);
+        }
+    }
+
+    public void addSuiteExecutionProperty(SuiteProperty prop) throws SQLException {
         final String sql = "INSERT INTO " + SuiteProperty.TABLE_NAME + " ("
             + SuiteProperty.SUITE_RESULT_ID + ", "
             + SuiteProperty.PROPERTY_NAME + ", "
             + SuiteProperty.PROPERTY_VALUE + ") VALUES (?,?,?)";
         try (Connection conn = this.getConnection()) {
             PreparedStatement stmt = conn.prepareStatement(sql);
-            for (SuiteProperty prop : properties) {
-                stmt.setString(1, prop.getSuiteResultId());
-                stmt.setString(2, StringUtils.left(prop.getPropertyName(), 255));
-                stmt.setString(3, StringUtils.left(prop.getPropertyValue(), 255));
-                stmt.executeUpdate();
-            }
+            stmt.setString(1, prop.getSuiteResultId());
+            stmt.setString(2, StringUtils.left(prop.getPropertyName(), 255));
+            stmt.setString(3, StringUtils.left(prop.getPropertyValue(), 255));
+            stmt.executeUpdate();
         }
     }
 

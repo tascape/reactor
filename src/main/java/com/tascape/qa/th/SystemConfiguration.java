@@ -72,6 +72,8 @@ public final class SystemConfiguration {
 
     public static final String SYSPROP_PRODUCT_UNDER_TEST = "qa.th.product.under.test";
 
+    public static final String SYSPROP_TEST_ENV = "qa.th.test.env";
+
     public static final String SYSENV_JOB_NAME = "JOB_NAME";
 
     public static final String SYSENV_JOB_NUMBER = "BUILD_NUMBER";

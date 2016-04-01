@@ -96,7 +96,7 @@ CREATE TABLE `test_result` (
   `TEST_STATION` varchar(255) COLLATE utf8_bin DEFAULT NULL,
   `LOG_DIR` varchar(255) COLLATE utf8_bin DEFAULT NULL,
   `EXTERNAL_ID` varchar(63) COLLATE utf8_bin DEFAULT NULL,
-  `TEST_ENV` varchar(255) COLLATE utf8_bin DEFAULT NULL,
+  `TEST_ENV` varchar(45) COLLATE utf8_bin DEFAULT NULL,
   PRIMARY KEY (`TEST_RESULT_ID`),
   KEY `suite-test_idx` (`SUITE_RESULT`),
   KEY `fk_test_case_idx` (`TEST_CASE_ID`),

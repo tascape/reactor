@@ -18,6 +18,7 @@ package com.tascape.qa.th;
 import com.tascape.qa.th.data.AbstractTestData;
 import com.tascape.qa.th.data.TestData;
 import com.tascape.qa.th.db.DbHandler;
+import com.tascape.qa.th.db.SuiteProperty;
 import com.tascape.qa.th.db.TestCase;
 import com.tascape.qa.th.db.TestResult;
 import com.tascape.qa.th.suite.AbstractSuite;
@@ -96,6 +97,13 @@ public class TestRunnerJUnit4 extends AbstractTestRunner implements Callable<Tes
             AbstractSuite abstractSuite = AbstractSuite.class.cast(Class.forName(suiteClass).newInstance());
             abstractSuite.setUp();
             AbstractSuite.addSuite(abstractSuite);
+            env = AbstractSuite.getEnvionment(suiteClass);
+
+            SuiteProperty prop = new SuiteProperty();
+            prop.setSuiteResultId(tcr.getSuiteResultId());
+            prop.setPropertyName(SystemConfiguration.SYSPROP_TEST_ENV + "." + Thread.currentThread().getName());
+            prop.setPropertyValue(env.getName());
+            this.db.addSuiteExecutionProperty(prop);
         }
     }
 
