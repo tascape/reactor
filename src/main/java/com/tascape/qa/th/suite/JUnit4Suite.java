@@ -33,6 +33,11 @@ public class JUnit4Suite extends AbstractSuite {
     }
 
     @Override
+    protected String getEnvironmentName() {
+        return "junit4";
+    }
+
+    @Override
     protected void tearDownEnvironment() {
     }
 

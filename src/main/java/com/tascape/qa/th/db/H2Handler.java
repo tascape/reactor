@@ -148,6 +148,7 @@ public final class H2Handler extends DbHandler {
                 stmt.setLong(6, time + 11);
                 stmt.setString(7, "?");
                 stmt.setString(8, "?");
+                stmt.setString(9, "");
                 LOG.debug("{}", stmt);
                 int i = stmt.executeUpdate();
             }
