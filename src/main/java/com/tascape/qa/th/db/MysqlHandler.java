@@ -287,11 +287,10 @@ public class MysqlHandler extends DbHandler {
         try (Statement stmt = conn.createStatement(); ResultSet rs = stmt.executeQuery(sqlLock)) {
             if (rs.next() && "1".equals(rs.getString(1))) {
                 LOG.trace("{} is locked", lock);
-            } else {
-                return false;
+                return true;
             }
         }
-        return true;
+        return false;
     }
 
     @Override
@@ -301,13 +300,12 @@ public class MysqlHandler extends DbHandler {
         try (Statement stmt = conn.createStatement(); ResultSet rs = stmt.executeQuery(sqlRelease)) {
             if (rs.next() && "1".equals(rs.getString(1))) {
                 LOG.trace("{} is released", lock);
-            } else {
-                return false;
+                return true;
             }
         } finally {
             conn.close();
         }
-        return true;
+        return false;
     }
 
     public static void main(String[] args) throws SQLException {
