@@ -91,6 +91,12 @@
             <version>5.1.38</version>
             <scope>runtime</scope>
         </dependency>
+        <dependency>
+            <groupId>org.jacoco</groupId>
+            <artifactId>org.jacoco.core</artifactId>
+            <version>0.7.6.201602180812</version>
+            <type>jar</type>
+        </dependency>
     </dependencies>
 
     <description>Testharness - Test Automation Framework</description>
