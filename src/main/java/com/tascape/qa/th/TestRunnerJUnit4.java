@@ -118,7 +118,7 @@ public class TestRunnerJUnit4 extends AbstractTestRunner implements Callable<Tes
             throw new IOException("Cannot create log directory " + testLogPath);
         }
         AbstractTestRunner.setTestLogPath(testLogPath);
-        String path = testLogPath.toFile().getAbsolutePath();
+        String path = testLogPath.toUri().toString();
         this.tcr.setLogDir(path.substring(path.indexOf(this.execId)));
 
         LOG.info("Creating log file");
