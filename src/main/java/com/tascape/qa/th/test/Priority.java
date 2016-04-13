@@ -1,5 +1,5 @@
 /*
- * Copyright 2015.
+ * Copyright 2015 - 2016 Nebula Bay.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -27,6 +27,7 @@ import java.lang.annotation.Target;
  */
 @Target(value = {ElementType.METHOD, ElementType.TYPE})
 @Retention(RetentionPolicy.RUNTIME)
+    @SuppressWarnings("PackageVisibleField")
 public @interface Priority {
     int NONE = -1;
 

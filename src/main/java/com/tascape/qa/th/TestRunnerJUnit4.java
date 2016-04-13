@@ -1,5 +1,5 @@
 /*
- * Copyright 2015.
+ * Copyright 2015 - 2016 Nebula Bay.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -75,12 +75,12 @@ public class TestRunnerJUnit4 extends AbstractTestRunner implements Callable<Tes
         String testDataInfo = this.tcr.getTestCase().getTestDataInfo();
         if (!testDataInfo.isEmpty()) {
             TestData testData = AbstractTestData.getTestData(testDataInfo);
-            LOG.info("Injecting test data: {} = {}", testDataInfo, testData.getValue());
+            LOG.debug("Injecting test data: {} = {}", testDataInfo, testData.getValue());
             AbstractTestData.setTestData(testData);
         }
 
         TestCase tc = this.tcr.getTestCase();
-        LOG.info("Loading test case {}", tc.format());
+        LOG.debug("Loading test case {}", tc.format());
         TestRunListener trl = new TestRunListener(this.db, this.tcr);
         JUnitCore core = new JUnitCore();
         core.addListener(trl);
@@ -113,7 +113,7 @@ public class TestRunnerJUnit4 extends AbstractTestRunner implements Callable<Tes
             .resolve(tc.formatForLogPath() + "." + System.currentTimeMillis() + "."
                 + Thread.currentThread().getName());
 
-        LOG.info("Creating test case execution log directory {}", testLogPath);
+        LOG.debug("Creating test case execution log directory {}", testLogPath);
         if (!testLogPath.toFile().mkdirs()) {
             throw new IOException("Cannot create log directory " + testLogPath);
         }
@@ -121,7 +121,7 @@ public class TestRunnerJUnit4 extends AbstractTestRunner implements Callable<Tes
         String path = testLogPath.toUri().toString();
         this.tcr.setLogDir(path.substring(path.indexOf(this.execId)));
 
-        LOG.info("Creating log file");
+        LOG.debug("Creating log file");
         Path logFile = testLogPath.resolve("test.log");
         addLog4jFileAppender(logFile.toFile().getAbsolutePath());
         return logFile;

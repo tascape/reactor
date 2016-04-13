@@ -1,5 +1,5 @@
 /*
- * Copyright 2016 tascape.
+ * Copyright 2015 - 2016 Nebula Bay.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,6 +15,8 @@
  */
 package com.tascape.qa.th.test;
 
+import com.tascape.qa.th.driver.JacocoClient;
+import com.tascape.qa.th.driver.TestDriver;
 import org.junit.After;
 import org.junit.Before;
 import org.slf4j.Logger;
@@ -25,11 +27,15 @@ import org.slf4j.LoggerFactory;
  *
  * @author linsong wang
  */
-@Priority(level = 2)
 public class JacocoTest extends AbstractTest {
     private static final Logger LOG = LoggerFactory.getLogger(JacocoTest.class);
 
+    public static final TestDriver JACOCO = new TestDriver(JacocoTest.class, JacocoClient.class);
+
+    private final JacocoClient jacocoClient;
+
     public JacocoTest() {
+        this.jacocoClient = super.getEntityDriver(JACOCO);
     }
 
     @Before

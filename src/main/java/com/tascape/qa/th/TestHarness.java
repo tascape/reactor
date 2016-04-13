@@ -1,5 +1,5 @@
 /*
- * Copyright 2015.
+ * Copyright 2015 - 2016 Nebula Bay.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -39,7 +39,7 @@ public class TestHarness {
             Pattern testClassRegex = config.getTestClassRegex();
             Pattern testMethodRegex = config.getTestMethodRegex();
             int priority = config.getTestPriority();
-            LOG.info("Running test suite class: {}", suiteClass);
+            LOG.debug("Running test suite class: {}", suiteClass);
             TestSuite ts = new TestSuite(suiteClass, testClassRegex, testMethodRegex, priority);
 
             if (ts.getTests().isEmpty()) {

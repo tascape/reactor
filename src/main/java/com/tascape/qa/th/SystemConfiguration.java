@@ -1,5 +1,5 @@
 /*
- * Copyright 2015 tascape.
+ * Copyright 2015 - 2016 Nebula Bay.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -341,7 +341,7 @@ public final class SystemConfiguration {
     }
 
     private void loadSystemPropertiesFromPath(Path path) {
-        LOG.info("Loading system properties from {}", path);
+        LOG.debug("Loading system properties from {}", path);
         File f = path.toFile();
         if (!f.exists()) {
             LOG.warn("Cannot find system properties file {}", path);

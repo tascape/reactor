@@ -1,5 +1,5 @@
 /*
- * Copyright 2015 tascape.
+ * Copyright 2015 - 2016 Nebula Bay.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -63,7 +63,7 @@ public class SuiteRunner {
     }
 
     public SuiteRunner(TestSuite testSuite) throws Exception {
-        LOG.info("Run suite with execution id {}", execId);
+        LOG.debug("Run suite with execution id {}", execId);
         this.ts = testSuite;
 
         this.db = DbHandler.getInstance();
@@ -73,7 +73,7 @@ public class SuiteRunner {
     @SuppressWarnings("UseSpecificCatch")
     public int runTests() throws IOException, InterruptedException, SQLException, XMLStreamException {
         File dir = SYS_CONFIG.getLogPath().resolve(execId).toFile();
-        LOG.info("Create suite execution log directory {}", dir);
+        LOG.debug("Create suite execution log directory {}", dir);
         if (!dir.exists() && !dir.mkdirs()) {
             throw new IOException("Cannot create directory " + dir);
         }
@@ -81,9 +81,9 @@ public class SuiteRunner {
         CompletionService<TestResult> completionService = new ExecutorCompletionService<>(executorService);
 
         this.saveExectionProperties(dir);
-        LOG.info("Start to acquire test cases to execute");
+        LOG.debug("Start to acquire test cases to execute");
         int loadLimit = SYS_CONFIG.getTestLoadLimit();
-        LOG.info("Load queued test cases {} per round", loadLimit);
+        LOG.debug("Load queued test cases {} per round", loadLimit);
 
         int numberOfFailures = 0;
         try {
@@ -92,7 +92,7 @@ public class SuiteRunner {
                 List<Future<TestResult>> futures = new ArrayList<>();
 
                 for (TestResult tcr : tcrs) {
-                    LOG.info("Submit test case {}", tcr.getTestCase().format());
+                    LOG.debug("Submit test case {}", tcr.getTestCase().format());
                     futures.add(completionService.submit(new TestRunnerJUnit4(db, tcr)));
                 }
                 LOG.debug("Total {} test cases submitted", futures.size());
@@ -102,7 +102,7 @@ public class SuiteRunner {
                         Future<TestResult> future = completionService.take();
                         TestResult tcr = future.get();
                         String result = tcr.getResult().result();
-                        LOG.info("Get result of test case {} - {}", tcr.getTestCase().format(), result);
+                        LOG.debug("Get result of test case {} - {}", tcr.getTestCase().format(), result);
                         if (!ExecutionResult.PASS.getName().equals(result) && !result.endsWith("/0")) {
                             numberOfFailures++;
                         }
@@ -124,7 +124,7 @@ public class SuiteRunner {
             } catch (Exception ex) {
                 LOG.warn("Cannot get product-under-test", ex);
             } finally {
-                LOG.info("No more test case to run on this host, updating suite execution result");
+                LOG.debug("No more test case to run on this host, updating suite execution result");
                 this.db.updateSuiteExecutionResult(this.execId, productUnderTest);
                 this.db.adjustSuiteExecutionResult(execId);
             }
@@ -173,7 +173,7 @@ public class SuiteRunner {
             throw new RuntimeException("Invalid execution environment number");
         }
         int threadCount = (tc == 0) ? (env == 0 ? 1 : env) : (env == 0 ? tc : Math.min(tc, env));
-        LOG.info("Start execution engine with {} thread(s)", threadCount);
+        LOG.debug("Start execution engine with {} thread(s)", threadCount);
         SYS_CONFIG.setExecutionThreadCount(threadCount);
         int len = (threadCount + "").length();
         ThreadFactory namedThreadFactory = new ThreadFactoryBuilder().setNameFormat("th%0" + len + "d").build();

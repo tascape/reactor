@@ -1,5 +1,5 @@
 /*
- * Copyright 2015 tascape.
+ * Copyright 2015 - 2016 Nebula Bay.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -51,7 +51,7 @@ public class TestSuite {
 
     public TestSuite(String suiteClass, Pattern testClassRegex, Pattern testMethodRegex, int priority)
         throws Exception {
-        LOG.info("Find test cases in target test suite {}", suiteClass);
+        LOG.debug("Find test cases in target test suite {}", suiteClass);
         AbstractSuite suite = AbstractSuite.class.cast(Class.forName(suiteClass).newInstance());
         this.name = suite.getName();
         this.projectName = suite.getProjectName();
@@ -99,8 +99,8 @@ public class TestSuite {
     }
 
     private List<TestCase> filter(Pattern testClassRegex, Pattern testMethodRegex) {
-        LOG.info("Use debug class  name fileter {}", testClassRegex);
-        LOG.info("Use debug method name fileter {}", testMethodRegex);
+        LOG.debug("Use debug class  name fileter {}", testClassRegex);
+        LOG.debug("Use debug method name fileter {}", testMethodRegex);
         List<TestCase> tcs = new ArrayList<>();
         this.tests.stream().forEach((tc) -> {
             Matcher mc = testClassRegex.matcher(tc.getTestClass());

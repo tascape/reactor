@@ -1,5 +1,5 @@
 /*
- * Copyright 2015.
+ * Copyright 2015 - 2016 Nebula Bay.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -260,7 +260,7 @@ public class Utils {
         ProcessBuilder pb = new ProcessBuilder(commands);
         pb.redirectErrorStream(true);
         pb.directory(workingDir);
-        LOG.info("Running command {}:  {}", workingDir == null ? "" : workingDir.getAbsolutePath(),
+        LOG.debug("Running command {}:  {}", workingDir == null ? "" : workingDir.getAbsolutePath(),
             pb.command().toString().replaceAll(",", ""));
         final Process p = pb.start();
 
@@ -455,7 +455,7 @@ public class Utils {
         };
         thread.setName(Thread.currentThread().getName() + "-cleaning-" + thread.hashCode());
         thread.setDaemon(true);
-        LOG.info("Starting directory cleaning thread (scanning hourly), all files/directories in {} and older than {} "
+        LOG.debug("Starting directory cleaning thread (scanning hourly), all files/directories in {} and older than {} "
             + "hour(s) and starts with {} will be deleted", dir, keepAliveHour, namePrefix);
         thread.start();
     }

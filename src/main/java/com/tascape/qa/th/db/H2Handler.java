@@ -1,5 +1,5 @@
 /*
- * Copyright 2015.
+ * Copyright 2015 - 2016 Nebula Bay.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -76,7 +76,7 @@ public final class H2Handler extends DbHandler {
 
     @Override
     public boolean queueTestSuite(TestSuite suite, String execId) throws SQLException {
-        LOG.info("Queueing test suite result with execution id {} ", execId);
+        LOG.debug("Queueing test suite result with execution id {} ", execId);
         final String sql = "INSERT INTO " + SuiteResult.TABLE_NAME + " ("
             + SuiteResult.SUITE_RESULT_ID + ", "
             + SuiteResult.SUITE_NAME + ", "
@@ -115,7 +115,7 @@ public final class H2Handler extends DbHandler {
 
     @Override
     protected void queueTestCaseResults(String execId, List<TestCase> tests) throws SQLException {
-        LOG.info("Queue {} test case result(s) with execution id {} ", tests.size(), execId);
+        LOG.debug("Queue {} test case result(s) with execution id {} ", tests.size(), execId);
         final String sql = "INSERT INTO " + TestResult.TABLE_NAME + " ("
             + TestResult.TEST_RESULT_ID + ", "
             + TestResult.SUITE_RESULT + ", "
@@ -157,7 +157,7 @@ public final class H2Handler extends DbHandler {
 
     @Override
     protected int getTestCaseId(TestCase test) throws SQLException {
-        LOG.info("Query for id of test case {} ", test.format());
+        LOG.debug("Query for id of test case {} ", test.format());
         try (Connection conn = this.getConnection()) {
             final String sql = "SELECT * FROM " + TestCase.TABLE_NAME + " WHERE "
                 + TestCase.SUITE_CLASS + " = ? AND "
@@ -225,7 +225,7 @@ public final class H2Handler extends DbHandler {
 
     @Override
     public void updateSuiteExecutionResult(String execId) throws SQLException {
-        LOG.info("Update test suite execution result with execution id {}", execId);
+        LOG.debug("Update test suite execution result with execution id {}", execId);
         int total = 0, fail = 0;
 
         try (Connection conn = this.getConnection();) {

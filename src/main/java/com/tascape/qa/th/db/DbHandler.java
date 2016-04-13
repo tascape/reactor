@@ -1,5 +1,5 @@
 /*
- * Copyright 2015.
+ * Copyright 2015 - 2016 Nebula Bay.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -93,7 +93,7 @@ public abstract class DbHandler {
     protected abstract Connection getConnection() throws SQLException;
 
     public SuiteResult getSuiteResult(String id) throws SQLException {
-        LOG.info("Query for suite result with execution id {}", id);
+        LOG.debug("Query for suite result with execution id {}", id);
         final String sql = "SELECT * FROM " + SuiteResult.TABLE_NAME + " WHERE "
             + SuiteResult.SUITE_RESULT_ID + " = ?";
 
@@ -117,7 +117,7 @@ public abstract class DbHandler {
     }
 
     public void queueSuiteExecution(TestSuite suite, String execId) throws SQLException {
-        LOG.info("Queue test suite for execution with execution id {}", execId);
+        LOG.debug("Queue test suite for execution with execution id {}", execId);
         String lock = "testharness." + execId;
         try (Connection conn = this.getConnection()) {
             try {
@@ -195,7 +195,7 @@ public abstract class DbHandler {
     protected abstract void queueTestCaseResults(String execId, List<TestCase> tests) throws SQLException;
 
     public List<TestResult> getQueuedTestCaseResults(String execId, int limit) throws SQLException {
-        LOG.info("Query database for all queued test cases");
+        LOG.debug("Query database for all queued test cases");
         final String sql = "SELECT * FROM " + TestResult.TABLE_NAME + " tr "
             + "INNER JOIN " + TestCase.TABLE_NAME + " tc "
             + "ON tr.TEST_CASE_ID=tc.TEST_CASE_ID AND " + TestResult.EXECUTION_RESULT + " = ? "
@@ -241,7 +241,7 @@ public abstract class DbHandler {
     }
 
     public boolean acquireTestCaseResult(TestResult tcr) throws SQLException {
-        LOG.info("Try to acquire test case {}", tcr.getTestCase().format());
+        LOG.debug("Try to acquire test case {}", tcr.getTestCase().format());
         final String sql = "SELECT * FROM " + TestResult.TABLE_NAME + " WHERE "
             + TestResult.TEST_RESULT_ID + " = ? LIMIT 1;";
 
@@ -271,7 +271,7 @@ public abstract class DbHandler {
     }
 
     public void updateTestExecutionResult(TestResult tcr) throws SQLException {
-        LOG.info("Update test result {} ({}) to {}", tcr.getTestResultId(), tcr.getTestCase().format(),
+        LOG.debug("Update test result {} ({}) to {}", tcr.getTestResultId(), tcr.getTestCase().format(),
             tcr.getResult().result());
         final String sql = "SELECT tr.* FROM " + TestResult.TABLE_NAME + " tr INNER JOIN " + TestCase.TABLE_NAME
             + " tc WHERE tr.TEST_CASE_ID=tc.TEST_CASE_ID AND "
@@ -304,7 +304,7 @@ public abstract class DbHandler {
     public abstract void updateSuiteExecutionResult(String execId) throws SQLException;
 
     public ExecutionResult updateSuiteExecutionResult(String execId, String productUnderTest) throws SQLException {
-        LOG.info("Update test suite execution result with execution id {}", execId);
+        LOG.debug("Update test suite execution result with execution id {}", execId);
         String lock = "testharness." + execId;
 
         ExecutionResult suiteResult = ExecutionResult.newMultiple();
@@ -375,7 +375,7 @@ public abstract class DbHandler {
     }
 
     public ExecutionResult adjustSuiteExecutionResult(String execId) throws SQLException {
-        LOG.info("Adjust test suite execution result of execution id {} with test iterations", execId);
+        LOG.debug("Adjust test suite execution result of execution id {} with test iterations", execId);
         String lock = "testharness." + execId;
 
         ExecutionResult suiteResult = ExecutionResult.newMultiple();
@@ -459,7 +459,7 @@ public abstract class DbHandler {
     }
 
     public void overwriteSuiteExecutionResult(String execId, ExecutionResult result) throws SQLException {
-        LOG.info("Overwrite test suite execution result with execution id {} with {}", execId, result);
+        LOG.debug("Overwrite test suite execution result with execution id {} with {}", execId, result);
         int total = result.getPass() + result.getFail();
         if (total == 0) {
             return;

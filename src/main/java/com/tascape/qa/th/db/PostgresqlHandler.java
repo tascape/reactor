@@ -1,5 +1,5 @@
 /*
- * Copyright 2015.
+ * Copyright 2015 - 2016 Nebula Bay.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -79,7 +79,7 @@ public class PostgresqlHandler extends DbHandler {
 
     @Override
     public void queueSuiteExecution(TestSuite suite, String execId) throws SQLException {
-        LOG.info("Queue test suite for execution with execution id {}", execId);
+        LOG.debug("Queue test suite for execution with execution id {}", execId);
         String lock = "testharness." + execId;
         try (Connection conn = this.getConnection()) {
             try {
@@ -98,7 +98,7 @@ public class PostgresqlHandler extends DbHandler {
 
     @Override
     public boolean queueTestSuite(TestSuite suite, String execId) throws SQLException {
-        LOG.info("Queueing test suite result with execution id {} ", execId);
+        LOG.debug("Queueing test suite result with execution id {} ", execId);
         final String sql = "SELECT * FROM " + SuiteResult.TABLE_NAME + " WHERE "
             + SuiteResult.SUITE_RESULT_ID + " = ?";
 
@@ -141,7 +141,7 @@ public class PostgresqlHandler extends DbHandler {
 
     @Override
     protected int getTestCaseId(TestCase test) throws SQLException {
-        LOG.info("Query for id of test case {} ", test.format());
+        LOG.debug("Query for id of test case {} ", test.format());
         final String sql = "SELECT * FROM " + TestCase.TABLE_NAME + " WHERE "
             + TestCase.SUITE_CLASS + " = ? AND "
             + TestCase.TEST_CLASS + " = ? AND "
@@ -179,7 +179,7 @@ public class PostgresqlHandler extends DbHandler {
 
     @Override
     protected void queueTestCaseResults(String execId, List<TestCase> tests) throws SQLException {
-        LOG.info("Queue {} test case result(s) with execution id {} ", tests.size(), execId);
+        LOG.debug("Queue {} test case result(s) with execution id {} ", tests.size(), execId);
         final String sql = "SELECT * FROM " + TestCase.TABLE_NAME + " WHERE "
             + TestResult.SUITE_RESULT + " = ?";
         Map<String, Integer> idMap = this.getTestCaseIds(tests);
@@ -230,7 +230,7 @@ public class PostgresqlHandler extends DbHandler {
 
     @Override
     public void updateSuiteExecutionResult(String execId) throws SQLException {
-        LOG.info("Update test suite execution result with execution id {}", execId);
+        LOG.debug("Update test suite execution result with execution id {}", execId);
         String lock = "testharness." + execId;
 
         Connection conn = this.getConnection();
