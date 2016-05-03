@@ -547,14 +547,12 @@ public abstract class DbHandler {
                             xsw.writeCharacters("\n");
 
                             String l = rs1.getString(TestResult.LOG_DIR);
-                            int i = l.lastIndexOf("/");
-                            if (i >= 0) {
-                                pwh.printf("<li><a href='%s/log.html'>%s</a> - %s</li>", l.substring(i + 1),
-                                    rs1.getString(TestCase.TEST_METHOD) + "(" + rs1.getString(TestCase.TEST_DATA) + ")",
-                                    rs1.getString(TestResult.EXECUTION_RESULT));
-                            }
+                            pwh.printf("<li><a href='%s/%s/log.html'>%s</a> - %s</li>", execId, l,
+                                rs1.getString(TestCase.TEST_METHOD) + "(" + rs1.getString(TestCase.TEST_DATA) + ")",
+                                rs1.getString(TestResult.EXECUTION_RESULT));
                         }
                     }
+
                     pwh.println("</ol></body></html>");
 
                     xsw.writeEndElement();

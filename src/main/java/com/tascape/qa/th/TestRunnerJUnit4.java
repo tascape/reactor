@@ -109,20 +109,18 @@ public class TestRunnerJUnit4 extends AbstractTestRunner implements Callable<Tes
 
     private Path newLogFile() throws IOException {
         TestCase tc = this.tcr.getTestCase();
-        Path testLogPath = sysConfig.getLogPath().resolve(this.execId)
-            .resolve(tc.formatForLogPath() + "." + System.currentTimeMillis() + "."
-                + Thread.currentThread().getName());
-
-        LOG.debug("Creating test case execution log directory {}", testLogPath);
+        String testLogDir = tc.formatForLogPath() + "." + System.currentTimeMillis() + "."
+            + Thread.currentThread().getName();
+        Path testLogPath = sysConfig.getLogPath().resolve(this.execId).resolve(testLogDir);
+        LOG.debug("Create test case execution log directory {}", testLogPath);
         if (!testLogPath.toFile().mkdirs()) {
             throw new IOException("Cannot create log directory " + testLogPath);
         }
         AbstractTestRunner.setTestLogPath(testLogPath);
-        String path = testLogPath.toUri().toString();
-        this.tcr.setLogDir(path.substring(path.indexOf(this.execId)));
+        this.tcr.setLogDir(testLogDir);
 
-        LOG.debug("Creating log file");
         Path logFile = testLogPath.resolve("test.log");
+        LOG.debug("Create log file {}", logFile);
         addLog4jFileAppender(logFile.toFile().getAbsolutePath());
         return logFile;
     }
