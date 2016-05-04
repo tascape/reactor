@@ -547,7 +547,7 @@ public abstract class DbHandler {
                             xsw.writeCharacters("\n");
 
                             String l = rs1.getString(TestResult.LOG_DIR);
-                            pwh.printf("<li><a href='%s/%s/log.html'>%s</a> - %s</li>", execId, l,
+                            pwh.printf("<li><a href='%s/log.html'>%s</a> - %s</li>", l,
                                 rs1.getString(TestCase.TEST_METHOD) + "(" + rs1.getString(TestCase.TEST_DATA) + ")",
                                 rs1.getString(TestResult.EXECUTION_RESULT));
                         }
