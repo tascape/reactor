@@ -535,14 +535,21 @@ public abstract class DbHandler {
                         stmt1.setString(1, execId);
                         ResultSet rs1 = stmt1.executeQuery();
                         while (rs1.next()) {
+                            String result = rs1.getString(TestResult.EXECUTION_RESULT);
                             xsw.writeCharacters("  ");
                             xsw.writeStartElement("testcase");
                             xsw.writeAttribute("name", rs1.getString(TestCase.TEST_METHOD) + "("
                                 + rs1.getString(TestCase.TEST_DATA) + ")");
                             xsw.writeAttribute("classname", rs1.getString(TestCase.TEST_CLASS));
-                            xsw.writeAttribute("result", rs1.getString(TestResult.EXECUTION_RESULT));
+                            xsw.writeAttribute("result", result);
                             xsw.writeAttribute("time", (rs1.getLong(TestResult.STOP_TIME)
                                 - rs1.getLong(TestResult.START_TIME)) / 1000.0 + "");
+                            if (ExecutionResult.isFailure(result)) {
+                                xsw.writeStartElement("failure");
+                                xsw.writeAttribute("type", "failure");
+                                xsw.writeEndElement();
+                                xsw.writeCharacters("\n");
+                            }
                             xsw.writeEndElement();
                             xsw.writeCharacters("\n");
 

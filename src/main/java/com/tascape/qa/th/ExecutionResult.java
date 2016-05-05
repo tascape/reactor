@@ -91,4 +91,8 @@ public class ExecutionResult {
     public int getFail() {
         return fail;
     }
+
+    public static boolean isFailure(String result) {
+        return !(result.equals("PASS") || result.endsWith("/0"));
+    }
 }
