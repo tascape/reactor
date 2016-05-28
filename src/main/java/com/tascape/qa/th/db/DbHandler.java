@@ -520,12 +520,17 @@ public abstract class DbHandler {
                     xsw.writeAttribute("srid", rs.getString(SuiteResult.SUITE_RESULT_ID));
                     xsw.writeCharacters("\n");
 
-                    pwh.println("<html><body>");
+                    pwh.println("<html><head><style>");
+                    pwh.println("body {font-family: Consolas,Monaco,Lucida Console,Liberation Mono,DejaVu Sans Mono,"
+                        + "Bitstream Vera Sans Mono,Courier New, monospace;}");
+                    pwh.println("tr:hover {background-color: lightgray;}");
+                    pwh.println("td {padding-left: 20px; padding-right: 20px;}");
+                    pwh.println("</style></head<body>");
                     pwh.printf("<h2>%s</h2>", rs.getString(SuiteResult.SUITE_NAME));
                     pwh.printf("<h3>%s</h3>", rs.getString(SuiteResult.PROJECT_NAME));
                     pwh.printf("<h4>tests %d, failures %d</h4>",
                         rs.getInt(SuiteResult.NUMBER_OF_TESTS), rs.getInt(SuiteResult.NUMBER_OF_FAILURE));
-                    pwh.println("<ol>");
+                    pwh.println("<table><thead><tr><th>index</th><th>test case</th><th>result</th></thead><tbody>");
 
                     final String sql1 = "SELECT * FROM " + TestResult.TABLE_NAME + " tr JOIN "
                         + TestCase.TABLE_NAME + " tc ON "
@@ -534,6 +539,7 @@ public abstract class DbHandler {
                     try (PreparedStatement stmt1 = this.getConnection().prepareStatement(sql1)) {
                         stmt1.setString(1, execId);
                         ResultSet rs1 = stmt1.executeQuery();
+                        int i = 0;
                         while (rs1.next()) {
                             String result = rs1.getString(TestResult.EXECUTION_RESULT);
                             xsw.writeCharacters("  ");
@@ -554,13 +560,16 @@ public abstract class DbHandler {
                             xsw.writeCharacters("\n");
 
                             String l = rs1.getString(TestResult.LOG_DIR);
-                            pwh.printf("<li><a href='%s/log.html'>%s</a> - %s</li>", l,
+                            String r = rs1.getString(TestResult.EXECUTION_RESULT);
+                            pwh.printf("<tr><td>%d</td><td>%s</td>"
+                                + "<td><a style='color: %s; font-weight: bold' href='%s/log.html' target='_blank'>%s</a></td></tr>",
+                                ++i,
                                 rs1.getString(TestCase.TEST_METHOD) + "(" + rs1.getString(TestCase.TEST_DATA) + ")",
-                                rs1.getString(TestResult.EXECUTION_RESULT));
+                                r.equals("PASS") || r.endsWith("/0") ? "green" : "red", l, r);
                         }
                     }
 
-                    pwh.println("</ol></body></html>");
+                    pwh.println("</tbody></table></body></html>");
 
                     xsw.writeEndElement();
                     xsw.writeCharacters("\n");
