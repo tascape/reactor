@@ -401,17 +401,20 @@ public abstract class DbHandler {
                             String result = rs.getString(TestResult.EXECUTION_RESULT);
                             int p = 0, f = 0;
                             String[] pf = result.split("/");
-                            if (pf.length == 1) {
-                                if (result.equals(ExecutionResult.PASS.getName())) {
-                                    p = 1;
-                                } else {
-                                    f = 1;
-                                }
-                            } else if (pf.length == 2) {
-                                p = Integer.parseInt(pf[0]);
-                                f = Integer.parseInt(pf[1]);
-                            } else {
-                                throw new RuntimeException("Cannot parse test execution result " + result);
+                            switch (pf.length) {
+                                case 1:
+                                    if (result.equals(ExecutionResult.PASS.getName())) {
+                                        p = 1;
+                                    } else {
+                                        f = 1;
+                                    }
+                                    break;
+                                case 2:
+                                    p = Integer.parseInt(pf[0]);
+                                    f = Integer.parseInt(pf[1]);
+                                    break;
+                                default:
+                                    throw new RuntimeException("Cannot parse test execution result " + result);
                             }
 
                             if (rs.getString(TestCase.TEST_DATA_INFO).startsWith(iterDataInfo)) {
