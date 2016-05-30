@@ -30,6 +30,7 @@ import java.util.Properties;
 import java.util.regex.Pattern;
 import java.util.stream.Stream;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.log4j.Level;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -73,6 +74,8 @@ public final class SystemConfiguration {
     public static final String SYSPROP_PRODUCT_UNDER_TEST = "qa.th.product.under.test";
 
     public static final String SYSPROP_TEST_ENV = "qa.th.test.env";
+
+    public static final String SYSPROP_TEST_LOG_LEVEL = "qa.th.test.log.level";
 
     public static final String SYSENV_JOB_NAME = "JOB_NAME";
 
@@ -273,6 +276,11 @@ public final class SystemConfiguration {
 
     public String getProdUnderTest() {
         return this.getProperty(SYSPROP_PRODUCT_UNDER_TEST, "");
+    }
+
+    public Level getTestLogLevel() {
+        String l = this.getProperty(SYSPROP_TEST_LOG_LEVEL, "DEBUG");
+        return Level.toLevel(l);
     }
 
     public String getJobName() {

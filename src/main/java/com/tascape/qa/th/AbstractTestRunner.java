@@ -29,7 +29,6 @@ import java.util.regex.Pattern;
 import org.apache.commons.io.FileUtils;
 import org.apache.log4j.Appender;
 import org.apache.log4j.FileAppender;
-import org.apache.log4j.Level;
 import org.apache.log4j.PatternLayout;
 import org.apache.log4j.spi.Filter;
 import org.apache.log4j.spi.LoggingEvent;
@@ -157,8 +156,7 @@ public abstract class AbstractTestRunner {
 
         FileAppender fa = new FileAppender(new PatternLayout(pattern), file);
         fa.addFilter(new ThreadFilter());
-        fa.setThreshold(Level.DEBUG);
-
+        fa.setThreshold(sysConfig.getTestLogLevel());
         fa.setImmediateFlush(true);
         fa.setAppend(true);
         fa.setName(file);
