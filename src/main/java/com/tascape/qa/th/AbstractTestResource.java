@@ -18,6 +18,7 @@ package com.tascape.qa.th;
 import java.awt.AWTException;
 import java.io.File;
 import java.io.IOException;
+import java.nio.charset.Charset;
 import java.nio.file.Path;
 import org.apache.commons.io.FileUtils;
 import org.slf4j.Logger;
@@ -30,9 +31,30 @@ import org.slf4j.LoggerFactory;
 public abstract class AbstractTestResource {
     private static final Logger LOG = LoggerFactory.getLogger(AbstractTestResource.class);
 
+    private static final ThreadLocal<Path> TEST_LOG_PATH = new ThreadLocal<Path>() {
+        @Override
+        protected Path initialValue() {
+            String execId = SystemConfiguration.getInstance().getExecId();
+            Path testLogPath = SystemConfiguration.getInstance().getLogPath().resolve(execId);
+            testLogPath.toFile().mkdirs();
+            return testLogPath;
+        }
+    };
+
+    public static void setTestLogPath(Path testLogPath) {
+        LOG.trace("Set runtime log directory {}: {}", Thread.currentThread().getName(), testLogPath);
+        TEST_LOG_PATH.set(testLogPath);
+    }
+
+    public static Path getTestLogPath() {
+        return TEST_LOG_PATH.get();
+    }
+
     protected final SystemConfiguration sysConfig = SystemConfiguration.getInstance();
 
-    public abstract Path getLogPath();
+    public Path getLogPath() {
+        return AbstractTestResource.getTestLogPath();
+    }
 
     public File saveAsTextFile(String prefix, CharSequence data) throws IOException {
         return this.saveIntoFile(prefix, "txt", data);
@@ -45,7 +67,7 @@ public abstract class AbstractTestResource {
             throw new IOException("Cannot create test log directory " + p);
         }
         File f = File.createTempFile(prefix + "-", "." + suffix, p);
-        FileUtils.write(f, data);
+        FileUtils.write(f, data, Charset.defaultCharset());
         LOG.debug("Save data into file {}", f.getAbsolutePath());
         return f;
     }
@@ -54,7 +76,7 @@ public abstract class AbstractTestResource {
         Path path = this.getLogPath();
         File f = File.createTempFile(SystemConfiguration.CONSTANT_LOG_KEEP_ALIVE_PREFIX + filePrefix, ".txt",
             path.toFile());
-        FileUtils.write(f, data);
+        FileUtils.write(f, data, Charset.defaultCharset());
         LOG.debug("Save data into file {}", f.getAbsolutePath());
         return f;
     }

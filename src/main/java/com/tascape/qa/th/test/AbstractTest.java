@@ -68,7 +68,7 @@ public abstract class AbstractTest extends AbstractTestResource {
 
     protected String execId = sysConfig.getExecId();
 
-    private final Path testLogPath = AbstractTestRunner.getTestLogPath();
+    private final Path testLogPath = AbstractTestResource.getTestLogPath();
 
     protected TestData testData = AbstractTestData.getTestData();
 

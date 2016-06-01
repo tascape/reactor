@@ -22,6 +22,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.PrintWriter;
+import java.nio.charset.Charset;
 import java.nio.file.Path;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -665,7 +666,7 @@ public abstract class DbHandler {
             }
             sr.put("suite_properties", sps);
         }
-        FileUtils.write(path.toFile(), new JSONObject().put("suite_result", sr).toString(2));
+        FileUtils.write(path.toFile(), new JSONObject().put("suite_result", sr).toString(2), Charset.defaultCharset());
     }
 
     public void importFromJson(String json) throws SQLException {

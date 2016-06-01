@@ -16,12 +16,15 @@
 package com.tascape.qa.th.suite;
 
 import com.tascape.qa.th.test.JUnit4Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  *
  * @author linsong wang
  */
 public class JUnit4Suite extends AbstractSuite {
+    private static final Logger LOG = LoggerFactory.getLogger(JUnit4Suite.class);
 
     @Override
     public void setUpTestClasses() {
@@ -30,6 +33,7 @@ public class JUnit4Suite extends AbstractSuite {
 
     @Override
     protected void setUpEnvironment() throws Exception {
+        LOG.info("some suite setup here");
     }
 
     @Override

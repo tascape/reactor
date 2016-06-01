@@ -20,6 +20,7 @@ import com.tascape.qa.th.db.TestResult;
 import java.io.File;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.nio.charset.Charset;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -41,25 +42,6 @@ import org.slf4j.LoggerFactory;
  */
 public abstract class AbstractTestRunner {
     private static final Logger LOG = LoggerFactory.getLogger(AbstractTestRunner.class);
-
-    private static final ThreadLocal<Path> TEST_LOG_PATH = new ThreadLocal<Path>() {
-        @Override
-        protected Path initialValue() {
-            String execId = SystemConfiguration.getInstance().getExecId();
-            Path testLogPath = SystemConfiguration.getInstance().getLogPath().resolve(execId);
-            testLogPath.toFile().mkdirs();
-            return testLogPath;
-        }
-    };
-
-    public static void setTestLogPath(Path testLogPath) {
-        LOG.trace("Setting runtime log directory {}", testLogPath);
-        TEST_LOG_PATH.set(testLogPath);
-    }
-
-    public static Path getTestLogPath() {
-        return TEST_LOG_PATH.get();
-    }
 
     private static final ThreadLocal<TestResult> TEST_CASE_RESULT = new ThreadLocal<>();
 
@@ -90,7 +72,7 @@ public abstract class AbstractTestRunner {
             pw.println("<html><body><pre>");
             pw.println("<a href='../'>Suite Log Directory</a><br /><a href='./'>Test Log Directory</a>");
             pw.println();
-            List<String> lines = FileUtils.readLines(logFile.toFile());
+            List<String> lines = FileUtils.readLines(logFile.toFile(),Charset.defaultCharset());
             List<File> files = new ArrayList<>(Arrays.asList(logFile.getParent().toFile().listFiles()));
 
             for (String line : lines) {

@@ -94,6 +94,7 @@ public class TestRunnerJUnit4 extends AbstractTestRunner implements Callable<Tes
         }
         Environment env = AbstractSuite.getEnvionment(suiteClass);
         if (env == null) {
+            LOG.info("init suite runtime environment");
             AbstractSuite abstractSuite = AbstractSuite.class.cast(Class.forName(suiteClass).newInstance());
             abstractSuite.setUp();
             AbstractSuite.addSuite(abstractSuite);
@@ -116,7 +117,7 @@ public class TestRunnerJUnit4 extends AbstractTestRunner implements Callable<Tes
         if (!testLogPath.toFile().mkdirs()) {
             throw new IOException("Cannot create log directory " + testLogPath);
         }
-        AbstractTestRunner.setTestLogPath(testLogPath);
+        AbstractTestResource.setTestLogPath(testLogPath);
         this.tcr.setLogDir(testLogDir);
 
         Path logFile = testLogPath.resolve("test.log");

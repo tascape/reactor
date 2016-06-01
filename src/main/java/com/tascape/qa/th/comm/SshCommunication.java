@@ -26,6 +26,7 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.nio.charset.Charset;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
@@ -82,14 +83,14 @@ public class SshCommunication extends EntityCommunication {
 
     public void shell(String command, OutputStream out) throws JSchException {
         Channel shell = this.session.openChannel("shell");
-        shell.setInputStream(IOUtils.toInputStream(command + "\n"));
+        shell.setInputStream(IOUtils.toInputStream(command + "\n", Charset.defaultCharset()));
         shell.setOutputStream(out);
         shell.connect(2000);
     }
 
     public Channel shell(String command, File out) throws JSchException, IOException {
         Channel shell = this.session.openChannel("shell");
-        shell.setInputStream(IOUtils.toInputStream(command + "\n"));
+        shell.setInputStream(IOUtils.toInputStream(command + "\n", Charset.defaultCharset()));
         shell.setOutputStream(FileUtils.openOutputStream(out));
         shell.connect();
         return shell;
