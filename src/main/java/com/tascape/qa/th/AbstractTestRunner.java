@@ -120,7 +120,7 @@ public abstract class AbstractTestRunner {
         }
     }
 
-    String addLog4jFileAppender(String file) throws IOException {
+    Path addLog4jFileAppender(final Path path) throws IOException {
         org.apache.log4j.Logger rootLogger = org.apache.log4j.Logger.getRootLogger();
 
         String pattern = "%d{HH:mm:ss.SSS} %-5p %t %C{1}.%M:%L - %m%n";
@@ -136,26 +136,26 @@ public abstract class AbstractTestRunner {
             }
         }
 
-        FileAppender fa = new FileAppender(new PatternLayout(pattern), file);
+        FileAppender fa = new FileAppender(new PatternLayout(pattern), path.toFile().getAbsolutePath());
         fa.addFilter(new ThreadFilter());
         fa.setThreshold(sysConfig.getTestLogLevel());
         fa.setImmediateFlush(true);
         fa.setAppend(true);
-        fa.setName(file);
+        fa.setName(path.toFile().getAbsolutePath());
 
         fa.activateOptions();
         rootLogger.addAppender(fa);
 
-        return file;
+        return path;
     }
 
-    void removeLog4jAppender(String appenderName) {
-        if (appenderName == null) {
+    void removeLog4jAppender(Path path) {
+        if (path == null) {
             LOG.warn("Appender name is null");
             return;
         }
         org.apache.log4j.Logger rootLogger = org.apache.log4j.Logger.getRootLogger();
-        Appender appender = rootLogger.getAppender(appenderName);
+        Appender appender = rootLogger.getAppender(path.toFile().getAbsolutePath());
         if (appender != null) {
             appender.close();
             rootLogger.removeAppender(appender);

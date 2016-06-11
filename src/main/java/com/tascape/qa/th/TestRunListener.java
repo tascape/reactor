@@ -115,7 +115,6 @@ public class TestRunListener extends RunListener {
                 return;
             }
             this.tcr.setAut(aut);
-            this.tcr.setTestEnv(Thread.currentThread().getName());
 
             this.db.updateTestExecutionResult(this.tcr);
         }

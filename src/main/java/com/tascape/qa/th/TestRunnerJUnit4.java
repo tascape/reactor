@@ -46,6 +46,7 @@ public class TestRunnerJUnit4 extends AbstractTestRunner implements Callable<Tes
 
     @Override
     public TestResult call() throws Exception {
+        this.tcr.setTestEnv(Thread.currentThread().getName());
         Path logFile = this.newLogFile();
         try {
             if (!db.acquireTestCaseResult(this.tcr)) {
@@ -63,7 +64,7 @@ public class TestRunnerJUnit4 extends AbstractTestRunner implements Callable<Tes
             this.db.updateTestExecutionResult(this.tcr);
             throw ex;
         } finally {
-            removeLog4jAppender(logFile.toFile().getAbsolutePath());
+            removeLog4jAppender(logFile);
             this.generateHtml(logFile);
         }
         return this.tcr;
@@ -122,7 +123,6 @@ public class TestRunnerJUnit4 extends AbstractTestRunner implements Callable<Tes
 
         Path logFile = testLogPath.resolve("test.log");
         LOG.debug("Create log file {}", logFile);
-        addLog4jFileAppender(logFile.toFile().getAbsolutePath());
-        return logFile;
+        return addLog4jFileAppender(logFile);
     }
 }
