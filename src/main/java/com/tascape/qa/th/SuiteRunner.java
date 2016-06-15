@@ -163,7 +163,7 @@ public class SuiteRunner {
 
     private ExecutorService getExecutorService() {
         int tc = SYS_CONFIG.getExecutionThreadCount();
-        LOG.debug("number of thread(s) {}", tc);
+        LOG.debug("thread count {}", tc);
         if (tc < 0) {
             throw new RuntimeException("Invalid execution thread number");
         }
@@ -175,7 +175,7 @@ public class SuiteRunner {
         int threadCount = (tc == 0) ? (env == 0 ? 1 : env) : (env == 0 ? tc : Math.min(tc, env));
         LOG.debug("Start execution engine with {} thread(s)", threadCount);
         SYS_CONFIG.setExecutionThreadCount(threadCount);
-        int len = (threadCount + "").length();
+        int len = ((threadCount - 1) + "").length();
         ThreadFactory namedThreadFactory = new ThreadFactoryBuilder().setNameFormat("th%0" + len + "d").build();
         ExecutorService executorService = Executors.newFixedThreadPool(threadCount, namedThreadFactory);
         return executorService;
