@@ -16,6 +16,7 @@
 package com.tascape.qa.th;
 
 import com.tascape.qa.th.db.DbHandler;
+import com.tascape.qa.th.suite.JUnit4Suite;
 import com.tascape.qa.th.test.Priority;
 import java.io.File;
 import java.io.FileInputStream;
@@ -68,6 +69,10 @@ public final class SystemConfiguration {
     public static final String SYSPROP_DEBUG_CLASS_REGEX = "qa.th.debug.class.regex";
 
     public static final String SYSPROP_DEBUG_METHOD_RESGX = "qa.th.debug.method.regex";
+
+    public static final String SYSPROP_DEBUG_CLASS_EXCLUDE_REGEX = "qa.th.debug.class.exclude.regex";
+
+    public static final String SYSPROP_DEBUG_METHOD_EXCLUDE_RESGX = "qa.th.debug.method.exclude.regex";
 
     public static final String SYSPROP_TEST_PRIORITY = "qa.th.test.priority";
 
@@ -181,7 +186,12 @@ public final class SystemConfiguration {
     }
 
     public Path getLogPath() {
-        return Paths.get(this.getProperty(SYSPROP_LOG_PATH, System.getProperty("user.home")));
+        String p = this.getProperty(SYSPROP_LOG_PATH);
+        if (StringUtils.isBlank(p)) {
+            return Paths.get(System.getProperty("user.home"), "qa", "th", "logs");
+        } else {
+            return Paths.get(p);
+        }
     }
 
     public int getTestRetry() {
@@ -225,9 +235,10 @@ public final class SystemConfiguration {
      */
     public String getTestSuite() {
         String suite = this.getProperty(SYSPROP_TEST_SUITE);
-        if (suite == null || suite.isEmpty()) {
-            throw new RuntimeException("There is no test suite class name specified (system property "
-                + SYSPROP_TEST_SUITE + ")");
+        if (StringUtils.isBlank(suite)) {
+            LOG.warn("There is no valid suite class name specified by system property {}", SYSPROP_TEST_SUITE);
+            suite = JUnit4Suite.class.getName();
+            LOG.warn("Use framework default {}", suite);
         }
         return suite;
     }
@@ -255,7 +266,7 @@ public final class SystemConfiguration {
     }
 
     public String getDatabaseType() {
-        return this.getProperty(DbHandler.SYSPROP_DATABASE_TYPE, "th");
+        return this.getProperty(DbHandler.SYSPROP_DATABASE_TYPE, "h2");
     }
 
     public String getDatabaseHost() {
