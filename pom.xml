@@ -1,14 +1,15 @@
+
 <?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0" 
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>com.tascape.qa</groupId>
-    <artifactId>testharness</artifactId>
-    <version>1.1.9</version>
+    <groupId>com.tascape</groupId>
+    <artifactId>reactor</artifactId>
+    <version>1.2.0</version>
     <packaging>jar</packaging>
-    <name>testharness</name>
+    <name>reactor</name>
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -20,14 +21,9 @@
 
     <dependencies>
         <dependency>
-            <groupId>com.tascape.qa</groupId>
-            <artifactId>th-junit4</artifactId>
+            <groupId>com.tascape</groupId>
+            <artifactId>reactor-junit4</artifactId>
             <version>4.12</version>
-        </dependency>
-        <dependency>
-            <groupId>com.tascape.qa</groupId>
-            <artifactId>th-ui</artifactId>
-            <version>1.0.0</version>
         </dependency>
         <dependency>
             <groupId>org.slf4j</groupId>
@@ -72,7 +68,7 @@
         <dependency>
             <groupId>com.h2database</groupId>
             <artifactId>h2</artifactId>
-            <version>1.4.191</version>
+            <version>1.4.192</version>
         </dependency>
         <dependency>
             <groupId>org.hamcrest</groupId>
@@ -98,12 +94,12 @@
         <dependency>
             <groupId>org.jacoco</groupId>
             <artifactId>org.jacoco.core</artifactId>
-            <version>0.7.6.201602180812</version>
+            <version>0.7.7.201606060606</version>
         </dependency>
     </dependencies>
 
-    <description>Testharness - Test Automation Framework</description>
-    <url>https://github.com/tascape/testharness</url>
+    <description>Reactor - Automation Framework</description>
+    <url>https://github.com/tascape/reactor</url>
     <licenses>
         <license>
             <name>The Apache License, Version 2.0</name>
@@ -119,9 +115,9 @@
         </developer>
     </developers>
     <scm>
-        <connection>scm:git:git@github.com:tascape/testharness.git</connection>
-        <developerConnection>scm:git:git@github.com:tascape/testharness.git</developerConnection>
-        <url>git@github.com:tascape/testharness.git</url>
+        <connection>scm:git:git@github.com:tascape/reactor.git</connection>
+        <developerConnection>scm:git:git@github.com:tascape/reactor.git</developerConnection>
+        <url>git@github.com:tascape/reactor.git</url>
     </scm>
 
     <distributionManagement>
