@@ -23,8 +23,8 @@ import org.slf4j.LoggerFactory;
  *
  * @author linsong wang
  */
-public class TestIterationData extends AbstractTestData {
-    private static final Logger LOG = LoggerFactory.getLogger(TestIterationData.class);
+public class CaseIterationData extends AbstractCaseData {
+    private static final Logger LOG = LoggerFactory.getLogger(CaseIterationData.class);
     
     public static final String USE_ITERATIONS = "useIterations";
 
@@ -32,34 +32,34 @@ public class TestIterationData extends AbstractTestData {
 
     private int iterations = 1;
 
-    public TestIterationData() {
+    public CaseIterationData() {
     }
 
-    private TestIterationData(int iteration, int iterations) {
+    private CaseIterationData(int iteration, int iterations) {
         this.iteration = iteration;
         this.iterations = iterations;
     }
 
-    public TestIterationData[] getData(String sysPropIterations) {
+    public CaseIterationData[] getData(String sysPropIterations) {
         String n = SystemConfiguration.getInstance().getProperty(sysPropIterations);
         return useIterations(n);
     }
 
-    public TestIterationData[] useIterations(String n) {
+    public CaseIterationData[] useIterations(String n) {
         int iters = 1;
         try {
             iters = Integer.parseInt(n);
         } catch (Exception ex) {
             LOG.warn(ex.getMessage());
         }
-        TestIterationData[] data = new TestIterationData[iters];
+        CaseIterationData[] data = new CaseIterationData[iters];
         for (int i = 0; i < iters; i++) {
-            data[i] = new TestIterationData(i, iters);
+            data[i] = new CaseIterationData(i, iters);
         }
         return data;
     }
 
-    public TestIterationData[] useSystemProperty(String sysPropIterations) {
+    public CaseIterationData[] useSystemProperty(String sysPropIterations) {
         String n = SystemConfiguration.getInstance().getProperty(sysPropIterations);
         return useIterations(n);
     }

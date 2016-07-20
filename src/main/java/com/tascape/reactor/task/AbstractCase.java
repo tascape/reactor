@@ -13,19 +13,18 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.tascape.reactor.test;
+package com.tascape.reactor.task;
 
-import com.tascape.reactor.AbstractTestRunner;
+import com.tascape.reactor.AbstractCaseRunner;
 import com.tascape.reactor.ExecutionResult;
-import com.tascape.reactor.data.AbstractTestData;
-import com.tascape.reactor.data.TestData;
-import com.tascape.reactor.db.TestResult;
+import com.tascape.reactor.data.AbstractCaseData;
+import com.tascape.reactor.db.CaseResult;
 import com.tascape.reactor.driver.EntityDriver;
 import com.tascape.reactor.suite.AbstractSuite;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
-import com.tascape.reactor.AbstractTestResource;
-import com.tascape.reactor.db.TestResultMetric;
-import com.tascape.reactor.driver.TestDriver;
+import com.tascape.reactor.AbstractCaseResource;
+import com.tascape.reactor.db.caseResultMetric;
+import com.tascape.reactor.driver.CaseDriver;
 import com.tascape.reactor.suite.Environment;
 import java.nio.file.Path;
 import java.util.LinkedList;
@@ -39,22 +38,23 @@ import org.junit.rules.TestName;
 import org.junit.rules.Timeout;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import com.tascape.reactor.data.CaseData;
 
 /**
  *
  * @author linsong wang
  */
-public abstract class AbstractTest extends AbstractTestResource {
-    private static final Logger LOG = LoggerFactory.getLogger(AbstractTest.class);
+public abstract class AbstractCase extends AbstractCaseResource {
+    private static final Logger LOG = LoggerFactory.getLogger(AbstractCase.class);
 
-    private static final ThreadLocal<AbstractTest> ABSTRACT_TEST = new ThreadLocal<>();
+    private static final ThreadLocal<AbstractCase> ABSTRACT_CASE = new ThreadLocal<>();
 
-    public static void setTest(AbstractTest test) {
-        ABSTRACT_TEST.set(test);
+    public static void setCase(AbstractCase kase) {
+        ABSTRACT_CASE.set(kase);
     }
 
-    public static AbstractTest getTest() {
-        return ABSTRACT_TEST.get();
+    public static AbstractCase getCase() {
+        return ABSTRACT_CASE.get();
     }
 
     @Rule
@@ -68,17 +68,17 @@ public abstract class AbstractTest extends AbstractTestResource {
 
     protected String execId = sysConfig.getExecId();
 
-    private final Path testLogPath = AbstractTestResource.getTestLogPath();
+    private final Path caseLogPath = AbstractCaseResource.getCaseLogPath();
 
-    protected TestData testData = AbstractTestData.getTestData();
+    protected CaseData caseData = AbstractCaseData.getCaseData();
 
-    private final TestResult tcr = AbstractTestRunner.getTestCaseResult();
+    private final CaseResult tcr = AbstractCaseRunner.getCaseResult();
 
     private ExecutionResult result = ExecutionResult.NA;
 
     private final ExecutorService backgroundExecutorService;
 
-    private final List<TestResultMetric> resultMetrics = new LinkedList<>();
+    private final List<caseResultMetric> resultMetrics = new LinkedList<>();
 
     private final Environment env;
 
@@ -86,9 +86,9 @@ public abstract class AbstractTest extends AbstractTestResource {
 
     private String externalId = "";
 
-    public abstract String getApplicationUnderTest();
+    public abstract String getApplicationUnderTask();
 
-    public AbstractTest() {
+    public AbstractCase() {
         this.result.setPass(0);
         this.result.setFail(0);
 
@@ -97,24 +97,24 @@ public abstract class AbstractTest extends AbstractTestResource {
         builder.setNameFormat(Thread.currentThread().getName() + "-%d");
         this.backgroundExecutorService = Executors.newCachedThreadPool(builder.build());
 
-        suiteClass = this.tcr.getTestCase().getSuiteClass();
+        suiteClass = this.tcr.getTaskCase().getSuiteClass();
         env = AbstractSuite.getEnvionment(suiteClass);
 
-        AbstractTest.setTest(this); // TODO: move this to somewhere else
+        AbstractCase.setCase(this); // TODO: move this to somewhere else
     }
 
     @Override
     public Path getLogPath() {
-        return testLogPath;
+        return caseLogPath;
     }
 
-    protected <D extends EntityDriver> D getEntityDriver(TestDriver testDriver) {
-        String key = testDriver.toString();
-        Class<? extends EntityDriver> clazz = testDriver.getDriverClass();
+    protected <D extends EntityDriver> D getEntityDriver(CaseDriver caseDriver) {
+        String key = caseDriver.toString();
+        Class<? extends EntityDriver> clazz = caseDriver.getDriverClass();
         if (clazz == null) {
-            throw new RuntimeException("EntityDriver type was not specified in TestDriver instance.");
+            throw new RuntimeException("EntityDriver type was not specified in CaseDriver instance.");
         }
-        LOG.debug("Getting runtime driver (name={}, type={}) from suite test environment", key, clazz.getName());
+        LOG.debug("Getting runtime driver (name={}, type={}) from suite environment", key, clazz.getName());
 
         if (suiteClass.isEmpty()) {
             return null;
@@ -122,42 +122,42 @@ public abstract class AbstractTest extends AbstractTestResource {
 
         EntityDriver driver = env.get(key);
         if (driver == null) {
-            LOG.error("Cannot find driver of name={} and type={}, please check suite test environemnt",
+            LOG.error("Cannot find driver of name={} and type={}, please check suite environemnt",
                 key, clazz.getName());
             return null;
         }
-        driver.setTest(this);
+        driver.setCase(this);
         return (D) driver;
     }
 
-    protected TestData getTestData() {
-        if (this.testData != null) {
-            LOG.debug("Getting injected test data {}={}", this.testData.getClass().getName(), this.testData.getValue());
+    protected CaseData getCaseData() {
+        if (this.caseData != null) {
+            LOG.debug("Getting injected case data {}={}", this.caseData.getClass().getName(), this.caseData.getValue());
         }
-        return this.testData;
+        return this.caseData;
     }
 
-    protected <T extends TestData> T getTestData(Class<T> clazz) throws Exception {
-        TestData td = getTestData();
+    protected <T extends CaseData> T getCaseData(Class<T> clazz) throws Exception {
+        CaseData td = AbstractCase.this.getCaseData();
         if (td == null) {
-            LOG.debug("There is no injected test data, create a new instance of ", clazz);
+            LOG.debug("There is no injected case data, create a new instance of ", clazz);
             td = clazz.newInstance();
         }
         return clazz.cast(td);
     }
 
     /**
-     * External id is for exporting test result into other test case management system, such as TestRail.
+     * External id is for exporting case result into other case management system, such as TestRail.
      *
-     * @return external id for test result export
+     * @return external id for case result export
      */
     public String getExternalId() {
         return externalId;
     }
 
     /**
-     * This is called in test method to register external id (if any). Do not call this if test result will not be
-     * exported into other test case management system, such as TestRail.
+     * This is called in case method to register external id (if any). Do not call this if case result will not be
+     * exported into other case management system, such as TestRail.
      *
      * @param externalId external id for test result export
      */
@@ -178,29 +178,29 @@ public abstract class AbstractTest extends AbstractTestResource {
     }
 
     /**
-     * Updates the test metrics presentation for easy understanding.
+     * Updates the case metrics presentation for easy understanding.
      *
-     * @param value update test data value
+     * @param value update case data value
      */
-    protected void updateTestDataFormat(String value) {
-        this.testData.setValue(value);
-        this.tcr.getTestCase().setTestData(value);
+    protected void updateCaseDataFormat(String value) {
+        this.caseData.setValue(value);
+        this.tcr.getTaskCase().setCaseData(value);
     }
 
     protected void setExecutionResult(ExecutionResult executionResult) {
         this.result = executionResult;
     }
 
-    public List<TestResultMetric> getTestResultMetrics() {
+    public List<caseResultMetric> getResultMetrics() {
         return resultMetrics;
     }
 
     protected void putResultMetric(String group, String name, double value) {
-        TestResultMetric metric = new TestResultMetric();
+        caseResultMetric metric = new caseResultMetric();
         metric.setMetricGroup(group);
         metric.setMetricName(name);
         metric.setMetricValue(value);
-        LOG.info("Test result metric '{}' - '{}' - {}", group, name, value);
+        LOG.info("Case result metric '{}' - '{}' - {}", group, name, value);
         this.resultMetrics.add(metric);
     }
 
@@ -213,7 +213,7 @@ public abstract class AbstractTest extends AbstractTestResource {
                     LOG.trace(ex.getMessage());
                     return;
                 }
-                AbstractTest.this.captureScreen();
+                AbstractCase.this.captureScreen();
             }
         });
     }

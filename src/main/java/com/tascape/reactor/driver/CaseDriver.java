@@ -15,30 +15,30 @@
  */
 package com.tascape.reactor.driver;
 
-import com.tascape.reactor.test.AbstractTest;
+import com.tascape.reactor.task.AbstractCase;
 
 /**
  *
  * @author linsong wang
  */
-public class TestDriver {
+public class CaseDriver {
 
-    private final Class<? extends AbstractTest> testClass;
+    private final Class<? extends AbstractCase> caseClass;
 
     private final Class<? extends EntityDriver> driverClass;
 
-    public TestDriver(Class<? extends AbstractTest> testClazz, Class<? extends EntityDriver> driverClazz) {
-        this.testClass = testClazz;
-        this.driverClass = driverClazz;
+    public CaseDriver(Class<? extends AbstractCase> caseClass, Class<? extends EntityDriver> driverClass) {
+        this.caseClass = caseClass;
+        this.driverClass = driverClass;
     }
 
     @Override
     public String toString() {
-        return testClass.getName() + "+" + driverClass.getName() + "+" + this.hashCode();
+        return caseClass.getName() + "+" + driverClass.getName() + "+" + this.hashCode();
     }
 
-    public Class<? extends AbstractTest> getTestClass() {
-        return testClass;
+    public Class<? extends AbstractCase> getCaseClass() {
+        return caseClass;
     }
 
     public Class<? extends EntityDriver> getDriverClass() {

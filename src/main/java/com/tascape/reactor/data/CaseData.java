@@ -19,7 +19,7 @@ package com.tascape.reactor.data;
  *
  * @author linsong wang
  */
-public interface TestData {
+public interface CaseData {
 
     String getClassName();
 
@@ -48,5 +48,5 @@ public interface TestData {
 
     int getPriority();
 
-    TestData setPriority(int priority);
+    CaseData setPriority(int priority);
 }

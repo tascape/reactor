@@ -15,7 +15,7 @@
  */
 package com.tascape.reactor.suite;
 
-import com.tascape.reactor.test.JUnit4Test;
+import com.tascape.reactor.task.JUnit4Case;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -28,7 +28,7 @@ public class JUnit4Suite extends AbstractSuite {
 
     @Override
     public void setUpTestClasses() {
-        this.addTestClass(JUnit4Test.class);
+        this.addCaseClass(JUnit4Case.class);
     }
 
     @Override
@@ -51,7 +51,7 @@ public class JUnit4Suite extends AbstractSuite {
     }
 
     @Override
-    public String getProductUnderTest() {
+    public String getProductUnderTask() {
         return "JUnit4 Sample 1.1";
     }
 }

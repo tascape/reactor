@@ -15,12 +15,11 @@
  */
 package com.tascape.reactor;
 
-import com.tascape.reactor.data.AbstractTestData;
-import com.tascape.reactor.data.TestData;
+import com.tascape.reactor.data.AbstractCaseData;
 import com.tascape.reactor.db.DbHandler;
 import com.tascape.reactor.db.SuiteProperty;
-import com.tascape.reactor.db.TestCase;
-import com.tascape.reactor.db.TestResult;
+import com.tascape.reactor.db.TaskCase;
+import com.tascape.reactor.db.CaseResult;
 import com.tascape.reactor.suite.AbstractSuite;
 import com.tascape.reactor.suite.Environment;
 import java.io.IOException;
@@ -30,38 +29,39 @@ import org.junit.runner.JUnitCore;
 import org.junit.runner.Request;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import com.tascape.reactor.data.CaseData;
 
 /**
  *
  * @author linsong wang
  */
-public class TestRunnerJUnit4 extends AbstractTestRunner implements Callable<TestResult> {
+public class TestRunnerJUnit4 extends AbstractCaseRunner implements Callable<CaseResult> {
     private static final Logger LOG = LoggerFactory.getLogger(TestRunnerJUnit4.class);
 
-    public TestRunnerJUnit4(DbHandler db, TestResult tcr) {
+    public TestRunnerJUnit4(DbHandler db, CaseResult tcr) {
         this.db = db;
         this.tcr = tcr;
         this.execId = this.tcr.getSuiteResultId();
     }
 
     @Override
-    public TestResult call() throws Exception {
-        this.tcr.setTestEnv(Thread.currentThread().getName());
+    public CaseResult call() throws Exception {
+        this.tcr.setCaseEnv(Thread.currentThread().getName());
         Path logFile = this.newLogFile();
         try {
-            if (!db.acquireTestCaseResult(this.tcr)) {
+            if (!db.acquireCaseResult(this.tcr)) {
                 return null;
             }
 
-            AbstractTestRunner.setTestCaseResult(this.tcr);
-            this.injectTestEnvironment();
+            AbstractCaseRunner.setCaseResult(this.tcr);
+            this.injectCaseEnvironment();
 
-            this.runTestCase();
+            this.runTaskCase();
         } catch (Throwable ex) {
-            LOG.error("Cannot execute test case {}", this.tcr.getTestCase().format(), ex);
+            LOG.error("Cannot execute test case {}", this.tcr.getTaskCase().format(), ex);
             this.tcr.setResult(ExecutionResult.FAIL);
             this.tcr.setException(ex);
-            this.db.updateTestExecutionResult(this.tcr);
+            this.db.updateCaseExecutionResult(this.tcr);
             throw ex;
         } finally {
             removeLog4jAppender(logFile);
@@ -71,25 +71,25 @@ public class TestRunnerJUnit4 extends AbstractTestRunner implements Callable<Tes
     }
 
     @Override
-    public void runTestCase() throws Exception {
-        AbstractTestData.setTestData(null);
-        String testDataInfo = this.tcr.getTestCase().getTestDataInfo();
-        if (!testDataInfo.isEmpty()) {
-            TestData testData = AbstractTestData.getTestData(testDataInfo);
-            LOG.debug("Injecting test data: {} = {}", testDataInfo, testData.getValue());
-            AbstractTestData.setTestData(testData);
+    public void runTaskCase() throws Exception {
+        AbstractCaseData.setCaseData(null);
+        String caseDataInfo = this.tcr.getTaskCase().getCaseDataInfo();
+        if (!caseDataInfo.isEmpty()) {
+            CaseData caseData = AbstractCaseData.getCaseData(caseDataInfo);
+            LOG.debug("Injecting case data: {} = {}", caseDataInfo, caseData.getValue());
+            AbstractCaseData.setCaseData(caseData);
         }
 
-        TestCase tc = this.tcr.getTestCase();
-        LOG.debug("Loading test case {}", tc.format());
-        TestRunListener trl = new TestRunListener(this.db, this.tcr);
+        TaskCase tc = this.tcr.getTaskCase();
+        LOG.debug("Loading case {}", tc.format());
+        CaseRunListener trl = new CaseRunListener(this.db, this.tcr);
         JUnitCore core = new JUnitCore();
         core.addListener(trl);
-        core.run(Request.method(Class.forName(tc.getTestClass()), tc.getTestMethod()));
+        core.run(Request.method(Class.forName(tc.getCaseClass()), tc.getCaseMethod()));
     }
 
-    private void injectTestEnvironment() throws Exception {
-        String suiteClass = this.tcr.getTestCase().getSuiteClass();
+    private void injectCaseEnvironment() throws Exception {
+        String suiteClass = this.tcr.getTaskCase().getSuiteClass();
         if (suiteClass == null || suiteClass.isEmpty()) {
             return;
         }
@@ -103,25 +103,25 @@ public class TestRunnerJUnit4 extends AbstractTestRunner implements Callable<Tes
 
             SuiteProperty prop = new SuiteProperty();
             prop.setSuiteResultId(tcr.getSuiteResultId());
-            prop.setPropertyName(SystemConfiguration.SYSPROP_TEST_ENV + "." + Thread.currentThread().getName());
+            prop.setPropertyName(SystemConfiguration.SYSPROP_CASE_ENV + "." + Thread.currentThread().getName());
             prop.setPropertyValue(env.getName());
             this.db.addSuiteExecutionProperty(prop);
         }
     }
 
     private Path newLogFile() throws IOException {
-        TestCase tc = this.tcr.getTestCase();
-        String testLogDir = tc.formatForLogPath() + "." + System.currentTimeMillis() + "."
+        TaskCase tc = this.tcr.getTaskCase();
+        String caseLogDir = tc.formatForLogPath() + "." + System.currentTimeMillis() + "."
             + Thread.currentThread().getName();
-        Path testLogPath = sysConfig.getLogPath().resolve(this.execId).resolve(testLogDir);
-        LOG.debug("Create test case execution log directory {}", testLogPath);
-        if (!testLogPath.toFile().mkdirs()) {
-            throw new IOException("Cannot create log directory " + testLogPath);
+        Path caseLogPath = sysConfig.getLogPath().resolve(this.execId).resolve(caseLogDir);
+        LOG.debug("Create case execution log directory {}", caseLogPath);
+        if (!caseLogPath.toFile().mkdirs()) {
+            throw new IOException("Cannot create log directory " + caseLogPath);
         }
-        AbstractTestResource.setTestLogPath(testLogPath);
-        this.tcr.setLogDir(testLogDir);
+        AbstractCaseResource.setCaseLogPath(caseLogPath);
+        this.tcr.setLogDir(caseLogDir);
 
-        Path logFile = testLogPath.resolve("test.log");
+        Path logFile = caseLogPath.resolve("case.log");
         LOG.debug("Create log file {}", logFile);
         return addLog4jFileAppender(logFile);
     }

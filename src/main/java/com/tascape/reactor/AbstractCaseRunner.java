@@ -16,7 +16,7 @@
 package com.tascape.reactor;
 
 import com.tascape.reactor.db.DbHandler;
-import com.tascape.reactor.db.TestResult;
+import com.tascape.reactor.db.CaseResult;
 import java.io.File;
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -40,28 +40,28 @@ import org.slf4j.LoggerFactory;
  *
  * @author linsong wang
  */
-public abstract class AbstractTestRunner {
-    private static final Logger LOG = LoggerFactory.getLogger(AbstractTestRunner.class);
+public abstract class AbstractCaseRunner {
+    private static final Logger LOG = LoggerFactory.getLogger(AbstractCaseRunner.class);
 
-    private static final ThreadLocal<TestResult> TEST_CASE_RESULT = new ThreadLocal<>();
+    private static final ThreadLocal<CaseResult> CASE_RESULT = new ThreadLocal<>();
 
-    public static void setTestCaseResult(TestResult testCaseResult) {
-        TEST_CASE_RESULT.set(testCaseResult);
+    public static void setCaseResult(CaseResult caseResult) {
+        CASE_RESULT.set(caseResult);
     }
 
-    public static TestResult getTestCaseResult() {
-        return TEST_CASE_RESULT.get();
+    public static CaseResult getCaseResult() {
+        return CASE_RESULT.get();
     }
 
     protected SystemConfiguration sysConfig = SystemConfiguration.getInstance();
 
     protected DbHandler db = null;
 
-    protected TestResult tcr = null;
+    protected CaseResult tcr = null;
 
     protected String execId = "";
 
-    public abstract void runTestCase() throws Exception;
+    public abstract void runTaskCase() throws Exception;
 
     protected void generateHtml(Path logFile) {
         Pattern http = Pattern.compile("((http|https)://\\S+)");
@@ -70,7 +70,7 @@ public abstract class AbstractTestRunner {
         LOG.trace("creating file {}", html);
         try (PrintWriter pw = new PrintWriter(html.toFile())) {
             pw.println("<html><body><pre>");
-            pw.println("<a href='../'>Suite Log Directory</a><br /><a href='./'>Test Log Directory</a>");
+            pw.println("<a href='../'>Suite Log Directory</a><br /><a href='./'>Case Log Directory</a>");
             pw.println();
             List<String> lines = FileUtils.readLines(logFile.toFile(),Charset.defaultCharset());
             List<File> files = new ArrayList<>(Arrays.asList(logFile.getParent().toFile().listFiles()));
@@ -138,7 +138,7 @@ public abstract class AbstractTestRunner {
 
         FileAppender fa = new FileAppender(new PatternLayout(pattern), path.toFile().getAbsolutePath());
         fa.addFilter(new ThreadFilter());
-        fa.setThreshold(sysConfig.getTestLogLevel());
+        fa.setThreshold(sysConfig.getCaseLogLevel());
         fa.setImmediateFlush(true);
         fa.setAppend(true);
         fa.setName(path.toFile().getAbsolutePath());

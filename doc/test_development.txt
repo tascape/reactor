@@ -11,7 +11,7 @@ Install/Update Firefox web browser
   2. install Firebug extension Netexport - http://getfirebug.com/wiki/index.php/Firebug_Extensions
 
 
-Install/Configure Apache httpd to serve test log
+Install/Configure Apache httpd to serve execution log
   1. sudo mkdir /Library/WebServer/Documents/logs
   2. sudo chown johnd /Library/WebServer/Documents/logs
   3. sudo mkdir /qa
@@ -35,6 +35,6 @@ Install Apache Ant
   http://www.vogella.com/tutorials/ApacheAnt/article.html
 
 
-Clone github project tascape/testharness
+Clone github project tascape/reactor
   1. cd /qa
-  2. git clone https://github.com/tascape/testharness.git
+  2. git clone https://github.com/tascape/reactor.git

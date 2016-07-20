@@ -13,11 +13,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.tascape.reactor.test;
+package com.tascape.reactor.task;
 
 import com.tascape.reactor.ExecutionResult;
-import com.tascape.reactor.data.TestDataProvider;
-import com.tascape.reactor.data.TestIterationData;
+import com.tascape.reactor.data.CaseIterationData;
 import java.io.IOException;
 import java.util.Random;
 import javax.xml.xpath.XPathException;
@@ -29,6 +28,7 @@ import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import static org.junit.Assert.*;
+import com.tascape.reactor.data.CaseDataProvider;
 
 /**
  * Base test class for JUnit4 test cases.
@@ -36,10 +36,10 @@ import static org.junit.Assert.*;
  * @author linsong wang
  */
 @Priority(level = 2)
-public class JUnit4Test extends AbstractTest {
-    private static final Logger LOG = LoggerFactory.getLogger(JUnit4Test.class);
+public class JUnit4Case extends AbstractCase {
+    private static final Logger LOG = LoggerFactory.getLogger(JUnit4Case.class);
 
-    public JUnit4Test() {
+    public JUnit4Case() {
     }
 
     @Before
@@ -55,7 +55,7 @@ public class JUnit4Test extends AbstractTest {
     }
 
     @Override
-    public String getApplicationUnderTest() {
+    public String getApplicationUnderTask() {
         LOG.debug("Please override");
         return "testharness";
     }
@@ -127,15 +127,15 @@ public class JUnit4Test extends AbstractTest {
     }
 
     @Test
-    @TestDataProvider(klass = SampleData.class)
+    @CaseDataProvider(klass = SampleData.class)
     public void testDataProvider() throws Exception {
-        SampleData d = this.getTestData(SampleData.class);
+        SampleData d = this.getCaseData(SampleData.class);
         LOG.debug("test data '{}'", d.testParameter);
         Thread.sleep(500);
     }
 
     @Test
-    @TestDataProvider(klass = TestIterationData.class, method = "useIterations", parameter = "3")
+    @CaseDataProvider(klass = CaseIterationData.class, method = "useIterations", parameter = "3")
     public void testIterations() throws Exception {
         LOG.debug("test iteration {}", RandomStringUtils.randomAlphanumeric(10));
         Thread.sleep(500);

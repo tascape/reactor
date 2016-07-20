@@ -28,32 +28,32 @@ import org.slf4j.LoggerFactory;
  *
  * @author linsong wang
  */
-public abstract class AbstractTestResource {
-    private static final Logger LOG = LoggerFactory.getLogger(AbstractTestResource.class);
+public abstract class AbstractCaseResource {
+    private static final Logger LOG = LoggerFactory.getLogger(AbstractCaseResource.class);
 
-    private static final ThreadLocal<Path> TEST_LOG_PATH = new ThreadLocal<Path>() {
+    private static final ThreadLocal<Path> CASE_LOG_PATH = new ThreadLocal<Path>() {
         @Override
         protected Path initialValue() {
             String execId = SystemConfiguration.getInstance().getExecId();
-            Path testLogPath = SystemConfiguration.getInstance().getLogPath().resolve(execId);
-            testLogPath.toFile().mkdirs();
-            return testLogPath;
+            Path caseLogPath = SystemConfiguration.getInstance().getLogPath().resolve(execId);
+            caseLogPath.toFile().mkdirs();
+            return caseLogPath;
         }
     };
 
-    public static void setTestLogPath(Path testLogPath) {
-        LOG.trace("Set runtime log directory {}: {}", Thread.currentThread().getName(), testLogPath);
-        TEST_LOG_PATH.set(testLogPath);
+    public static void setCaseLogPath(Path caseLogPath) {
+        LOG.trace("Set runtime log directory {}: {}", Thread.currentThread().getName(), caseLogPath);
+        CASE_LOG_PATH.set(caseLogPath);
     }
 
-    public static Path getTestLogPath() {
-        return TEST_LOG_PATH.get();
+    public static Path getCaseLogPath() {
+        return CASE_LOG_PATH.get();
     }
 
     protected final SystemConfiguration sysConfig = SystemConfiguration.getInstance();
 
     public Path getLogPath() {
-        return AbstractTestResource.getTestLogPath();
+        return AbstractCaseResource.getCaseLogPath();
     }
 
     public File saveAsTextFile(String prefix, CharSequence data) throws IOException {
@@ -64,7 +64,7 @@ public abstract class AbstractTestResource {
         Path path = this.getLogPath();
         File p = path.toFile();
         if (!p.exists() && !p.mkdirs()) {
-            throw new IOException("Cannot create test log directory " + p);
+            throw new IOException("Cannot create log directory " + p);
         }
         File f = File.createTempFile(prefix + "-", "." + suffix, p);
         FileUtils.write(f, data, Charset.defaultCharset());

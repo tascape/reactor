@@ -16,10 +16,11 @@
 package com.tascape.reactor.db;
 
 import com.tascape.reactor.ExecutionResult;
-import com.tascape.reactor.TestSuite;
+import com.tascape.reactor.TaskSuite;
 import com.tascape.reactor.Utils;
 import com.jolbox.bonecp.BoneCP;
 import com.jolbox.bonecp.BoneCPConfig;
+import com.tascape.reactor.Reactor;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -78,17 +79,17 @@ public class MysqlHandler extends DbHandler {
     }
 
     @Override
-    public void queueSuiteExecution(TestSuite suite, String execId) throws SQLException {
-        LOG.debug("Queue test suite for execution with execution id {}", execId);
-        String lock = "testharness." + execId;
+    public void queueSuiteExecution(TaskSuite suite, String execId) throws SQLException {
+        LOG.debug("Queue suite for execution with execution id {}", execId);
+        String lock = this.getDbLock(execId);
         try (Connection conn = this.getConnection()) {
             try {
                 if (!this.acquireExecutionLock(conn, lock)) {
                     throw new SQLException("Cannot acquire lock of name " + lock);
                 }
 
-                if (this.queueTestSuite(suite, execId)) {
-                    this.queueTestCaseResults(execId, suite.getTests());
+                if (this.queueTaskSuite(suite, execId)) {
+                    this.queueCaseResults(execId, suite.getCases());
                 }
             } finally {
                 this.releaseExecutionLock(conn, lock);
@@ -97,7 +98,7 @@ public class MysqlHandler extends DbHandler {
     }
 
     @Override
-    public boolean queueTestSuite(TestSuite suite, String execId) throws SQLException {
+    public boolean queueTaskSuite(TaskSuite suite, String execId) throws SQLException {
         LOG.debug("Queueing test suite result with execution id {} ", execId);
         final String sql = "SELECT * FROM " + SuiteResult.TABLE_NAME + " WHERE "
             + SuiteResult.SUITE_RESULT_ID + " = ?";
@@ -127,49 +128,49 @@ public class MysqlHandler extends DbHandler {
     }
 
     @Override
-    protected int getTestCaseId(TestCase test) throws SQLException {
+    protected int getCaseId(TaskCase test) throws SQLException {
         LOG.debug("Query for id of test case {} ", test.format());
-        final String sql = "SELECT * FROM " + TestCase.TABLE_NAME + " WHERE "
-            + TestCase.SUITE_CLASS + " = ? AND "
-            + TestCase.TEST_CLASS + " = ? AND "
-            + TestCase.TEST_METHOD + " = ? AND "
-            + TestCase.TEST_DATA_INFO + " = ? AND "
-            + TestCase.TEST_DATA + " = ?";
+        final String sql = "SELECT * FROM " + TaskCase.TABLE_NAME + " WHERE "
+            + TaskCase.SUITE_CLASS + " = ? AND "
+            + TaskCase.CASE_CLASS + " = ? AND "
+            + TaskCase.CASE_METHOD + " = ? AND "
+            + TaskCase.CASE_DATA_INFO + " = ? AND "
+            + TaskCase.CASE_DATA + " = ?";
 
         try (Connection conn = this.getConnection()) {
             PreparedStatement stmt = conn.prepareStatement(sql,
                 ResultSet.TYPE_SCROLL_SENSITIVE,
                 ResultSet.CONCUR_UPDATABLE);
             stmt.setString(1, test.getSuiteClass());
-            stmt.setString(2, test.getTestClass());
-            stmt.setString(3, test.getTestMethod());
-            stmt.setString(4, test.getTestDataInfo());
-            stmt.setString(5, test.getTestData());
+            stmt.setString(2, test.getCaseClass());
+            stmt.setString(3, test.getCaseMethod());
+            stmt.setString(4, test.getCaseDataInfo());
+            stmt.setString(5, test.getCaseData());
             stmt.setMaxRows(1);
 
             ResultSet rs = stmt.executeQuery();
             if (!rs.next()) {
                 rs.moveToInsertRow();
-                rs.updateString(TestCase.SUITE_CLASS, test.getSuiteClass());
-                rs.updateString(TestCase.TEST_CLASS, test.getTestClass());
-                rs.updateString(TestCase.TEST_METHOD, test.getTestMethod());
-                rs.updateString(TestCase.TEST_DATA_INFO, test.getTestDataInfo());
-                rs.updateString(TestCase.TEST_DATA, test.getTestData());
+                rs.updateString(TaskCase.SUITE_CLASS, test.getSuiteClass());
+                rs.updateString(TaskCase.CASE_CLASS, test.getCaseClass());
+                rs.updateString(TaskCase.CASE_METHOD, test.getCaseMethod());
+                rs.updateString(TaskCase.CASE_DATA_INFO, test.getCaseDataInfo());
+                rs.updateString(TaskCase.CASE_DATA, test.getCaseData());
 
                 rs.insertRow();
                 rs.last();
                 rs.updateRow();
             }
-            return rs.getInt(TestCase.TEST_CASE_ID);
+            return rs.getInt(TaskCase.TASK_CASE_ID);
         }
     }
 
     @Override
-    protected void queueTestCaseResults(String execId, List<TestCase> tests) throws SQLException {
+    protected void queueCaseResults(String execId, List<TaskCase> tests) throws SQLException {
         LOG.debug("Queue {} test case result(s) with execution id {} ", tests.size(), execId);
-        final String sql = "SELECT * FROM " + TestResult.TABLE_NAME + " WHERE "
-            + TestResult.SUITE_RESULT + " = ?";
-        Map<String, Integer> idMap = this.getTestCaseIds(tests);
+        final String sql = "SELECT * FROM " + CaseResult.TABLE_NAME + " WHERE "
+            + CaseResult.SUITE_RESULT + " = ?";
+        Map<String, Integer> idMap = this.getCaseIds(tests);
 
         try (Connection conn = this.getConnection()) {
             PreparedStatement stmt = conn.prepareStatement(sql,
@@ -183,24 +184,24 @@ public class MysqlHandler extends DbHandler {
             try {
                 conn.setAutoCommit(false);
                 int index = 0;
-                for (TestCase test : tests) {
+                for (TaskCase test : tests) {
                     index++;
                     rs.moveToInsertRow();
 
                     Integer tcid = idMap.get(test.format());
                     if (tcid == null) {
-                        tcid = this.getTestCaseId(test);
+                        tcid = this.getCaseId(test);
                     }
 
-                    rs.updateString(TestResult.TEST_RESULT_ID, Utils.getUniqueId());
-                    rs.updateString(TestResult.SUITE_RESULT, execId);
-                    rs.updateInt(TestResult.TEST_CASE_ID, tcid);
-                    rs.updateString(TestResult.EXECUTION_RESULT, ExecutionResult.QUEUED.getName());
-                    rs.updateLong(TestResult.START_TIME, System.currentTimeMillis());
-                    rs.updateLong(TestResult.STOP_TIME, System.currentTimeMillis());
-                    rs.updateString(TestResult.TEST_STATION, ".");
-                    rs.updateString(TestResult.TEST_ENV, ".");
-                    rs.updateString(TestResult.LOG_DIR, ".");
+                    rs.updateString(CaseResult.CASE_RESULT_ID, Utils.getUniqueId());
+                    rs.updateString(CaseResult.SUITE_RESULT, execId);
+                    rs.updateInt(CaseResult.TASK_CASE_ID, tcid);
+                    rs.updateString(CaseResult.EXECUTION_RESULT, ExecutionResult.QUEUED.getName());
+                    rs.updateLong(CaseResult.START_TIME, System.currentTimeMillis());
+                    rs.updateLong(CaseResult.STOP_TIME, System.currentTimeMillis());
+                    rs.updateString(CaseResult.CASE_STATION, ".");
+                    rs.updateString(CaseResult.CASE_ENV, ".");
+                    rs.updateString(CaseResult.LOG_DIR, ".");
 
                     rs.insertRow();
                     rs.last();
@@ -218,8 +219,8 @@ public class MysqlHandler extends DbHandler {
 
     @Override
     public void updateSuiteExecutionResult(String execId) throws SQLException {
-        LOG.debug("Update test suite execution result with execution id {}", execId);
-        String lock = "testharness." + execId;
+        LOG.debug("Update suite execution result with execution id {}", execId);
+        String lock = this.getDbLock(execId);
 
         Connection conn = this.getConnection();
         try {
@@ -228,8 +229,8 @@ public class MysqlHandler extends DbHandler {
             }
 
             int total = 0, fail = 0;
-            final String sql1 = "SELECT " + TestResult.EXECUTION_RESULT + " FROM "
-                + TestResult.TABLE_NAME + " WHERE " + TestResult.SUITE_RESULT
+            final String sql1 = "SELECT " + CaseResult.EXECUTION_RESULT + " FROM "
+                + CaseResult.TABLE_NAME + " WHERE " + CaseResult.SUITE_RESULT
                 + " = ?;";
             try (PreparedStatement stmt = this.getConnection().prepareStatement(sql1,
                 ResultSet.TYPE_FORWARD_ONLY,
@@ -238,7 +239,7 @@ public class MysqlHandler extends DbHandler {
                 stmt.setFetchSize(Integer.MIN_VALUE);
                 ResultSet rs = stmt.executeQuery();
                 while (rs.next()) {
-                    String result = rs.getString(TestResult.EXECUTION_RESULT);
+                    String result = rs.getString(CaseResult.EXECUTION_RESULT);
                     String[] pf = result.split("/");
                     if (pf.length == 1) {
                         total++;
@@ -310,8 +311,8 @@ public class MysqlHandler extends DbHandler {
 
     public static void main(String[] args) throws SQLException {
         MysqlHandler db = new MysqlHandler();
-        TestCase tc = new TestCase();
+        TaskCase tc = new TaskCase();
         tc.setSuiteClass("a");
-        LOG.debug("test case id = {}", db.getTestCaseId(tc));
+        LOG.debug("test case id = {}", db.getCaseId(tc));
     }
 }

@@ -15,9 +15,9 @@
  */
 package com.tascape.reactor.driver;
 
-import com.tascape.reactor.AbstractTestResource;
+import com.tascape.reactor.AbstractCaseResource;
 import com.tascape.reactor.comm.EntityCommunication;
-import com.tascape.reactor.test.AbstractTest;
+import com.tascape.reactor.task.AbstractCase;
 import java.nio.file.Path;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -26,19 +26,19 @@ import org.slf4j.LoggerFactory;
  *
  * @author linsong wang
  */
-public abstract class EntityDriver extends AbstractTestResource {
+public abstract class EntityDriver extends AbstractCaseResource {
     private static final Logger LOG = LoggerFactory.getLogger(EntityDriver.class);
 
     private EntityCommunication entityCommunication;
 
-    private AbstractTest test;
+    private AbstractCase kase;
 
     @Override
     public Path getLogPath() {
-        if (this.test == null) {
+        if (this.kase == null) {
             return super.getLogPath();
         }
-        return this.test.getLogPath();
+        return this.kase.getLogPath();
     }
 
     public EntityCommunication getEntityCommunication() {
@@ -49,16 +49,16 @@ public abstract class EntityDriver extends AbstractTestResource {
         this.entityCommunication = entityCommunication;
     }
 
-    public void setTest(AbstractTest test) {
-        this.test = test;
+    public void setCase(AbstractCase kase) {
+        this.kase = kase;
         if (this.entityCommunication != null) {
             this.entityCommunication.setDriver(this);
-            this.entityCommunication.setTest(test);
+            this.entityCommunication.setCase(kase);
         }
     }
 
-    protected AbstractTest getTest() {
-        return test;
+    protected AbstractCase getCase() {
+        return kase;
     }
 
     /**

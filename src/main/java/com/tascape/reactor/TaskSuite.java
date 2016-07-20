@@ -15,14 +15,12 @@
  */
 package com.tascape.reactor;
 
-import com.tascape.reactor.data.AbstractTestData;
-import com.tascape.reactor.data.TestData;
-import com.tascape.reactor.data.TestDataInfo;
-import com.tascape.reactor.data.TestDataProvider;
-import com.tascape.reactor.db.TestCase;
+import com.tascape.reactor.data.AbstractCaseData;
+import com.tascape.reactor.data.CaseDataInfo;
+import com.tascape.reactor.db.TaskCase;
 import com.tascape.reactor.suite.AbstractSuite;
-import com.tascape.reactor.test.AbstractTest;
-import com.tascape.reactor.test.Priority;
+import com.tascape.reactor.task.AbstractCase;
+import com.tascape.reactor.task.Priority;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -33,13 +31,15 @@ import org.apache.commons.lang3.StringUtils;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import com.tascape.reactor.data.CaseData;
+import com.tascape.reactor.data.CaseDataProvider;
 
 /**
  *
  * @author linsong wang
  */
-public class TestSuite {
-    private static final Logger LOG = LoggerFactory.getLogger(TestSuite.class);
+public class TaskSuite {
+    private static final Logger LOG = LoggerFactory.getLogger(TaskSuite.class);
 
     private String name;
 
@@ -47,9 +47,9 @@ public class TestSuite {
     
     private final int numberOfEnvs;
 
-    private List<TestCase> tests = new ArrayList<>();
+    private List<TaskCase> tests = new ArrayList<>();
 
-    public TestSuite(String suiteClass, Pattern testClassRegex, Pattern testMethodRegex, int priority)
+    public TaskSuite(String suiteClass, Pattern testClassRegex, Pattern testMethodRegex, int priority)
         throws Exception {
         LOG.debug("Find test cases in target test suite {}", suiteClass);
         AbstractSuite suite = AbstractSuite.class.cast(Class.forName(suiteClass).newInstance());
@@ -60,12 +60,12 @@ public class TestSuite {
             this.name = suiteClass;
         }
         suite.setUpTestClasses();
-        for (Class<? extends AbstractTest> clazz : suite.getTestClasses()) {
+        for (Class<? extends AbstractCase> clazz : suite.getCaseClasses()) {
             for (Method method : this.getTestMethods(clazz)) {
-                TestCase tc = new TestCase();
+                TaskCase tc = new TaskCase();
                 tc.setSuiteClass(suiteClass);
-                tc.setTestClass(clazz.getName());
-                tc.setTestMethod(method.getName());
+                tc.setCaseClass(clazz.getName());
+                tc.setCaseMethod(method.getName());
                 this.tests.add(tc);
             }
         }
@@ -76,13 +76,13 @@ public class TestSuite {
 
         this.tests = this.filter(priority);
 
-        if (SystemConfiguration.getInstance().isShuffleTests()) {
+        if (SystemConfiguration.getInstance().isShuffleCases()) {
             LOG.debug("do test cases shuffle");
             Collections.shuffle(tests);
         }
     }
 
-    public List<TestCase> getTests() {
+    public List<TaskCase> getCases() {
         return tests;
     }
 
@@ -98,13 +98,13 @@ public class TestSuite {
         return numberOfEnvs;
     }
 
-    private List<TestCase> filter(Pattern testClassRegex, Pattern testMethodRegex) {
+    private List<TaskCase> filter(Pattern testClassRegex, Pattern testMethodRegex) {
         LOG.debug("Use debug class  name fileter {}", testClassRegex);
         LOG.debug("Use debug method name fileter {}", testMethodRegex);
-        List<TestCase> tcs = new ArrayList<>();
+        List<TaskCase> tcs = new ArrayList<>();
         this.tests.stream().forEach((tc) -> {
-            Matcher mc = testClassRegex.matcher(tc.getTestClass());
-            Matcher mm = testMethodRegex.matcher(tc.getTestMethod());
+            Matcher mc = testClassRegex.matcher(tc.getCaseClass());
+            Matcher mm = testMethodRegex.matcher(tc.getCaseMethod());
             if (mc.find() && mm.find()) {
                 tcs.add(tc);
             }
@@ -112,47 +112,47 @@ public class TestSuite {
         return tcs;
     }
 
-    private List<TestCase> filter(int priority) {
-        List<TestCase> tcs = new ArrayList<>();
+    private List<TaskCase> filter(int priority) {
+        List<TaskCase> tcs = new ArrayList<>();
         this.tests.stream().filter((tc) -> !(tc.getPriority() > priority)).forEach((tc) -> {
             tcs.add(tc);
         });
         return tcs;
     }
 
-    private List<TestCase> processTestAnnotations() {
+    private List<TaskCase> processTestAnnotations() {
         LOG.debug("Checking method annotation TestDataProvider for each test case");
-        List<TestCase> tcs = new ArrayList<>();
+        List<TaskCase> tcs = new ArrayList<>();
 
         this.tests.stream().forEach((tc) -> {
             try {
-                Class<?> testClass = Class.forName(tc.getTestClass());
-                Method testMethod = testClass.getDeclaredMethod(tc.getTestMethod());
+                Class<?> testClass = Class.forName(tc.getCaseClass());
+                Method testMethod = testClass.getDeclaredMethod(tc.getCaseMethod());
 
                 Priority p = testMethod.getAnnotation(Priority.class);
                 if (p != null) {
                     tc.setPriority(p.level());
                 }
 
-                TestDataProvider tdp = testMethod.getAnnotation(TestDataProvider.class);
+                CaseDataProvider tdp = testMethod.getAnnotation(CaseDataProvider.class);
                 if (tdp == null) {
                     LOG.debug("Adding test case {}", tc.format());
                     tcs.add(tc);
                 } else {
                     LOG.trace("Calling class {}, method {}, with parameter {}", tdp.klass(), tdp.method(),
                         tdp.parameter());
-                    TestData[] data = AbstractTestData.getTestData(tdp.klass(), tdp.method(), tdp.parameter());
+                    CaseData[] data = AbstractCaseData.getCaseData(tdp.klass(), tdp.method(), tdp.parameter());
                     LOG.debug("{} is a data-driven test case, test data size is {}", tc.format(), data.length);
                     int length = (data.length + "").length();
                     for (int i = 0; i < data.length; i++) {
-                        TestCase t = new TestCase(tc);
-                        TestDataInfo tdi = new TestDataInfo(tdp.klass(), tdp.method(), tdp.parameter(), i);
-                        t.setTestDataInfo(tdi.format(length));
+                        TaskCase t = new TaskCase(tc);
+                        CaseDataInfo tdi = new CaseDataInfo(tdp.klass(), tdp.method(), tdp.parameter(), i);
+                        t.setCaseDataInfo(tdi.format(length));
                         String value = data[i].getValue();
                         if (StringUtils.isEmpty(value)) {
                             value = String.format("%s-%0" + length + "d", data[i].getClassName(), i);
                         }
-                        t.setTestData(value);
+                        t.setCaseData(value);
                         t.setPriority(Math.min(t.getPriority(), data[i].getPriority()));
 
                         LOG.debug("Adding test case {}", t.format());
@@ -166,7 +166,7 @@ public class TestSuite {
         return tcs;
     }
 
-    private <T extends AbstractTest> List<Method> getTestMethods(Class<T> testClass) {
+    private <T extends AbstractCase> List<Method> getTestMethods(Class<T> testClass) {
         List<Method> methods = new ArrayList<>();
         for (Method m : testClass.getDeclaredMethods()) {
             if (m.getAnnotation(Test.class) != null) {

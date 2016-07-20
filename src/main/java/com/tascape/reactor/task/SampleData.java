@@ -13,15 +13,15 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.tascape.reactor.test;
+package com.tascape.reactor.task;
 
-import com.tascape.reactor.data.AbstractTestData;
+import com.tascape.reactor.data.AbstractCaseData;
 
 /**
  *
  * @author linsong wang
  */
-public class SampleData extends AbstractTestData {
+public class SampleData extends AbstractCaseData {
 
     public String testParameter = "";
 

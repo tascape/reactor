@@ -18,8 +18,8 @@ package com.tascape.reactor;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import com.tascape.reactor.db.DbHandler;
 import com.tascape.reactor.db.SuiteProperty;
-import com.tascape.reactor.db.TestCase;
-import com.tascape.reactor.db.TestResult;
+import com.tascape.reactor.db.TaskCase;
+import com.tascape.reactor.db.CaseResult;
 import com.tascape.reactor.exception.SuiteEnvironmentException;
 import com.tascape.reactor.suite.AbstractSuite;
 import java.io.File;
@@ -48,7 +48,7 @@ import org.slf4j.LoggerFactory;
 public class SuiteRunner {
     private static final Logger LOG = LoggerFactory.getLogger(SuiteRunner.class);
 
-    private TestSuite ts = null;
+    private TaskSuite ts = null;
 
     private DbHandler db = null;
 
@@ -56,13 +56,13 @@ public class SuiteRunner {
 
     private final String execId = SYS_CONFIG.getExecId();
 
-    private static final Map<String, TestCase> UNSUPPORTED_TESTS = new HashMap<>();
+    private static final Map<String, TaskCase> UNSUPPORTED_TESTS = new HashMap<>();
 
-    public synchronized static void addUnspportedTestCase(TestCase tc) {
+    public synchronized static void addUnspportedTestCase(TaskCase tc) {
         UNSUPPORTED_TESTS.put(tc.format(), tc);
     }
 
-    public SuiteRunner(TestSuite testSuite) throws Exception {
+    public SuiteRunner(TaskSuite testSuite) throws Exception {
         LOG.debug("Run suite with execution id {}", execId);
         this.ts = testSuite;
 
@@ -78,31 +78,31 @@ public class SuiteRunner {
             throw new IOException("Cannot create directory " + dir);
         }
         ExecutorService executorService = this.getExecutorService();
-        CompletionService<TestResult> completionService = new ExecutorCompletionService<>(executorService);
+        CompletionService<CaseResult> completionService = new ExecutorCompletionService<>(executorService);
 
         this.saveExectionProperties(dir);
         LOG.debug("Start to acquire test cases to execute");
-        int loadLimit = SYS_CONFIG.getTestLoadLimit();
+        int loadLimit = SYS_CONFIG.getCaseLoadLimit();
         LOG.debug("Load queued test cases {} per round", loadLimit);
 
         int numberOfFailures = 0;
         try {
-            List<TestResult> tcrs = this.filter(this.db.getQueuedTestCaseResults(this.execId, loadLimit));
+            List<CaseResult> tcrs = this.filter(this.db.getQueuedCaseResults(this.execId, loadLimit));
             while (!tcrs.isEmpty()) {
-                List<Future<TestResult>> futures = new ArrayList<>();
+                List<Future<CaseResult>> futures = new ArrayList<>();
 
-                for (TestResult tcr : tcrs) {
-                    LOG.debug("Submit test case {}", tcr.getTestCase().format());
+                for (CaseResult tcr : tcrs) {
+                    LOG.debug("Submit test case {}", tcr.getTaskCase().format());
                     futures.add(completionService.submit(new TestRunnerJUnit4(db, tcr)));
                 }
                 LOG.debug("Total {} test cases submitted", futures.size());
 
-                for (Future<TestResult> f : futures) {
+                for (Future<CaseResult> f : futures) {
                     try {
-                        Future<TestResult> future = completionService.take();
-                        TestResult tcr = future.get();
+                        Future<CaseResult> future = completionService.take();
+                        CaseResult tcr = future.get();
                         String result = tcr.getResult().result();
-                        LOG.debug("Get result of test case {} - {}", tcr.getTestCase().format(), result);
+                        LOG.debug("Get result of test case {} - {}", tcr.getTaskCase().format(), result);
                         if (!ExecutionResult.PASS.getName().equals(result) && !result.endsWith("/0")) {
                             numberOfFailures++;
                         }
@@ -112,7 +112,7 @@ public class SuiteRunner {
                     }
                 }
 
-                tcrs = this.filter(this.db.getQueuedTestCaseResults(this.execId, 100));
+                tcrs = this.filter(this.db.getQueuedCaseResults(this.execId, 100));
             }
             String productUnderTest = "NA";
             try {
@@ -120,7 +120,7 @@ public class SuiteRunner {
                 if (AbstractSuite.getSuites().isEmpty()) {
                     throw new SuiteEnvironmentException("Cannot setup suite environment");
                 }
-                productUnderTest = AbstractSuite.getSuites().get(0).getProductUnderTest();
+                productUnderTest = AbstractSuite.getSuites().get(0).getProductUnderTask();
             } catch (Exception ex) {
                 LOG.warn("Cannot get product-under-test", ex);
             } finally {
@@ -181,13 +181,13 @@ public class SuiteRunner {
         return executorService;
     }
 
-    private List<TestResult> filter(List<TestResult> tcrs) {
-        List<TestResult> tcrs0 = new ArrayList<>();
-        tcrs.stream().filter((tcr) -> (UNSUPPORTED_TESTS.get(tcr.getTestCase().format()) == null)).forEach((tcr) -> {
+    private List<CaseResult> filter(List<CaseResult> tcrs) {
+        List<CaseResult> tcrs0 = new ArrayList<>();
+        tcrs.stream().filter((tcr) -> (UNSUPPORTED_TESTS.get(tcr.getTaskCase().format()) == null)).forEach((tcr) -> {
             tcrs0.add(tcr);
         });
 
-        if (SystemConfiguration.getInstance().isShuffleTests()) {
+        if (SystemConfiguration.getInstance().isShuffleCases()) {
             LOG.debug("do test cases shuffle");
             Collections.shuffle(tcrs0);
         }

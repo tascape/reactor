@@ -15,9 +15,9 @@
  */
 package com.tascape.reactor.comm;
 
-import com.tascape.reactor.AbstractTestResource;
+import com.tascape.reactor.AbstractCaseResource;
 import com.tascape.reactor.driver.EntityDriver;
-import com.tascape.reactor.test.AbstractTest;
+import com.tascape.reactor.task.AbstractCase;
 import java.nio.file.Path;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -26,12 +26,12 @@ import org.slf4j.LoggerFactory;
  *
  * @author linsong wang
  */
-public abstract class EntityCommunication extends AbstractTestResource {
+public abstract class EntityCommunication extends AbstractCaseResource {
     private static final Logger LOG = LoggerFactory.getLogger(EntityCommunication.class);
 
     private EntityDriver driver;
 
-    private AbstractTest test;
+    private AbstractCase kase;
 
     public abstract void connect() throws Exception;
 
@@ -45,19 +45,19 @@ public abstract class EntityCommunication extends AbstractTestResource {
         this.driver = driver;
     }
 
-    public void setTest(AbstractTest test) {
-        this.test = test;
+    public void setCase(AbstractCase kase) {
+        this.kase = kase;
     }
 
-    public AbstractTest getTest() {
-        return test;
+    public AbstractCase getCase() {
+        return kase;
     }
 
     @Override
     public Path getLogPath() {
-        if (this.test == null) {
+        if (this.kase == null) {
             return super.getLogPath();
         }
-        return this.test.getLogPath();
+        return this.kase.getLogPath();
     }
 }

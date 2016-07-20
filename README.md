@@ -1,15 +1,12 @@
-testharness
-http://tascape.github.io/testharness/
-
-TestHarness is a test automation framework, which includes test case management, test execution engine, and test reporting web UI, which in project https://github.com/tascape/testharness-report.  
+Reactor is an automation framework, which includes case management, execution engine, and reporting web app, which in project https://github.com/tascape/reactor-report.  
   
-Test cases are written in JUnit format, with customized test data provider.  
-Test cases are organized in test suites, which also manage the test environment.  
+Cases are written in JUnit format, with customized data provider.  
+Cases are organized in suites, which also manage the execution environment.  
   
 ```
 <dependency>
-    <groupId>com.tascape.qa</groupId>
-    <artifactId>testharness</artifactId>
-    <version>1.1.1</version>
+    <groupId>com.tascape</groupId>
+    <artifactId>reactor</artifactId>
+    <version>1.2.0</version>
 </dependency>
 ```

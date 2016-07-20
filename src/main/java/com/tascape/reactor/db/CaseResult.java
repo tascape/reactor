@@ -15,6 +15,7 @@
  */
 package com.tascape.reactor.db;
 
+import com.sun.corba.se.spi.activation._ActivatorImplBase;
 import com.tascape.reactor.ExecutionResult;
 import java.io.PrintWriter;
 import java.io.StringWriter;
@@ -33,16 +34,16 @@ import org.slf4j.LoggerFactory;
  *
  * @author linsong wang
  */
-public class TestResult {
-    private static final Logger LOG = LoggerFactory.getLogger(TestResult.class);
+public class CaseResult {
+    private static final Logger LOG = LoggerFactory.getLogger(CaseResult.class);
 
-    public static final String TABLE_NAME = "test_result";
+    public static final String TABLE_NAME = "case_result";
 
-    public static final String TEST_RESULT_ID = "TEST_RESULT_ID";
+    public static final String CASE_RESULT_ID = "CASE_RESULT_ID";
 
     public static final String SUITE_RESULT = "SUITE_RESULT";
 
-    public static final String TEST_CASE_ID = "TEST_CASE_ID";
+    public static final String TASK_CASE_ID = "TASK_CASE_ID";
 
     public static final String EXECUTION_RESULT = "EXECUTION_RESULT";
 
@@ -54,18 +55,18 @@ public class TestResult {
 
     public static final String RETRY = "RETRY";
 
-    public static final String TEST_STATION = "TEST_STATION";
+    public static final String CASE_STATION = "CASE_STATION";
 
     public static final String LOG_DIR = "LOG_DIR";
 
     public static final String EXTERNAL_ID = "EXTERNAL_ID";
 
-    public static final String TEST_ENV = "TEST_ENV";
+    public static final String CASE_ENV = "CASE_ENV";
 
     @Id
     @Basic(optional = false)
-    @Column(name = "TEST_RESULT_ID")
-    private String testResultId;
+    @Column(name = "CASE_RESULT_ID")
+    private String caseResultId;
 
     @Column(name = "EXECUTION_RESULT")
     private String executionResult = ExecutionResult.NA.getName();
@@ -80,8 +81,8 @@ public class TestResult {
 
     private Integer retry = 2;
 
-    @Column(name = "TEST_STATION")
-    private String testStation;
+    @Column(name = "CASE_STATION")
+    private String caseStation;
 
     @Column(name = "LOG_DIR")
     private String logDir;
@@ -89,23 +90,23 @@ public class TestResult {
     @Column(name = "EXTERNAL_ID")
     private String externalId;
 
-    @Column(name = "TEST_ENV")
-    private String testEnv;
+    @Column(name = "CASE_ENV")
+    private String caseEnv;
 
     @JoinColumn(name = "SUITE_RESULT", referencedColumnName = "SUITE_RESULT_ID")
     @ManyToOne
     private SuiteResult suiteResult;
 
-    @JoinColumn(name = "TEST_CASE_ID", referencedColumnName = "TEST_CASE_ID")
+    @JoinColumn(name = "TASK_CASE_ID", referencedColumnName = "TASK_CASE_ID")
     @ManyToOne
-    private TestCase testCaseId;
+    private TaskCase taskCaseId;
 
-    @OneToMany(mappedBy = "testResultId")
-    private List<com.tascape.reactor.db.TestResultMetric> testResultMetricList;
+    @OneToMany(mappedBy = "caseResultId")
+    private List<com.tascape.reactor.db.caseResultMetric> caseResultMetricList;
 
     private ExecutionResult result = ExecutionResult.NA;
 
-    private TestCase testCase = null;
+    private TaskCase taskCase = null;
 
     private String suiteResultId = "";
 
@@ -113,19 +114,19 @@ public class TestResult {
 
     private String stacktrace = "";
 
-    TestResult() {
+    CaseResult() {
     }
 
-    public TestResult(TestCase tc) {
-        this.testCase = tc;
+    public CaseResult(TaskCase tc) {
+        this.taskCase = tc;
     }
 
-    public String getTestResultId() {
-        return testResultId;
+    public String getCaseResultId() {
+        return caseResultId;
     }
 
-    public void setTestResultId(String testResultId) {
-        this.testResultId = testResultId;
+    public void setCaseResultId(String caseResultId) {
+        this.caseResultId = caseResultId;
     }
 
     public String getExecutionResult() {
@@ -168,12 +169,12 @@ public class TestResult {
         this.retry = retry;
     }
 
-    public String getTestStation() {
-        return testStation;
+    public String getCaseStation() {
+        return caseStation;
     }
 
-    public void setTestStation(String testStation) {
-        this.testStation = testStation;
+    public void setCaseStation(String caseStation) {
+        this.caseStation = caseStation;
     }
 
     public String getLogDir() {
@@ -192,12 +193,12 @@ public class TestResult {
         this.externalId = externalId;
     }
 
-    public String getTestEnv() {
-        return testEnv;
+    public String getCaseEnv() {
+        return caseEnv;
     }
 
-    public void setTestEnv(String testEnv) {
-        this.testEnv = testEnv;
+    public void setCaseEnv(String caseEnv) {
+        this.caseEnv = caseEnv;
     }
 
     public SuiteResult getSuiteResult() {
@@ -208,21 +209,21 @@ public class TestResult {
         this.suiteResult = suiteResult;
     }
 
-    public TestCase getTestCaseId() {
-        return testCaseId;
+    public TaskCase getTaskCaseId() {
+        return taskCaseId;
     }
 
-    public void setTestCaseId(TestCase testCaseId) {
-        this.testCaseId = testCaseId;
+    public void setTaskCaseId(TaskCase taskCaseId) {
+        this.taskCaseId = taskCaseId;
     }
 
     @XmlTransient
-    public List<TestResultMetric> getTestResultMetricList() {
-        return testResultMetricList;
+    public List<caseResultMetric> getCaseResultMetricList() {
+        return caseResultMetricList;
     }
 
-    public void setTestResultMetricList(List<TestResultMetric> testResultMetricList) {
-        this.testResultMetricList = testResultMetricList;
+    public void setCaseResultMetricList(List<caseResultMetric> caseResultMetricList) {
+        this.caseResultMetricList = caseResultMetricList;
     }
 
     public String getSuiteResultId() {
@@ -237,12 +238,12 @@ public class TestResult {
         this.startTime = startTime;
     }
 
-    public TestCase getTestCase() {
-        return testCase;
+    public TaskCase getTaskCase() {
+        return taskCase;
     }
 
-    public void setTestCase(TestCase testCase) {
-        this.testCase = testCase;
+    public void setTaskCase(TaskCase taskCase) {
+        this.taskCase = taskCase;
     }
 
     public Throwable getException() {
@@ -266,24 +267,24 @@ public class TestResult {
     @Override
     public int hashCode() {
         int hash = 0;
-        hash += (testResultId != null ? testResultId.hashCode() : 0);
+        hash += (caseResultId != null ? caseResultId.hashCode() : 0);
         return hash;
     }
 
     @Override
     public boolean equals(Object object) {
         // TODO: Warning - this method won't work in the case the id fields are not set
-        if (!(object instanceof TestResult)) {
+        if (!(object instanceof CaseResult)) {
             return false;
         }
-        TestResult other = (TestResult) object;
-        return !((this.testResultId == null && other.testResultId != null)
-            || (this.testResultId != null && !this.testResultId.equals(other.testResultId)));
+        CaseResult other = (CaseResult) object;
+        return !((this.caseResultId == null && other.caseResultId != null)
+            || (this.caseResultId != null && !this.caseResultId.equals(other.caseResultId)));
     }
 
     @Override
     public String toString() {
-        return "com.tascape.qa.th.db.TestResult[ testResultId=" + testResultId + " ]";
+        return this.getClass().getName() + "[" + caseResultId + "]";
     }
 
     public ExecutionResult getResult() {

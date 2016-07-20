@@ -17,11 +17,11 @@ package com.tascape.reactor.suite;
 
 import com.tascape.reactor.ExecutionResult;
 import com.tascape.reactor.SystemConfiguration;
-import com.tascape.reactor.TestHarness;
+import com.tascape.reactor.Reactor;
 import com.tascape.reactor.driver.EntityDriver;
-import com.tascape.reactor.driver.TestDriver;
+import com.tascape.reactor.driver.CaseDriver;
 import com.tascape.reactor.driver.PoolableEntityDriver;
-import com.tascape.reactor.test.AbstractTest;
+import com.tascape.reactor.task.AbstractCase;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -58,7 +58,7 @@ public abstract class AbstractSuite {
 
     private static final List<AbstractSuite> SUITES = new ArrayList<>();
 
-    private final List<Class<? extends AbstractTest>> testClasses = new ArrayList<>();
+    private final List<Class<? extends AbstractCase>> caseClasses = new ArrayList<>();
 
     private final Environment suiteEnvironment = new Environment();
 
@@ -88,7 +88,7 @@ public abstract class AbstractSuite {
     }
 
     public void runByClass() throws Exception {
-        this.testClasses.forEach((clazz) -> {
+        this.caseClasses.forEach((clazz) -> {
             JUnitCore core = new JUnitCore();
             core.run(Request.classWithoutSuiteMethod(clazz));
         });
@@ -98,14 +98,14 @@ public abstract class AbstractSuite {
         this.tearDownEnvironment();
     }
 
-    public List<Class<? extends AbstractTest>> getTestClasses() {
-        return testClasses;
+    public List<Class<? extends AbstractCase>> getCaseClasses() {
+        return caseClasses;
     }
 
-    protected void putTestDirver(TestDriver testDriver, EntityDriver driver) {
-        String key = testDriver.toString();
-        LOG.debug("Putting runtime driver {}={} into suite test environment", key, driver);
-        Class<? extends EntityDriver> clazz = testDriver.getDriverClass();
+    protected void putTestDirver(CaseDriver caseDriver, EntityDriver driver) {
+        String key = caseDriver.toString();
+        LOG.debug("Putting runtime driver {}={} into suite environment", key, driver);
+        Class<? extends EntityDriver> clazz = caseDriver.getDriverClass();
         if (clazz != null && !clazz.isInstance(driver)) {
             throw new RuntimeException("wrong driver type, " + key + " vs " + driver);
         }
@@ -126,11 +126,11 @@ public abstract class AbstractSuite {
         throw new UnsupportedOperationException("Cannot add non-poolable driver with the same key " + key);
     }
 
-    protected <T extends AbstractTest> void addTestClass(Class<T> clazz) {
-        if (testClasses.contains(clazz)) {
-            throw new UnsupportedOperationException("Adding same test class multiple times is not supported yet.");
+    protected <T extends AbstractCase> void addCaseClass(Class<T> clazz) {
+        if (caseClasses.contains(clazz)) {
+            throw new UnsupportedOperationException("Adding same case class multiple times is not supported yet.");
         }
-        this.testClasses.add(clazz);
+        this.caseClasses.add(clazz);
     }
 
     protected String getSuiteProperty(String name, String defValue) {
@@ -158,12 +158,12 @@ public abstract class AbstractSuite {
     }
 
     /**
-     * Gets the info of product-under-test. This method is called at the end of your test suite, before the suite
+     * Gets the info of product-under-task. This method is called at the end of your suite, before the suite
      * environment is torn down automatically.
      *
      * @return name and version of product
      */
-    public abstract String getProductUnderTest();
+    public abstract String getProductUnderTask();
 
     protected abstract void tearDownEnvironment();
 
@@ -176,7 +176,7 @@ public abstract class AbstractSuite {
     }
 
     /**
-     * This is used to launch TestHarness from within individual test suite classes.
+     * This is used to launch Reactor from within individual suite classes.
      *
      * @param args command arguments
      *
@@ -199,7 +199,7 @@ public abstract class AbstractSuite {
             }
             suiteClassName = className;
         }
-        sysConfig.setTestSuite(suiteClassName);
-        TestHarness.main(args);
+        sysConfig.setSuite(suiteClassName);
+        Reactor.main(args);
     }
 }

@@ -15,7 +15,7 @@
  */
 package com.tascape.reactor.db;
 
-import com.tascape.reactor.TestSuite;
+import com.tascape.reactor.TaskSuite;
 import java.io.Serializable;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -110,7 +110,7 @@ public class SuiteResult implements Serializable {
     private String productUnderTest;
 
     @OneToMany(mappedBy = "suiteResult")
-    private List<TestResult> testResultList;
+    private List<CaseResult> caseResultList;
 
     @OneToMany(mappedBy = "suiteResult")
     private List<SuiteProperty> suitePropertyList;
@@ -118,21 +118,21 @@ public class SuiteResult implements Serializable {
     public SuiteResult() {
     }
 
-    public SuiteResult(TestSuite testSuite, String execId) {
+    public SuiteResult(TaskSuite taskSuite, String execId) {
         Long time = System.currentTimeMillis();
         this.suiteResultId = execId;
-        this.suiteName = testSuite.getName();
-        this.projectName = testSuite.getProjectName();
+        this.suiteName = taskSuite.getName();
+        this.projectName = taskSuite.getProjectName();
         this.jobName = SYS_CONFIG.getJobName();
         this.jobBuildNumber = SYS_CONFIG.getJobBuildNumber();
         this.jobBuildUrl = SYS_CONFIG.getJobBuildUrl();
         this.executionResult = "";
         this.startTime = time;
         this.stopTime = time + 1;
-        this.numberOfTests = testSuite.getTests().size();
-        this.numberOfFailure = testSuite.getTests().size();
+        this.numberOfTests = taskSuite.getCases().size();
+        this.numberOfFailure = taskSuite.getCases().size();
         this.invisibleEntry = false;
-        this.productUnderTest = SYS_CONFIG.getProdUnderTest();
+        this.productUnderTest = SYS_CONFIG.getProdUnderTask();
         this.invisibleEntry = !SYS_CONFIG.getResultVisibility();
     }
 
@@ -269,12 +269,12 @@ public class SuiteResult implements Serializable {
     }
 
     @XmlTransient
-    public List<TestResult> getTestResultList() {
-        return testResultList;
+    public List<CaseResult> getCaseResultList() {
+        return caseResultList;
     }
 
-    public void setTestResultList(List<TestResult> testResultList) {
-        this.testResultList = testResultList;
+    public void setCaseResultList(List<CaseResult> caseResultList) {
+        this.caseResultList = caseResultList;
     }
 
     public List<SuiteProperty> getSuitePropertyList() {

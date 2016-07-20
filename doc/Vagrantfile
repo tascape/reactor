@@ -24,7 +24,7 @@ Vagrant.configure(2) do |config|
 
 
   config.vm.provision "shell", inline: <<-SHELL
-    wget "https://raw.githubusercontent.com/tascape/testharness/master/doc/ubuntu" -O ubuntu
+    wget "https://raw.githubusercontent.com/tascape/reactor/master/doc/ubuntu" -O ubuntu
     bash ubuntu
   SHELL
 

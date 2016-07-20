@@ -32,17 +32,17 @@ import javax.xml.bind.annotation.XmlRootElement;
  * @author linsong wang
  */
 @MappedSuperclass
-@Table(name = "test_result_metric")
+@Table(name = "case_result_metric")
 @XmlRootElement
-public class TestResultMetric implements Serializable {
+public class caseResultMetric implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
-    public static final String TABLE_NAME = "test_result_metric";
+    public static final String TABLE_NAME = "case_result_metric";
 
-    public static final String TEST_RESULT_METRIC_ID = "TEST_RESULT_METRIC_ID";
+    public static final String CASE_RESULT_METRIC_ID = "CASE_RESULT_METRIC_ID";
 
-    public static final String TEST_RESULT_ID = "TEST_RESULT_ID";
+    public static final String CASE_RESULT_ID = "CASE_RESULT_ID";
 
     public static final String METRIC_GROUP = "METRIC_GROUP";
 
@@ -53,8 +53,8 @@ public class TestResultMetric implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Basic(optional = false)
-    @Column(name = "TEST_RESULT_METRIC_ID")
-    private Integer testResultMetricId;
+    @Column(name = "CASE_RESULT_METRIC_ID")
+    private Integer caseResultMetricId;
 
     @Column(name = "METRIC_GROUP")
     private String metricGroup;
@@ -66,23 +66,23 @@ public class TestResultMetric implements Serializable {
     @Column(name = "METRIC_VALUE")
     private Double metricValue;
 
-    @JoinColumn(name = "TEST_RESULT_ID", referencedColumnName = "TEST_RESULT_ID")
+    @JoinColumn(name = "CASE_RESULT_ID", referencedColumnName = "CASE_RESULT_ID")
     @ManyToOne
-    private TestResult testResultId;
+    private CaseResult caseResultId;
 
-    public TestResultMetric() {
+    public caseResultMetric() {
     }
 
-    public TestResultMetric(Integer testResultMetricId) {
-        this.testResultMetricId = testResultMetricId;
+    public caseResultMetric(Integer caseResultMetricId) {
+        this.caseResultMetricId = caseResultMetricId;
     }
 
-    public Integer getTestResultMetricId() {
-        return testResultMetricId;
+    public Integer getCaseResultMetricId() {
+        return caseResultMetricId;
     }
 
-    public void setTestResultMetricId(Integer testResultMetricId) {
-        this.testResultMetricId = testResultMetricId;
+    public void setCaseResultMetricId(Integer caseResultMetricId) {
+        this.caseResultMetricId = caseResultMetricId;
     }
 
     public String getMetricGroup() {
@@ -109,33 +109,33 @@ public class TestResultMetric implements Serializable {
         this.metricValue = metricValue;
     }
 
-    public TestResult getTestResultId() {
-        return testResultId;
+    public CaseResult getCaseResultId() {
+        return caseResultId;
     }
 
-    public void setTestResultId(TestResult testResultId) {
-        this.testResultId = testResultId;
+    public void setCaseResultId(CaseResult caseResultId) {
+        this.caseResultId = caseResultId;
     }
 
     @Override
     public int hashCode() {
         int hash = 0;
-        hash += (testResultMetricId != null ? testResultMetricId.hashCode() : 0);
+        hash += (caseResultMetricId != null ? caseResultMetricId.hashCode() : 0);
         return hash;
     }
 
     @Override
     public boolean equals(Object object) {
-        if (!(object instanceof TestResultMetric)) {
+        if (!(object instanceof caseResultMetric)) {
             return false;
         }
-        TestResultMetric other = (TestResultMetric) object;
-        return !((this.testResultMetricId == null && other.testResultMetricId != null)
-            || (this.testResultMetricId != null && !this.testResultMetricId.equals(other.testResultMetricId)));
+        caseResultMetric other = (caseResultMetric) object;
+        return !((this.caseResultMetricId == null && other.caseResultMetricId != null)
+            || (this.caseResultMetricId != null && !this.caseResultMetricId.equals(other.caseResultMetricId)));
     }
 
     @Override
     public String toString() {
-        return "com.tascape.qa.th.db.TestResultMetric[ testResultMetricId=" + testResultMetricId + " ]";
+        return caseResultMetricId + " " + metricName + "=" + metricValue;
     }
 }

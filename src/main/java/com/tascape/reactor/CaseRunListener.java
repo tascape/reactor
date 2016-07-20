@@ -16,9 +16,9 @@
 package com.tascape.reactor;
 
 import com.tascape.reactor.db.DbHandler;
-import com.tascape.reactor.db.TestResult;
-import com.tascape.reactor.db.TestResultMetric;
-import com.tascape.reactor.test.AbstractTest;
+import com.tascape.reactor.db.CaseResult;
+import com.tascape.reactor.db.caseResultMetric;
+import com.tascape.reactor.task.AbstractCase;
 import java.lang.reflect.Field;
 import java.sql.SQLException;
 import java.util.List;
@@ -34,16 +34,16 @@ import org.slf4j.LoggerFactory;
  *
  * @author linsong wang
  */
-public class TestRunListener extends RunListener {
-    private static final Logger LOG = LoggerFactory.getLogger(TestRunListener.class);
+public class CaseRunListener extends RunListener {
+    private static final Logger LOG = LoggerFactory.getLogger(CaseRunListener.class);
 
     private DbHandler db = null;
 
-    private TestResult tcr = null;
+    private CaseResult tcr = null;
 
     private Throwable throwable;
 
-    public TestRunListener(DbHandler db, TestResult tcr) {
+    public CaseRunListener(DbHandler db, CaseResult tcr) {
         this.db = db;
         this.tcr = tcr;
     }
@@ -76,20 +76,20 @@ public class TestRunListener extends RunListener {
         this.tcr.setStartTime(millis);
         this.tcr.setStopTime(millis + 11);
         this.tcr.setResult(ExecutionResult.RUNNING);
-        this.tcr.setTestStation(SystemConfiguration.getInstance().getHostName());
+        this.tcr.setCaseStation(SystemConfiguration.getInstance().getHostName());
 
         try {
-            this.db.updateTestExecutionResult(this.tcr);
+            this.db.updateCaseExecutionResult(this.tcr);
         } catch (SQLException ex) {
-            LOG.error("Cannot update test result", ex);
+            LOG.error("Cannot update case result", ex);
             throw ex;
         }
     }
 
     /**
-     * Called when an atomic test flags that it assumes a condition that is false
+     * Called when an atomic kase flags that it assumes a condition that is false
      *
-     * @param failure describes the test that failed and the {@link AssumptionViolatedException} that was thrown
+     * @param failure describes the kase that failed and the {@link AssumptionViolatedException} that was thrown
      */
     @Override
     public void testAssumptionFailure(Failure failure) {
@@ -98,33 +98,33 @@ public class TestRunListener extends RunListener {
     }
 
     /**
-     * Called when an atomic test is about to be started.
+     * Called when an atomic kase is about to be started.
      *
-     * @param description the description of the test that is about to be run (generally a class and method name)
+     * @param description the description of the kase that is about to be run (generally a class and method name)
      *
      * @throws Exception for various issues
      */
     @Override
     public void testStarted(Description description) throws Exception {
-        LOG.debug("Test method started {}.{}", description.getClassName(), description.getMethodName());
+        LOG.debug("Case method started {}.{}", description.getClassName(), description.getMethodName());
 
-        AbstractTest test = AbstractTest.getTest();
+        AbstractCase test = AbstractCase.getCase();
         if (test != null) {
-            String aut = test.getApplicationUnderTest();
+            String aut = test.getApplicationUnderTask();
             if (aut == null || aut.isEmpty()) {
                 return;
             }
             this.tcr.setAut(aut);
 
-            this.db.updateTestExecutionResult(this.tcr);
+            this.db.updateCaseExecutionResult(this.tcr);
         }
-        LOG.debug("Application under test: {}", this.tcr.getAut());
+        LOG.debug("Application under task: {}", this.tcr.getAut());
     }
 
     /**
-     * Called when an atomic test fails.
+     * Called when an atomic kase fails.
      *
-     * @param failure describes the test that failed and the exception that was thrown
+     * @param failure describes the kase that failed and the exception that was thrown
      *
      * @throws Exception for various issues
      */
@@ -140,42 +140,42 @@ public class TestRunListener extends RunListener {
             return;
         }
 
-        AbstractTest test = AbstractTest.getTest();
+        AbstractCase test = AbstractCase.getCase();
         this.tcr.setException(throwable);
     }
 
     /**
-     * Called when an atomic test has finished, whether the test succeeds or fails.
+     * Called when an atomic kase has finished, whether the kase succeeds or fails.
      *
-     * @param description the description of the test that just ran
+     * @param description the description of the kase that just ran
      *
      * @throws Exception for various issues
      */
     @Override
     public void testFinished(Description description) throws Exception {
-        LOG.debug("Test method finished {}.{}", description.getClassName(), description.getMethodName());
+        LOG.debug("Case method finished {}.{}", description.getClassName(), description.getMethodName());
         if (this.db == null || this.tcr == null) {
             return;
         }
 
-        AbstractTest test = AbstractTest.getTest();
-        if (test == null) {
+        AbstractCase kase = AbstractCase.getCase();
+        if (kase == null) {
             return;
         }
 
-        this.tcr.setExternalId(test.getExternalId());
-        test.cleanBackgoundTasks();
+        this.tcr.setExternalId(kase.getExternalId());
+        kase.cleanBackgoundTasks();
 
-        List<TestResultMetric> resultMetrics = test.getTestResultMetrics();
+        List<caseResultMetric> resultMetrics = kase.getResultMetrics();
         if (!resultMetrics.isEmpty()) {
-            db.saveTestResultMetrics(tcr.getTestResultId(), resultMetrics);
+            db.saveCaseResultMetrics(tcr.getCaseResultId(), resultMetrics);
         }
     }
 
     /**
      * Called when all tests have finished
      *
-     * @param result the summary of the test run, including all the tests that failed
+     * @param result the summary of the kase run, including all the tests that failed
      *
      * @throws Exception for various issues
      */
@@ -197,7 +197,7 @@ public class TestRunListener extends RunListener {
         this.tcr.setStopTime(System.currentTimeMillis());
         this.tcr.setResult(pass ? ExecutionResult.PASS : ExecutionResult.FAIL);
 
-        AbstractTest test = AbstractTest.getTest();
+        AbstractCase test = AbstractCase.getCase();
         if (test != null) {
             ExecutionResult er = test.getExecutionResult();
             if (!ExecutionResult.NA.equals(er)) {
@@ -207,17 +207,17 @@ public class TestRunListener extends RunListener {
         } else {
             LOG.warn("Null test case? Test may have failed in @BeforeClass methods.");
         }
-        AbstractTest.setTest(null);
+        AbstractCase.setCase(null);
 
         this.checkExceptionToRequeue(throwable);
-        this.db.updateTestExecutionResult(this.tcr);
+        this.db.updateCaseExecutionResult(this.tcr);
     }
 
     /**
-     * Called when a test will not be run, generally because a test method is annotated with
-     * {@link org.junit.Ignore}.
+     * Called when a kase will not be run, generally because a kase method is annotated with
+ {@link org.junit.Ignore}.
      *
-     * @param description describes the test that will not be run
+     * @param description describes the kase that will not be run
      *
      * @throws Exception for various issues
      */
@@ -239,7 +239,7 @@ public class TestRunListener extends RunListener {
         if (!(throwable instanceof AssumptionViolatedException)) {
             return;
         }
-        LOG.debug("Requeue test case {}", this.tcr.getTestCase().format());
+        LOG.debug("Requeue test case {}", this.tcr.getTaskCase().format());
         this.tcr.setRetry(this.tcr.getRetry() + 1);
         this.tcr.setResult(ExecutionResult.QUEUED);
     }

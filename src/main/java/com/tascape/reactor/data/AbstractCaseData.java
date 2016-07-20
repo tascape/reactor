@@ -15,7 +15,7 @@
  */
 package com.tascape.reactor.data;
 
-import com.tascape.reactor.test.Priority;
+import com.tascape.reactor.task.Priority;
 import java.lang.reflect.Method;
 import java.util.HashMap;
 import java.util.Map;
@@ -26,27 +26,27 @@ import org.slf4j.LoggerFactory;
  *
  * @author linsong wang
  */
-public abstract class AbstractTestData implements TestData {
-    private static final Logger LOG = LoggerFactory.getLogger(AbstractTestData.class);
+public abstract class AbstractCaseData implements CaseData {
+    private static final Logger LOG = LoggerFactory.getLogger(AbstractCaseData.class);
 
-    private static final ThreadLocal<TestData> TEST_DATA = new ThreadLocal<>();
+    private static final ThreadLocal<CaseData> CASE_DATA = new ThreadLocal<>();
 
-    public static void setTestData(TestData data) {
-        TEST_DATA.set(data);
+    public static void setCaseData(CaseData data) {
+        CASE_DATA.set(data);
     }
 
-    public static TestData getTestData() {
-        return TEST_DATA.get();
+    public static CaseData getCaseData() {
+        return CASE_DATA.get();
     }
 
-    private static final Map<String, TestData[]> LOADED_DATA = new HashMap<>();
+    private static final Map<String, CaseData[]> LOADED_DATA = new HashMap<>();
 
-    private static final Map<Class<? extends TestData>, Object> LOADED_PROVIDERS = new HashMap<>();
+    private static final Map<Class<? extends CaseData>, Object> LOADED_PROVIDERS = new HashMap<>();
 
     private String value = null;
 
     /*
-     * works together with Priority of test method. NONE means no data priority specified.
+     * works together with Priority of case method. NONE means no data priority specified.
      */
     private int priority = Priority.NONE;
 
@@ -58,7 +58,7 @@ public abstract class AbstractTestData implements TestData {
     @Override
     public String getValue() {
         if (value == null) {
-            LOG.warn("Value of test data is not specified.");
+            LOG.warn("Value of case data is not specified.");
             return this.toString();
         }
         return this.value;
@@ -75,46 +75,46 @@ public abstract class AbstractTestData implements TestData {
     }
 
     @Override
-    public TestData setPriority(int priority) {
+    public CaseData setPriority(int priority) {
         this.priority = priority;
         return this;
     }
 
-    public static TestData getTestData(String testDataInfo) throws Exception {
-        TestDataInfo info = new TestDataInfo(testDataInfo);
-        TestData[] data = getTestData(info.getKlass(), info.getMethod(), info.getParameter());
+    public static CaseData getCaseData(String caseDataInfo) throws Exception {
+        CaseDataInfo info = new CaseDataInfo(caseDataInfo);
+        CaseData[] data = getCaseData(info.getKlass(), info.getMethod(), info.getParameter());
         int index = info.getIndex();
         if (data.length <= index) {
-            throw new Exception("Cannot find test data using " + testDataInfo);
+            throw new Exception("Cannot find case data using " + caseDataInfo);
         }
         return data[index];
     }
 
-    public static synchronized TestData[] getTestData(Class<? extends TestData> klass, String method, String parameter)
+    public static synchronized CaseData[] getCaseData(Class<? extends CaseData> klass, String method, String parameter)
         throws Exception {
         String key = klass + "." + method + "." + parameter;
-        TestData[] data = AbstractTestData.LOADED_DATA.get(key);
+        CaseData[] data = AbstractCaseData.LOADED_DATA.get(key);
         if (data == null) {
-            Object provider = AbstractTestData.LOADED_PROVIDERS.get(klass);
+            Object provider = AbstractCaseData.LOADED_PROVIDERS.get(klass);
             if (provider == null) {
                 provider = klass.newInstance();
-                AbstractTestData.LOADED_PROVIDERS.put(klass, provider);
+                AbstractCaseData.LOADED_PROVIDERS.put(klass, provider);
             }
 
             if (parameter == null || parameter.isEmpty()) {
                 Method m = klass.getDeclaredMethod(method, (Class<?>[]) null);
-                data = (TestData[]) m.invoke(provider, (Object[]) null);
+                data = (CaseData[]) m.invoke(provider, (Object[]) null);
             } else {
                 Method m = klass.getDeclaredMethod(method, new Class<?>[]{parameter.getClass()});
-                data = (TestData[]) m.invoke(provider, new Object[]{parameter});
+                data = (CaseData[]) m.invoke(provider, new Object[]{parameter});
             }
-            AbstractTestData.LOADED_DATA.put(key, data);
+            AbstractCaseData.LOADED_DATA.put(key, data);
         }
         return data;
     }
 
     /**
-     * The default external id is empty string. Please override this method to provide external id for your test data.
+     * The default external id is empty string. Please override this method to provide external id for your case data.
      *
      * @return empty string
      */

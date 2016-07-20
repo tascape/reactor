@@ -26,10 +26,10 @@ import java.lang.annotation.Target;
  */
 @Target(value = {ElementType.METHOD})
 @Retention(RetentionPolicy.RUNTIME)
-public @interface TestDataProvider {
+public @interface CaseDataProvider {
     String DEFAULT_METHOD_NAME = "getData";
 
-    Class<? extends TestData> klass();
+    Class<? extends CaseData> klass();
 
     String method() default DEFAULT_METHOD_NAME;
 

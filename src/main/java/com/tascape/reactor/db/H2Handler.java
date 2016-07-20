@@ -17,7 +17,7 @@ package com.tascape.reactor.db;
 
 import com.tascape.reactor.ExecutionResult;
 import com.tascape.reactor.SystemConfiguration;
-import com.tascape.reactor.TestSuite;
+import com.tascape.reactor.TaskSuite;
 import com.tascape.reactor.Utils;
 import java.io.File;
 import java.io.IOException;
@@ -75,8 +75,8 @@ public final class H2Handler extends DbHandler {
     }
 
     @Override
-    public boolean queueTestSuite(TestSuite suite, String execId) throws SQLException {
-        LOG.debug("Queueing test suite result with execution id {} ", execId);
+    public boolean queueTaskSuite(TaskSuite suite, String execId) throws SQLException {
+        LOG.debug("Queueing suite result with execution id {} ", execId);
         final String sql = "INSERT INTO " + SuiteResult.TABLE_NAME + " ("
             + SuiteResult.SUITE_RESULT_ID + ", "
             + SuiteResult.SUITE_NAME + ", "
@@ -104,9 +104,9 @@ public final class H2Handler extends DbHandler {
             stmt.setLong(7, time);
             stmt.setLong(8, time + 11);
             stmt.setString(9, ExecutionResult.QUEUED.getName());
-            stmt.setInt(10, suite.getTests().size());
-            stmt.setInt(11, suite.getTests().size());
-            stmt.setString(12, SYS_CONFIG.getProdUnderTest());
+            stmt.setInt(10, suite.getCases().size());
+            stmt.setInt(11, suite.getCases().size());
+            stmt.setString(12, SYS_CONFIG.getProdUnderTask());
             LOG.debug("{}", stmt);
             int i = stmt.executeUpdate();
             return i == 1;
@@ -114,29 +114,29 @@ public final class H2Handler extends DbHandler {
     }
 
     @Override
-    protected void queueTestCaseResults(String execId, List<TestCase> tests) throws SQLException {
-        LOG.debug("Queue {} test case result(s) with execution id {} ", tests.size(), execId);
-        final String sql = "INSERT INTO " + TestResult.TABLE_NAME + " ("
-            + TestResult.TEST_RESULT_ID + ", "
-            + TestResult.SUITE_RESULT + ", "
-            + TestResult.TEST_CASE_ID + ", "
-            + TestResult.EXECUTION_RESULT + ", "
-            + TestResult.START_TIME + ", "
-            + TestResult.STOP_TIME + ", "
-            + TestResult.TEST_STATION + ", "
-            + TestResult.TEST_ENV + ", "
-            + TestResult.LOG_DIR
+    protected void queueCaseResults(String execId, List<TaskCase> cases) throws SQLException {
+        LOG.debug("Queue {} case result(s) with execution id {} ", cases.size(), execId);
+        final String sql = "INSERT INTO " + CaseResult.TABLE_NAME + " ("
+            + CaseResult.CASE_RESULT_ID + ", "
+            + CaseResult.SUITE_RESULT + ", "
+            + CaseResult.TASK_CASE_ID + ", "
+            + CaseResult.EXECUTION_RESULT + ", "
+            + CaseResult.START_TIME + ", "
+            + CaseResult.STOP_TIME + ", "
+            + CaseResult.CASE_STATION + ", "
+            + CaseResult.CASE_ENV + ", "
+            + CaseResult.LOG_DIR
             + ") VALUES (?,?,?,?,?,?,?,?,?);";
-        Map<String, Integer> idMap = this.getTestCaseIds(tests);
+        Map<String, Integer> idMap = this.getCaseIds(cases);
 
         try (Connection conn = this.getConnection()) {
             PreparedStatement stmt = conn.prepareStatement(sql);
 
             int index = 0;
-            for (TestCase test : tests) {
-                Integer tcid = idMap.get(test.format());
+            for (TaskCase kase : cases) {
+                Integer tcid = idMap.get(kase.format());
                 if (tcid == null) {
-                    tcid = this.getTestCaseId(test);
+                    tcid = this.getCaseId(kase);
                 }
 
                 Long time = System.currentTimeMillis();
@@ -156,68 +156,68 @@ public final class H2Handler extends DbHandler {
     }
 
     @Override
-    protected int getTestCaseId(TestCase test) throws SQLException {
-        LOG.debug("Query for id of test case {} ", test.format());
+    protected int getCaseId(TaskCase kase) throws SQLException {
+        LOG.debug("Query for id of case {} ", kase.format());
         try (Connection conn = this.getConnection()) {
-            final String sql = "SELECT * FROM " + TestCase.TABLE_NAME + " WHERE "
-                + TestCase.SUITE_CLASS + " = ? AND "
-                + TestCase.TEST_CLASS + " = ? AND "
-                + TestCase.TEST_METHOD + " = ? AND "
-                + TestCase.TEST_DATA_INFO + " = ? AND "
-                + TestCase.TEST_DATA + " = ?";
+            final String sql = "SELECT * FROM " + TaskCase.TABLE_NAME + " WHERE "
+                + TaskCase.SUITE_CLASS + " = ? AND "
+                + TaskCase.CASE_CLASS + " = ? AND "
+                + TaskCase.CASE_METHOD + " = ? AND "
+                + TaskCase.CASE_DATA_INFO + " = ? AND "
+                + TaskCase.CASE_DATA + " = ?";
 
             PreparedStatement stmt = conn.prepareStatement(sql);
-            stmt.setString(1, test.getSuiteClass());
-            stmt.setString(2, test.getTestClass());
-            stmt.setString(3, test.getTestMethod());
-            stmt.setString(4, test.getTestDataInfo());
-            stmt.setString(5, test.getTestData());
+            stmt.setString(1, kase.getSuiteClass());
+            stmt.setString(2, kase.getCaseClass());
+            stmt.setString(3, kase.getCaseMethod());
+            stmt.setString(4, kase.getCaseDataInfo());
+            stmt.setString(5, kase.getCaseData());
             stmt.setMaxRows(1);
 
             ResultSet rs = stmt.executeQuery();
             if (rs.next()) {
-                return rs.getInt(TestCase.TEST_CASE_ID);
+                return rs.getInt(TaskCase.TASK_CASE_ID);
             }
         }
 
         try (Connection conn = this.getConnection()) {
-            final String sql = "INSERT INTO " + TestCase.TABLE_NAME + " ("
-                + TestCase.SUITE_CLASS + ", "
-                + TestCase.TEST_CLASS + ", "
-                + TestCase.TEST_METHOD + ", "
-                + TestCase.TEST_DATA_INFO + ", "
-                + TestCase.TEST_DATA
+            final String sql = "INSERT INTO " + TaskCase.TABLE_NAME + " ("
+                + TaskCase.SUITE_CLASS + ", "
+                + TaskCase.CASE_CLASS + ", "
+                + TaskCase.CASE_METHOD + ", "
+                + TaskCase.CASE_DATA_INFO + ", "
+                + TaskCase.CASE_DATA
                 + ") VALUES (?,?,?,?,?);";
 
             PreparedStatement stmt = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
-            stmt.setString(1, test.getSuiteClass());
-            stmt.setString(2, test.getTestClass());
-            stmt.setString(3, test.getTestMethod());
-            stmt.setString(4, test.getTestDataInfo());
-            stmt.setString(5, test.getTestData());
+            stmt.setString(1, kase.getSuiteClass());
+            stmt.setString(2, kase.getCaseClass());
+            stmt.setString(3, kase.getCaseMethod());
+            stmt.setString(4, kase.getCaseDataInfo());
+            stmt.setString(5, kase.getCaseData());
             int i = stmt.executeUpdate();
         }
 
         try (Connection conn = this.getConnection()) {
-            final String sql = "SELECT * FROM " + TestCase.TABLE_NAME + " WHERE "
-                + TestCase.SUITE_CLASS + " = ? AND "
-                + TestCase.TEST_CLASS + " = ? AND "
-                + TestCase.TEST_METHOD + " = ? AND "
-                + TestCase.TEST_DATA_INFO + " = ? AND "
-                + TestCase.TEST_DATA + " = ? ORDER BY " + TestCase.TEST_CASE_ID
+            final String sql = "SELECT * FROM " + TaskCase.TABLE_NAME + " WHERE "
+                + TaskCase.SUITE_CLASS + " = ? AND "
+                + TaskCase.CASE_CLASS + " = ? AND "
+                + TaskCase.CASE_METHOD + " = ? AND "
+                + TaskCase.CASE_DATA_INFO + " = ? AND "
+                + TaskCase.CASE_DATA + " = ? ORDER BY " + TaskCase.TASK_CASE_ID
                 + " DESC;";
 
             PreparedStatement stmt = conn.prepareStatement(sql);
-            stmt.setString(1, test.getSuiteClass());
-            stmt.setString(2, test.getTestClass());
-            stmt.setString(3, test.getTestMethod());
-            stmt.setString(4, test.getTestDataInfo());
-            stmt.setString(5, test.getTestData());
+            stmt.setString(1, kase.getSuiteClass());
+            stmt.setString(2, kase.getCaseClass());
+            stmt.setString(3, kase.getCaseMethod());
+            stmt.setString(4, kase.getCaseDataInfo());
+            stmt.setString(5, kase.getCaseData());
             stmt.setMaxRows(1);
 
             ResultSet rs = stmt.executeQuery();
             if (rs.next()) {
-                return rs.getInt(TestCase.TEST_CASE_ID);
+                return rs.getInt(TaskCase.TASK_CASE_ID);
             }
         }
         throw new SQLException();
@@ -225,19 +225,19 @@ public final class H2Handler extends DbHandler {
 
     @Override
     public void updateSuiteExecutionResult(String execId) throws SQLException {
-        LOG.debug("Update test suite execution result with execution id {}", execId);
+        LOG.debug("Update suite execution result with execution id {}", execId);
         int total = 0, fail = 0;
 
         try (Connection conn = this.getConnection();) {
-            final String sql1 = "SELECT " + TestResult.EXECUTION_RESULT
-                + " FROM " + TestResult.TABLE_NAME
-                + " WHERE " + TestResult.SUITE_RESULT + " = ?;";
+            final String sql1 = "SELECT " + CaseResult.EXECUTION_RESULT
+                + " FROM " + CaseResult.TABLE_NAME
+                + " WHERE " + CaseResult.SUITE_RESULT + " = ?;";
             try (PreparedStatement stmt = conn.prepareStatement(sql1)) {
                 stmt.setString(1, execId);
                 ResultSet rs = stmt.executeQuery();
                 while (rs.next()) {
                     total++;
-                    String result = rs.getString(TestResult.EXECUTION_RESULT);
+                    String result = rs.getString(CaseResult.EXECUTION_RESULT);
                     if (!result.equals(ExecutionResult.PASS.getName()) && !result.endsWith("/0")) {
                         fail++;
                     }
@@ -283,7 +283,7 @@ public final class H2Handler extends DbHandler {
         try (Connection conn = this.getConnection()) {
             ScriptRunner runner = new ScriptRunner(conn, true, true);
             try (InputStreamReader isr = new InputStreamReader(
-                this.getClass().getClassLoader().getResourceAsStream("db/thr-h2.sql"))) {
+                this.getClass().getClassLoader().getResourceAsStream("db/report-h2.sql"))) {
                 runner.runScript(isr);
             }
         }

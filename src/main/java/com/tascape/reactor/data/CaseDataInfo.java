@@ -27,14 +27,14 @@ import org.slf4j.LoggerFactory;
  *
  * @author linsong wang
  */
-public class TestDataInfo {
-    private static final Logger LOG = LoggerFactory.getLogger(TestDataInfo.class);
+public class CaseDataInfo {
+    private static final Logger LOG = LoggerFactory.getLogger(CaseDataInfo.class);
 
     private static final Pattern pattern = Pattern.compile("([\\w\\.]+)\\.(\\w+?)\\((.*)\\)#(\\d+)");
 
     private static Map<String, Integer> dataSize = new HashMap<>();
 
-    private Class<? extends TestData> klass;
+    private Class<? extends CaseData> klass;
 
     private String method;
 
@@ -42,7 +42,7 @@ public class TestDataInfo {
 
     private int index;
 
-    public TestDataInfo(Class<? extends TestData> klass, String method, String parameter, int index) {
+    public CaseDataInfo(Class<? extends CaseData> klass, String method, String parameter, int index) {
         this.klass = klass;
         this.method = method;
         this.parameter = parameter;
@@ -63,19 +63,19 @@ public class TestDataInfo {
      * @throws ClassNotFoundException issue with test data provide class name
      * @throws IOException            IO issue
      */
-    public TestDataInfo(String infoString) throws ClassNotFoundException, IOException {
+    public CaseDataInfo(String infoString) throws ClassNotFoundException, IOException {
         Matcher m = pattern.matcher(infoString);
         if (!m.find()) {
             throw new IOException("Cannot parse test data info string " + infoString);
         }
 
-        this.klass = Class.forName(m.group(1)).asSubclass(TestData.class);
+        this.klass = Class.forName(m.group(1)).asSubclass(CaseData.class);
         this.method = m.group(2);
         this.parameter = m.group(3);
         this.index = Integer.parseInt(m.group(4));
     }
 
-    Class<? extends TestData> getKlass() {
+    Class<? extends CaseData> getKlass() {
         return klass;
     }
 

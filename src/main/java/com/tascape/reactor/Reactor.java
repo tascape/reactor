@@ -23,8 +23,8 @@ import org.slf4j.LoggerFactory;
  *
  * @author linsong wang
  */
-public class TestHarness {
-    private static final Logger LOG = LoggerFactory.getLogger(TestHarness.class);
+public class Reactor {
+    private static final Logger LOG = LoggerFactory.getLogger(Reactor.class);
 
     public static void main(String[] args) {
         int exitCode = 0;
@@ -35,15 +35,15 @@ public class TestHarness {
             Utils.cleanDirectory(config.getLogPath().toFile().getAbsolutePath(), 240,
                 SystemConfiguration.CONSTANT_LOG_KEEP_ALIVE_PREFIX);
 
-            String suiteClass = config.getTestSuite();
-            Pattern testClassRegex = config.getTestClassRegex();
-            Pattern testMethodRegex = config.getTestMethodRegex();
-            int priority = config.getTestPriority();
-            LOG.debug("Running test suite class: {}", suiteClass);
-            TestSuite ts = new TestSuite(suiteClass, testClassRegex, testMethodRegex, priority);
+            String suiteClass = config.getSuite();
+            Pattern caseClassRegex = config.getCaseClassRegex();
+            Pattern caseMethodRegex = config.getCaseMethodRegex();
+            int priority = config.getCasePriority();
+            LOG.debug("Running suite class: {}", suiteClass);
+            TaskSuite ts = new TaskSuite(suiteClass, caseClassRegex, caseMethodRegex, priority);
 
-            if (ts.getTests().isEmpty()) {
-                throw new RuntimeException("No test cases found based on system properties");
+            if (ts.getCases().isEmpty()) {
+                throw new RuntimeException("No cases found based on system properties");
             }
 
             SuiteRunner sr = new SuiteRunner(ts);

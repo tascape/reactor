@@ -13,10 +13,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.tascape.reactor.test;
+package com.tascape.reactor.task;
 
 import com.tascape.reactor.driver.JacocoClient;
-import com.tascape.reactor.driver.TestDriver;
+import com.tascape.reactor.driver.CaseDriver;
 import org.junit.After;
 import org.junit.Before;
 import org.slf4j.Logger;
@@ -27,10 +27,10 @@ import org.slf4j.LoggerFactory;
  *
  * @author linsong wang
  */
-public class JacocoTest extends AbstractTest {
+public class JacocoTest extends AbstractCase {
     private static final Logger LOG = LoggerFactory.getLogger(JacocoTest.class);
 
-    public static final TestDriver JACOCO = new TestDriver(JacocoTest.class, JacocoClient.class);
+    public static final CaseDriver JACOCO = new CaseDriver(JacocoTest.class, JacocoClient.class);
 
     private final JacocoClient jacocoClient;
 
@@ -51,7 +51,7 @@ public class JacocoTest extends AbstractTest {
     }
 
     @Override
-    public String getApplicationUnderTest() {
+    public String getApplicationUnderTask() {
         LOG.debug("Please override");
         return "testharness";
     }
