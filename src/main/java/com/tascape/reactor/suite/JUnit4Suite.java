@@ -27,7 +27,7 @@ public class JUnit4Suite extends AbstractSuite {
     private static final Logger LOG = LoggerFactory.getLogger(JUnit4Suite.class);
 
     @Override
-    public void setUpTestClasses() {
+    public void setUpCaseClasses() {
         this.addCaseClass(JUnit4Case.class);
     }
 

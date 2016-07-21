@@ -102,7 +102,7 @@ public abstract class AbstractSuite {
         return caseClasses;
     }
 
-    protected void putTestDirver(CaseDriver caseDriver, EntityDriver driver) {
+    protected void putCaseDirver(CaseDriver caseDriver, EntityDriver driver) {
         String key = caseDriver.toString();
         LOG.debug("Putting runtime driver {}={} into suite environment", key, driver);
         Class<? extends EntityDriver> clazz = caseDriver.getDriverClass();
@@ -149,7 +149,7 @@ public abstract class AbstractSuite {
         return "";
     }
 
-    public abstract void setUpTestClasses();
+    public abstract void setUpCaseClasses();
 
     protected abstract void setUpEnvironment() throws Exception;
 

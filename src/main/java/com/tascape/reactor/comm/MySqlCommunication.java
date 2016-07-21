@@ -63,7 +63,7 @@ public class MySqlCommunication extends EntityCommunication {
 
     /**
      *
-     * @param dbUrl    such as "jdbc:mysql://localhost:3570/testharness");
+     * @param dbUrl    such as "jdbc:mysql://localhost:3570/reactor");
      * @param user     username
      * @param password password
      */

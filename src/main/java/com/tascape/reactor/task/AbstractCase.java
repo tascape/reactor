@@ -159,7 +159,7 @@ public abstract class AbstractCase extends AbstractCaseResource {
      * This is called in case method to register external id (if any). Do not call this if case result will not be
      * exported into other case management system, such as TestRail.
      *
-     * @param externalId external id for test result export
+     * @param externalId external id for case result export
      */
     protected void setExternalId(String externalId) {
         this.externalId = externalId;

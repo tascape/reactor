@@ -58,15 +58,15 @@ public class CaseDataInfo {
     /**
      *
      * @param infoString format class_name.method_name(parameter)#data_index
-     *                   example: "com.example.qa.ui.USERTestData.getData(sample.json)#39"
+     *                   example: "com.example.qa.ui.UserCaseData.getData(sample.json)#39"
      *
-     * @throws ClassNotFoundException issue with test data provide class name
+     * @throws ClassNotFoundException issue with case data provide class name
      * @throws IOException            IO issue
      */
     public CaseDataInfo(String infoString) throws ClassNotFoundException, IOException {
         Matcher m = pattern.matcher(infoString);
         if (!m.find()) {
-            throw new IOException("Cannot parse test data info string " + infoString);
+            throw new IOException("Cannot parse case data info string " + infoString);
         }
 
         this.klass = Class.forName(m.group(1)).asSubclass(CaseData.class);

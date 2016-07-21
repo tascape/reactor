@@ -66,7 +66,7 @@ public final class H2Handler extends DbHandler {
         connPool.setMaxConnections(10);
         try (Connection conn = this.getConnection()) {
             try {
-                conn.prepareStatement("SELECT * FROM test_result WHERE 0;").executeQuery();
+                conn.prepareStatement("SELECT * FROM case_result WHERE 0;").executeQuery();
             } catch (SQLException ex) {
                 LOG.warn("{}", ex.getMessage());
                 this.initSchema();
@@ -87,9 +87,9 @@ public final class H2Handler extends DbHandler {
             + SuiteResult.START_TIME + ", "
             + SuiteResult.STOP_TIME + ", "
             + SuiteResult.EXECUTION_RESULT + ", "
-            + SuiteResult.NUMBER_OF_TESTS + ", "
+            + SuiteResult.NUMBER_OF_CASES + ", "
             + SuiteResult.NUMBER_OF_FAILURE + ", "
-            + SuiteResult.PRODUCT_UNDER_TEST
+            + SuiteResult.PRODUCT_UNDER_TASK
             + ") VALUES (?,?,?,?,?,?,?,?,?,?,?,?);";
 
         try (Connection conn = this.getConnection()) {
@@ -254,7 +254,7 @@ public final class H2Handler extends DbHandler {
                 stmt.setString(1, execId);
                 ResultSet rs = stmt.executeQuery();
                 if (rs.first()) {
-                    rs.updateInt(SuiteResult.NUMBER_OF_TESTS, total);
+                    rs.updateInt(SuiteResult.NUMBER_OF_CASES, total);
                     rs.updateInt(SuiteResult.NUMBER_OF_FAILURE, fail);
                     rs.updateString(SuiteResult.EXECUTION_RESULT, fail == 0 ? "PASS" : "FAIL");
                     rs.updateLong(SuiteResult.STOP_TIME, System.currentTimeMillis());

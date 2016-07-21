@@ -47,13 +47,13 @@ public class Reactor {
             }
 
             SuiteRunner sr = new SuiteRunner(ts);
-            exitCode = sr.runTests();
+            exitCode = sr.runCases();
         } catch (Throwable t) {
-            LOG.error("TestHarness finishes with exception", t);
+            LOG.error("Reactor finishes with exception", t);
             exitCode = -1;
         } finally {
             if (exitCode != 0) {
-                LOG.error("TestHarness finishes with exit code {}", exitCode);
+                LOG.error("Reactor finishes with exit code {}", exitCode);
             }
             System.exit(exitCode);
         }

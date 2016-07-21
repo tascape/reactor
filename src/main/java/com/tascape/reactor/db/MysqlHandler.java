@@ -99,7 +99,7 @@ public class MysqlHandler extends DbHandler {
 
     @Override
     public boolean queueTaskSuite(TaskSuite suite, String execId) throws SQLException {
-        LOG.debug("Queueing test suite result with execution id {} ", execId);
+        LOG.debug("Queueing suite result with execution id {} ", execId);
         final String sql = "SELECT * FROM " + SuiteResult.TABLE_NAME + " WHERE "
             + SuiteResult.SUITE_RESULT_ID + " = ?";
         SuiteResult sr = new SuiteResult(suite, execId);
@@ -128,8 +128,8 @@ public class MysqlHandler extends DbHandler {
     }
 
     @Override
-    protected int getCaseId(TaskCase test) throws SQLException {
-        LOG.debug("Query for id of test case {} ", test.format());
+    protected int getCaseId(TaskCase kase) throws SQLException {
+        LOG.debug("Query for id of case {} ", kase.format());
         final String sql = "SELECT * FROM " + TaskCase.TABLE_NAME + " WHERE "
             + TaskCase.SUITE_CLASS + " = ? AND "
             + TaskCase.CASE_CLASS + " = ? AND "
@@ -141,21 +141,21 @@ public class MysqlHandler extends DbHandler {
             PreparedStatement stmt = conn.prepareStatement(sql,
                 ResultSet.TYPE_SCROLL_SENSITIVE,
                 ResultSet.CONCUR_UPDATABLE);
-            stmt.setString(1, test.getSuiteClass());
-            stmt.setString(2, test.getCaseClass());
-            stmt.setString(3, test.getCaseMethod());
-            stmt.setString(4, test.getCaseDataInfo());
-            stmt.setString(5, test.getCaseData());
+            stmt.setString(1, kase.getSuiteClass());
+            stmt.setString(2, kase.getCaseClass());
+            stmt.setString(3, kase.getCaseMethod());
+            stmt.setString(4, kase.getCaseDataInfo());
+            stmt.setString(5, kase.getCaseData());
             stmt.setMaxRows(1);
 
             ResultSet rs = stmt.executeQuery();
             if (!rs.next()) {
                 rs.moveToInsertRow();
-                rs.updateString(TaskCase.SUITE_CLASS, test.getSuiteClass());
-                rs.updateString(TaskCase.CASE_CLASS, test.getCaseClass());
-                rs.updateString(TaskCase.CASE_METHOD, test.getCaseMethod());
-                rs.updateString(TaskCase.CASE_DATA_INFO, test.getCaseDataInfo());
-                rs.updateString(TaskCase.CASE_DATA, test.getCaseData());
+                rs.updateString(TaskCase.SUITE_CLASS, kase.getSuiteClass());
+                rs.updateString(TaskCase.CASE_CLASS, kase.getCaseClass());
+                rs.updateString(TaskCase.CASE_METHOD, kase.getCaseMethod());
+                rs.updateString(TaskCase.CASE_DATA_INFO, kase.getCaseDataInfo());
+                rs.updateString(TaskCase.CASE_DATA, kase.getCaseData());
 
                 rs.insertRow();
                 rs.last();
@@ -166,11 +166,11 @@ public class MysqlHandler extends DbHandler {
     }
 
     @Override
-    protected void queueCaseResults(String execId, List<TaskCase> tests) throws SQLException {
-        LOG.debug("Queue {} test case result(s) with execution id {} ", tests.size(), execId);
+    protected void queueCaseResults(String execId, List<TaskCase> cases) throws SQLException {
+        LOG.debug("Queue {} case result(s) with execution id {} ", cases.size(), execId);
         final String sql = "SELECT * FROM " + CaseResult.TABLE_NAME + " WHERE "
             + CaseResult.SUITE_RESULT + " = ?";
-        Map<String, Integer> idMap = this.getCaseIds(tests);
+        Map<String, Integer> idMap = this.getCaseIds(cases);
 
         try (Connection conn = this.getConnection()) {
             PreparedStatement stmt = conn.prepareStatement(sql,
@@ -184,13 +184,13 @@ public class MysqlHandler extends DbHandler {
             try {
                 conn.setAutoCommit(false);
                 int index = 0;
-                for (TaskCase test : tests) {
+                for (TaskCase kase : cases) {
                     index++;
                     rs.moveToInsertRow();
 
-                    Integer tcid = idMap.get(test.format());
+                    Integer tcid = idMap.get(kase.format());
                     if (tcid == null) {
-                        tcid = this.getCaseId(test);
+                        tcid = this.getCaseId(kase);
                     }
 
                     rs.updateString(CaseResult.CASE_RESULT_ID, Utils.getUniqueId());
@@ -252,7 +252,7 @@ public class MysqlHandler extends DbHandler {
                         total += p + f;
                         fail += f;
                     } else {
-                        throw new RuntimeException("Cannot parse test execution result " + result);
+                        throw new RuntimeException("Cannot parse case execution result " + result);
                     }
                 }
             }
@@ -265,7 +265,7 @@ public class MysqlHandler extends DbHandler {
                 stmt.setString(1, execId);
                 ResultSet rs = stmt.executeQuery();
                 if (rs.first()) {
-                    rs.updateInt(SuiteResult.NUMBER_OF_TESTS, total);
+                    rs.updateInt(SuiteResult.NUMBER_OF_CASES, total);
                     rs.updateInt(SuiteResult.NUMBER_OF_FAILURE, fail);
                     rs.updateString(SuiteResult.EXECUTION_RESULT, fail == 0 ? "PASS" : "FAIL");
                     rs.updateLong(SuiteResult.STOP_TIME, System.currentTimeMillis());
@@ -313,6 +313,6 @@ public class MysqlHandler extends DbHandler {
         MysqlHandler db = new MysqlHandler();
         TaskCase tc = new TaskCase();
         tc.setSuiteClass("a");
-        LOG.debug("test case id = {}", db.getCaseId(tc));
+        LOG.debug("case id = {}", db.getCaseId(tc));
     }
 }

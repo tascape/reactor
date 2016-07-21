@@ -23,12 +23,12 @@ import com.tascape.reactor.data.AbstractCaseData;
  */
 public class SampleData extends AbstractCaseData {
 
-    public String testParameter = "";
+    public String caseParameter = "";
 
     private static final SampleData[] DATA = new SampleData[]{
         new SampleData() {
             {
-                testParameter = "scenario one";
+                caseParameter = "scenario one";
             }
 
             public String getValue() {
@@ -37,7 +37,7 @@ public class SampleData extends AbstractCaseData {
         },
         new SampleData() {
             {
-                testParameter = "scenario two";
+                caseParameter = "scenario two";
             }
 
             public String getValue() {
@@ -46,8 +46,8 @@ public class SampleData extends AbstractCaseData {
         },
         new SampleData() {
             {
-                testParameter = "scenario three";
-                setValue(testParameter);
+                caseParameter = "scenario three";
+                setValue(caseParameter);
             }
 
             public String getValue() {

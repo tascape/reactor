@@ -35,10 +35,10 @@ import com.tascape.reactor.data.CaseData;
  *
  * @author linsong wang
  */
-public class TestRunnerJUnit4 extends AbstractCaseRunner implements Callable<CaseResult> {
-    private static final Logger LOG = LoggerFactory.getLogger(TestRunnerJUnit4.class);
+public class CaseRunnerJUnit4 extends AbstractCaseRunner implements Callable<CaseResult> {
+    private static final Logger LOG = LoggerFactory.getLogger(CaseRunnerJUnit4.class);
 
-    public TestRunnerJUnit4(DbHandler db, CaseResult tcr) {
+    public CaseRunnerJUnit4(DbHandler db, CaseResult tcr) {
         this.db = db;
         this.tcr = tcr;
         this.execId = this.tcr.getSuiteResultId();

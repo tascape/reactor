@@ -16,6 +16,7 @@
 package com.tascape.reactor.task;
 
 import com.tascape.reactor.ExecutionResult;
+import com.tascape.reactor.Reactor;
 import com.tascape.reactor.data.CaseIterationData;
 import java.io.IOException;
 import java.util.Random;
@@ -31,7 +32,7 @@ import static org.junit.Assert.*;
 import com.tascape.reactor.data.CaseDataProvider;
 
 /**
- * Base test class for JUnit4 test cases.
+ * Base case class for JUnit4 cases.
  *
  * @author linsong wang
  */
@@ -44,28 +45,28 @@ public class JUnit4Case extends AbstractCase {
 
     @Before
     public void setUp() throws Exception {
-        LOG.debug("Run something before test case");
+        LOG.debug("Run something before case");
         LOG.debug("Please override");
     }
 
     @After
     public void tearDown() throws Exception {
-        LOG.debug("Run something after test case");
+        LOG.debug("Run something after case");
         LOG.debug("Please override");
     }
 
     @Override
     public String getApplicationUnderTask() {
         LOG.debug("Please override");
-        return "testharness";
+        return Reactor.class.getName();
     }
 
     @Test
     @Priority(level = 0)
-    public void testPositive() throws Exception {
-        LOG.info("Sample positive test");
-        LOG.debug("Sample positive test");
-        LOG.trace("Sample positive test");
+    public void runPositive() throws Exception {
+        LOG.info("Sample positive case");
+        LOG.debug("Sample positive case");
+        LOG.trace("Sample positive case");
         Random r = new Random();
         this.putResultMetric("JUnit4", "positive-1", r.nextInt(100));
         this.putResultMetric("JUnit4", "positive-2", r.nextInt(200));
@@ -73,14 +74,14 @@ public class JUnit4Case extends AbstractCase {
     }
 
     @Test
-    public void testFailure() throws Exception {
-        LOG.info("Sample failure test");
-        Assert.fail("test failed");
+    public void runFailure() throws Exception {
+        LOG.info("Sample failure case");
+        Assert.fail("case failed");
     }
 
     @Test
-    public void testExternalId() throws Exception {
-        LOG.info("Sample external id test, set to aaa");
+    public void runExternalId() throws Exception {
+        LOG.info("Sample external id case, set to aaa");
         this.setExternalId("aaa");
         Random r = new Random();
         this.putResultMetric("JUnit4", "external-id-1", r.nextInt(100));
@@ -96,8 +97,8 @@ public class JUnit4Case extends AbstractCase {
 
     @Test
     @Priority(level = 0)
-    public void testNegative() throws Exception {
-        LOG.info("Sample negative test");
+    public void runNegative() throws Exception {
+        LOG.info("Sample negative case");
         expectedException.expect(IOException.class);
         expectedException.expectMessage("something bad");
         Thread.sleep(3000);
@@ -107,8 +108,8 @@ public class JUnit4Case extends AbstractCase {
 
     @Test
     @Priority(level = 1)
-    public void testNegativeAgain() throws Exception {
-        LOG.info("Sample negative test again");
+    public void runNegativeAgain() throws Exception {
+        LOG.info("Sample negative case again");
         expectedException.expect(XPathException.class);
         expectedException.expectMessage("Cannot resolve xyz");
         Thread.sleep(1000);
@@ -116,8 +117,8 @@ public class JUnit4Case extends AbstractCase {
     }
 
     @Test
-    public void testMultiple() throws Exception {
-        LOG.info("Sample multiple result test");
+    public void runMultiple() throws Exception {
+        LOG.info("Sample multiple-result case");
         this.doSomethingGood();
         ExecutionResult er = ExecutionResult.newMultiple();
         Thread.sleep(500);
@@ -128,16 +129,16 @@ public class JUnit4Case extends AbstractCase {
 
     @Test
     @CaseDataProvider(klass = SampleData.class)
-    public void testDataProvider() throws Exception {
+    public void runDataProvider() throws Exception {
         SampleData d = this.getCaseData(SampleData.class);
-        LOG.debug("test data '{}'", d.testParameter);
+        LOG.debug("case data '{}'", d.caseParameter);
         Thread.sleep(500);
     }
 
     @Test
     @CaseDataProvider(klass = CaseIterationData.class, method = "useIterations", parameter = "3")
-    public void testIterations() throws Exception {
-        LOG.debug("test iteration {}", RandomStringUtils.randomAlphanumeric(10));
+    public void runIterations() throws Exception {
+        LOG.debug("case iteration {}", RandomStringUtils.randomAlphanumeric(10));
         Thread.sleep(500);
         Assert.assertEquals(0, System.currentTimeMillis() % 2);
     }

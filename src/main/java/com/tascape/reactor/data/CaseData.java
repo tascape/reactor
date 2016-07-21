@@ -24,15 +24,15 @@ public interface CaseData {
     String getClassName();
 
     /**
-     * The string representation of one piece of test data.
+     * The string representation of one piece of case data.
      *
      * @return value
      */
     String getValue();
 
     /**
-     * For data-driven test cases, the test case external id is defined in corresponding test data. Please implement
-     * this method to provide external id based on the test case management system, such as TestRail, that is used for
+     * For data-driven test cases, the case external id is defined in corresponding case data. Please implement
+     * this method to provide external id based on the case management system, such as TestRail, that is used for
      * result reporting.
      *
      * @return value
@@ -40,7 +40,7 @@ public interface CaseData {
     String getExternalId();
 
     /**
-     * Sets value for updating test method name. The final test method name will look like testMethod(value).
+     * Sets value for updating case method name. The final case method name will look like caseMethod(value).
      *
      * @param value the value for display
      */

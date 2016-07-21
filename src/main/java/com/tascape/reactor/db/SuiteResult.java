@@ -60,13 +60,13 @@ public class SuiteResult implements Serializable {
 
     public static final String STOP_TIME = "STOP_TIME";
 
-    public static final String NUMBER_OF_TESTS = "NUMBER_OF_TESTS";
+    public static final String NUMBER_OF_CASES = "NUMBER_OF_CASES";
 
     public static final String NUMBER_OF_FAILURE = "NUMBER_OF_FAILURE";
 
     public static final String INVISIBLE_ENTRY = "INVISIBLE_ENTRY";
 
-    public static final String PRODUCT_UNDER_TEST = "PRODUCT_UNDER_TEST";
+    public static final String PRODUCT_UNDER_TASK = "PRODUCT_UNDER_TASK";
 
     @Id
     @Basic(optional = false)
@@ -97,8 +97,8 @@ public class SuiteResult implements Serializable {
     @Column(name = "STOP_TIME")
     private Long stopTime;
 
-    @Column(name = "NUMBER_OF_TESTS")
-    private Integer numberOfTests;
+    @Column(name = "NUMBER_OF_CASES")
+    private Integer numberOfCases;
 
     @Column(name = "NUMBER_OF_FAILURE")
     private Integer numberOfFailure;
@@ -106,8 +106,8 @@ public class SuiteResult implements Serializable {
     @Column(name = "INVISIBLE_ENTRY")
     private Boolean invisibleEntry;
 
-    @Column(name = "PRODUCT_UNDER_TEST")
-    private String productUnderTest;
+    @Column(name = "PRODUCT_UNDER_TASK")
+    private String productUnderTask;
 
     @OneToMany(mappedBy = "suiteResult")
     private List<CaseResult> caseResultList;
@@ -129,10 +129,10 @@ public class SuiteResult implements Serializable {
         this.executionResult = "";
         this.startTime = time;
         this.stopTime = time + 1;
-        this.numberOfTests = taskSuite.getCases().size();
+        this.numberOfCases = taskSuite.getCases().size();
         this.numberOfFailure = taskSuite.getCases().size();
         this.invisibleEntry = false;
-        this.productUnderTest = SYS_CONFIG.getProdUnderTask();
+        this.productUnderTask = SYS_CONFIG.getProdUnderTask();
         this.invisibleEntry = !SYS_CONFIG.getResultVisibility();
     }
 
@@ -146,10 +146,10 @@ public class SuiteResult implements Serializable {
         this.executionResult = rs.getString(EXECUTION_RESULT);
         this.startTime = rs.getLong(START_TIME);
         this.stopTime = rs.getLong(STOP_TIME);
-        this.numberOfTests = rs.getInt(NUMBER_OF_TESTS);
+        this.numberOfCases = rs.getInt(NUMBER_OF_CASES);
         this.numberOfFailure = rs.getInt(NUMBER_OF_FAILURE);
         this.invisibleEntry = rs.getBoolean(INVISIBLE_ENTRY);
-        this.productUnderTest = rs.getNString(PRODUCT_UNDER_TEST);
+        this.productUnderTask = rs.getNString(PRODUCT_UNDER_TASK);
     }
 
     public void update(ResultSet rs) throws SQLException {
@@ -162,10 +162,10 @@ public class SuiteResult implements Serializable {
         rs.updateLong(START_TIME, this.getStartTime());
         rs.updateLong(STOP_TIME, this.getStartTime());
         rs.updateString(EXECUTION_RESULT, this.getExecutionResult());
-        rs.updateInt(NUMBER_OF_TESTS, this.getNumberOfTests());
+        rs.updateInt(NUMBER_OF_CASES, this.getNumberOfCases());
         rs.updateInt(NUMBER_OF_FAILURE, this.getNumberOfFailure());
         rs.updateBoolean(INVISIBLE_ENTRY, this.getInvisibleEntry());
-        rs.updateNString(PRODUCT_UNDER_TEST, this.getProductUnderTest());
+        rs.updateNString(PRODUCT_UNDER_TASK, this.getProductUnderTask());
     }
 
     public SuiteResult(String suiteResultId) {
@@ -236,12 +236,12 @@ public class SuiteResult implements Serializable {
         this.stopTime = stopTime;
     }
 
-    public Integer getNumberOfTests() {
-        return numberOfTests;
+    public Integer getNumberOfCases() {
+        return numberOfCases;
     }
 
-    public void setNumberOfTests(Integer numberOfTests) {
-        this.numberOfTests = numberOfTests;
+    public void setNumberOfCases(Integer numberOfCases) {
+        this.numberOfCases = numberOfCases;
     }
 
     public Integer getNumberOfFailure() {
@@ -260,12 +260,12 @@ public class SuiteResult implements Serializable {
         this.invisibleEntry = invisibleEntry;
     }
 
-    public String getProductUnderTest() {
-        return productUnderTest;
+    public String getProductUnderTask() {
+        return productUnderTask;
     }
 
-    public void setProductUnderTest(String productUnderTest) {
-        this.productUnderTest = productUnderTest;
+    public void setProductUnderTask(String productUnderTask) {
+        this.productUnderTask = productUnderTask;
     }
 
     @XmlTransient

@@ -56,22 +56,22 @@ public class SuiteRunner {
 
     private final String execId = SYS_CONFIG.getExecId();
 
-    private static final Map<String, TaskCase> UNSUPPORTED_TESTS = new HashMap<>();
+    private static final Map<String, TaskCase> UNSUPPORTED_CASES = new HashMap<>();
 
-    public synchronized static void addUnspportedTestCase(TaskCase tc) {
-        UNSUPPORTED_TESTS.put(tc.format(), tc);
+    public synchronized static void addUnspportedCase(TaskCase tc) {
+        UNSUPPORTED_CASES.put(tc.format(), tc);
     }
 
-    public SuiteRunner(TaskSuite testSuite) throws Exception {
+    public SuiteRunner(TaskSuite taskSuite) throws Exception {
         LOG.debug("Run suite with execution id {}", execId);
-        this.ts = testSuite;
+        this.ts = taskSuite;
 
         this.db = DbHandler.getInstance();
         db.queueSuiteExecution(ts, this.execId);
     }
 
     @SuppressWarnings("UseSpecificCatch")
-    public int runTests() throws IOException, InterruptedException, SQLException, XMLStreamException {
+    public int runCases() throws IOException, InterruptedException, SQLException, XMLStreamException {
         File dir = SYS_CONFIG.getLogPath().resolve(execId).toFile();
         LOG.debug("Create suite execution log directory {}", dir);
         if (!dir.exists() && !dir.mkdirs()) {
@@ -81,9 +81,9 @@ public class SuiteRunner {
         CompletionService<CaseResult> completionService = new ExecutorCompletionService<>(executorService);
 
         this.saveExectionProperties(dir);
-        LOG.debug("Start to acquire test cases to execute");
+        LOG.debug("Start to acquire cases to execute");
         int loadLimit = SYS_CONFIG.getCaseLoadLimit();
-        LOG.debug("Load queued test cases {} per round", loadLimit);
+        LOG.debug("Load queued cases {} per round", loadLimit);
 
         int numberOfFailures = 0;
         try {
@@ -92,40 +92,40 @@ public class SuiteRunner {
                 List<Future<CaseResult>> futures = new ArrayList<>();
 
                 for (CaseResult tcr : tcrs) {
-                    LOG.debug("Submit test case {}", tcr.getTaskCase().format());
-                    futures.add(completionService.submit(new TestRunnerJUnit4(db, tcr)));
+                    LOG.debug("Submit case {}", tcr.getTaskCase().format());
+                    futures.add(completionService.submit(new CaseRunnerJUnit4(db, tcr)));
                 }
-                LOG.debug("Total {} test cases submitted", futures.size());
+                LOG.debug("Total {} cases submitted", futures.size());
 
                 for (Future<CaseResult> f : futures) {
                     try {
                         Future<CaseResult> future = completionService.take();
                         CaseResult tcr = future.get();
                         String result = tcr.getResult().result();
-                        LOG.debug("Get result of test case {} - {}", tcr.getTaskCase().format(), result);
+                        LOG.debug("Get result of case {} - {}", tcr.getTaskCase().format(), result);
                         if (!ExecutionResult.PASS.getName().equals(result) && !result.endsWith("/0")) {
                             numberOfFailures++;
                         }
                     } catch (Throwable ex) {
-                        LOG.error("Error executing test thread", ex);
+                        LOG.error("Error executing case thread", ex);
                         numberOfFailures++;
                     }
                 }
 
                 tcrs = this.filter(this.db.getQueuedCaseResults(this.execId, 100));
             }
-            String productUnderTest = "NA";
+            String productUnderTask = "NA";
             try {
-                LOG.debug("Getting suite-under-test");
+                LOG.debug("Getting suite-under-task");
                 if (AbstractSuite.getSuites().isEmpty()) {
                     throw new SuiteEnvironmentException("Cannot setup suite environment");
                 }
-                productUnderTest = AbstractSuite.getSuites().get(0).getProductUnderTask();
+                productUnderTask = AbstractSuite.getSuites().get(0).getProductUnderTask();
             } catch (Exception ex) {
-                LOG.warn("Cannot get product-under-test", ex);
+                LOG.warn("Cannot get product-under-task", ex);
             } finally {
-                LOG.debug("No more test case to run on this host, updating suite execution result");
-                this.db.updateSuiteExecutionResult(this.execId, productUnderTest);
+                LOG.debug("No more case to run on this host, updating suite execution result");
+                this.db.updateSuiteExecutionResult(this.execId, productUnderTask);
                 this.db.adjustSuiteExecutionResult(execId);
             }
         } finally {
@@ -146,11 +146,11 @@ public class SuiteRunner {
 
     private void saveExectionProperties(File dir) throws IOException, SQLException {
         File props = new File(dir, "execution.properties");
-        SYS_CONFIG.getProperties().store(FileUtils.openOutputStream(props), "Testharness");
+        SYS_CONFIG.getProperties().store(FileUtils.openOutputStream(props), Reactor.class.getName());
 
         List<SuiteProperty> sps = new ArrayList<>();
         SYS_CONFIG.getProperties().entrySet().stream()
-            .filter(key -> !key.toString().startsWith("qa.th.db."))
+            .filter(key -> !key.toString().startsWith("reactor.db."))
             .forEach(entry -> {
                 SuiteProperty sp = new SuiteProperty();
                 sp.setSuiteResultId(this.execId);
@@ -183,12 +183,12 @@ public class SuiteRunner {
 
     private List<CaseResult> filter(List<CaseResult> tcrs) {
         List<CaseResult> tcrs0 = new ArrayList<>();
-        tcrs.stream().filter((tcr) -> (UNSUPPORTED_TESTS.get(tcr.getTaskCase().format()) == null)).forEach((tcr) -> {
+        tcrs.stream().filter((tcr) -> (UNSUPPORTED_CASES.get(tcr.getTaskCase().format()) == null)).forEach((tcr) -> {
             tcrs0.add(tcr);
         });
 
         if (SystemConfiguration.getInstance().isShuffleCases()) {
-            LOG.debug("do test cases shuffle");
+            LOG.debug("do case shuffle");
             Collections.shuffle(tcrs0);
         }
         return tcrs0;

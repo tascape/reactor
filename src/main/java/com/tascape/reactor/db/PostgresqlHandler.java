@@ -128,9 +128,9 @@ public class PostgresqlHandler extends DbHandler {
                 rs.updateLong(SuiteResult.START_TIME, time);
                 rs.updateLong(SuiteResult.STOP_TIME, time);
                 rs.updateString(SuiteResult.EXECUTION_RESULT, ExecutionResult.QUEUED.getName());
-                rs.updateInt(SuiteResult.NUMBER_OF_TESTS, suite.getCases().size());
+                rs.updateInt(SuiteResult.NUMBER_OF_CASES, suite.getCases().size());
                 rs.updateInt(SuiteResult.NUMBER_OF_FAILURE, suite.getCases().size());
-                rs.updateNString(SuiteResult.PRODUCT_UNDER_TEST, SYS_CONFIG.getProdUnderTask());
+                rs.updateNString(SuiteResult.PRODUCT_UNDER_TASK, SYS_CONFIG.getProdUnderTask());
 
                 rs.insertRow();
                 rs.last();
@@ -267,7 +267,7 @@ public class PostgresqlHandler extends DbHandler {
                 stmt.setString(1, execId);
                 ResultSet rs = stmt.executeQuery();
                 if (rs.first()) {
-                    rs.updateInt(SuiteResult.NUMBER_OF_TESTS, total);
+                    rs.updateInt(SuiteResult.NUMBER_OF_CASES, total);
                     rs.updateInt(SuiteResult.NUMBER_OF_FAILURE, fail);
                     rs.updateString(SuiteResult.EXECUTION_RESULT, fail == 0 ? "PASS" : "FAIL");
                     rs.updateLong(SuiteResult.STOP_TIME, System.currentTimeMillis());
@@ -317,6 +317,6 @@ public class PostgresqlHandler extends DbHandler {
         PostgresqlHandler db = new PostgresqlHandler();
         TaskCase tc = new TaskCase();
         tc.setSuiteClass("a");
-        LOG.debug("test case id = {}", db.getCaseId(tc));
+        LOG.debug("case id = {}", db.getCaseId(tc));
     }
 }

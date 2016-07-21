@@ -291,7 +291,7 @@ public abstract class DbHandler {
             ResultSet rs = stmt.executeQuery();
             if (rs.first()) {
 // TODO: update case data into task case table
-//                rs.updateString(TaskCase.CASE_DATA.name(), tcr.getTestCase().getTestData());
+//                rs.updateString(TaskCase.CASE_DATA, tcr.getTaskCase().getCaseData());
                 rs.updateString(CaseResult.EXECUTION_RESULT, tcr.getResult().result());
                 rs.updateString(CaseResult.AUT, tcr.getAut());
                 rs.updateLong(CaseResult.START_TIME, tcr.getStartTime());
@@ -360,13 +360,13 @@ public abstract class DbHandler {
                         stmt.setString(1, execId);
                         ResultSet rs = stmt.executeQuery();
                         if (rs.first()) {
-                            rs.updateInt(SuiteResult.NUMBER_OF_TESTS, total);
+                            rs.updateInt(SuiteResult.NUMBER_OF_CASES, total);
                             rs.updateInt(SuiteResult.NUMBER_OF_FAILURE, fail);
                             rs.updateString(SuiteResult.EXECUTION_RESULT, fail == 0 ? "PASS" : "FAIL");
                             rs.updateLong(SuiteResult.STOP_TIME, System.currentTimeMillis());
-                            if (rs.getNString(SuiteResult.PRODUCT_UNDER_TEST).isEmpty()
+                            if (rs.getNString(SuiteResult.PRODUCT_UNDER_TASK).isEmpty()
                                 && !StringUtils.isEmpty(productUnderTask)) {
-                                rs.updateString(SuiteResult.PRODUCT_UNDER_TEST, productUnderTask);
+                                rs.updateString(SuiteResult.PRODUCT_UNDER_TASK, productUnderTask);
                             }
                             rs.updateRow();
                             suiteResult.setPass(total - fail);
@@ -454,7 +454,7 @@ public abstract class DbHandler {
                         stmt.setString(1, execId);
                         ResultSet rs = stmt.executeQuery();
                         if (rs.first()) {
-                            rs.updateInt(SuiteResult.NUMBER_OF_TESTS, total);
+                            rs.updateInt(SuiteResult.NUMBER_OF_CASES, total);
                             rs.updateInt(SuiteResult.NUMBER_OF_FAILURE, fail);
                             rs.updateString(SuiteResult.EXECUTION_RESULT, fail == 0 ? "PASS" : "FAIL");
                             rs.updateRow();
@@ -490,7 +490,7 @@ public abstract class DbHandler {
                     stmt.setString(1, execId);
                     ResultSet rs = stmt.executeQuery();
                     if (rs.first()) {
-                        rs.updateInt(SuiteResult.NUMBER_OF_TESTS, total);
+                        rs.updateInt(SuiteResult.NUMBER_OF_CASES, total);
                         rs.updateInt(SuiteResult.NUMBER_OF_FAILURE, fail);
                         rs.updateString(SuiteResult.EXECUTION_RESULT, fail == 0 ? "PASS" : "FAIL");
                         rs.updateRow();
@@ -523,7 +523,7 @@ public abstract class DbHandler {
                     xsw.writeStartElement("testsuite");
                     xsw.writeAttribute("name", rs.getString(SuiteResult.SUITE_NAME));
                     xsw.writeAttribute("projectname", rs.getString(SuiteResult.PROJECT_NAME) + "");
-                    xsw.writeAttribute("tests", rs.getInt(SuiteResult.NUMBER_OF_TESTS) + "");
+                    xsw.writeAttribute("tests", rs.getInt(SuiteResult.NUMBER_OF_CASES) + "");
                     xsw.writeAttribute("failures", rs.getInt(SuiteResult.NUMBER_OF_FAILURE) + "");
                     xsw.writeAttribute("time", (rs.getLong(SuiteResult.STOP_TIME)
                         - rs.getLong(CaseResult.START_TIME)) / 1000.0 + "");
@@ -539,7 +539,7 @@ public abstract class DbHandler {
                     pwh.printf("<h2>%s</h2>", rs.getString(SuiteResult.SUITE_NAME));
                     pwh.printf("<h3>%s</h3>", rs.getString(SuiteResult.PROJECT_NAME));
                     pwh.printf("<h4>casess %d, failures %d</h4>",
-                        rs.getInt(SuiteResult.NUMBER_OF_TESTS), rs.getInt(SuiteResult.NUMBER_OF_FAILURE));
+                        rs.getInt(SuiteResult.NUMBER_OF_CASES), rs.getInt(SuiteResult.NUMBER_OF_FAILURE));
                     pwh.println("<table><thead><tr><th>index</th><th>case</th><th>result</th></thead><tbody>");
 
                     final String sql1 = "SELECT * FROM " + CaseResult.TABLE_NAME + " tr JOIN "
