@@ -17,31 +17,31 @@ echo "install mysql"
 DEBIAN_FRONTEND=noninteractive apt-get -y --force-yes install mysql-server
 sed -i '/bind-address/d' /etc/mysql/my.cnf
 
-echo "CREATE DATABASE testharness;" > mysql-th.txt
-echo "CREATE USER 'th'@'localhost' IDENTIFIED BY 'p@ssword';" >> mysql-th.txt
-echo "GRANT ALL ON testharness.* TO 'th'@'localhost';" >> mysql-th.txt
-echo "CREATE USER 'th'@'%' IDENTIFIED BY 'p@ssword';" >> mysql-th.txt
-echo "GRANT ALL ON testharness.* TO 'th'@'%';" >> mysql-th.txt
+echo "CREATE DATABASE reactor;" > mysql-th.txt
+echo "CREATE USER 'reactor'@'localhost' IDENTIFIED BY 'p@ssword';" >> mysql-th.txt
+echo "GRANT ALL ON reactor.* TO 'reactor'@'localhost';" >> mysql-th.txt
+echo "CREATE USER 'reactor'@'%' IDENTIFIED BY 'p@ssword';" >> mysql-th.txt
+echo "GRANT ALL ON reactor.* TO 'reactor'@'%';" >> mysql-th.txt
 mysql -u root < mysql-th.txt
 
-wget "https://raw.githubusercontent.com/tascape/testharness/master/src/main/resources/db/thr.sql" -O thr.sql
-mysql -u th -pp@ssword testharness < thr.sql
+wget "https://raw.githubusercontent.com/tascape/reactor/master/src/main/resources/db/reactor.sql" -O reactor.sql
+mysql -u reactor -pp@ssword reactor < reactor.sql
 service mysql restart
 
-(crontab -l 2>/dev/null; echo "*/17 * * * * mysqldump -u root --no-create-info testharness > /home/vagrant/qa/th/th.sql") | crontab -
-if [[ -e /home/vagrant/qa/th/th.sql ]]; then
-  echo "restore testharness db"
-  mysql -u root testharness < /home/vagrant/qa/th/th.sql || echo "error restoring tesharness db"
+(crontab -l 2>/dev/null; echo "*/17 * * * * mysqldump -u root --no-create-info reactor > /home/vagrant/reactor/reactor-data.sql") | crontab -
+if [[ -e /home/vagrant/reactor/reactor-data.sql ]]; then
+  echo "restore reactor db"
+  mysql -u root reactor < /home/vagrant/reactor/reactor-data.sql || echo "error restoring reactor db"
 fi
 
 
 echo "install tomee +"
-wget "https://raw.githubusercontent.com/tascape/testharness-report/master/doc/tomee.sh" -O tomee.sh
+wget "https://raw.githubusercontent.com/tascape/reactor-report/master/doc/tomee.sh" -O tomee.sh
 bash tomee.sh
 
 
 echo "install nginx"
 apt-get install -y --force-yes nginx
-echo "server {listen 8088;root /home/vagrant/qa/th/;index index.html index.htm;autoindex on;autoindex_localtime on; location /thr/ {proxy_pass http://127.0.0.1:8080/thr/;}}" > th-logs
-mv th-logs /etc/nginx/sites-enabled/th-logs
+echo "server {listen 8088;root /home/vagrant/qa/th/;index index.html index.htm;autoindex on;autoindex_localtime on; location /reactor-report/ {proxy_pass http://127.0.0.1:8080/reactor-report/;}}" > reactor-logs
+mv th-logs /etc/nginx/sites-enabled/reactor-logs
 service nginx restart

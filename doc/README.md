@@ -3,21 +3,21 @@
 * first time setup, run the following line in console
 
 ```
-cd && mkdir -p ~/qa/th && wget https://raw.githubusercontent.com/tascape/reactor/master/doc/th.sh -O th.sh && bash th.sh
+cd && mkdir -p ~/reactor && wget https://raw.githubusercontent.com/tascape/reactor/master/doc/reactor.sh -O reactor.sh && bash reactor.sh
 ```
 
 
 * restart environment, after host machine reboot
 
 ```
-cd && vagrant up
+cd ~/reactor && vagrant up
 ```
 
 
 * destroy environment (for re-setup)
 
 ```
-cd && vagrant destroy
+cd ~/reactor && vagrant destroy
 ```
 
 
