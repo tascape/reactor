@@ -1,6 +1,6 @@
 -- MySQL dump 10.13  Distrib 5.1.73, for apple-darwin10.3.0 (i386)
 --
--- Host: 127.0.0.1    Database: th
+-- Host: 127.0.0.1    Database: reactor
 -- ------------------------------------------------------
 -- Server version	5.5.37
 
@@ -32,10 +32,10 @@ CREATE TABLE `suite_result` (
   `EXECUTION_RESULT` varchar(45) DEFAULT NULL,
   `START_TIME` bigint(20) DEFAULT NULL,
   `STOP_TIME` bigint(20) DEFAULT NULL,
-  `NUMBER_OF_TESTS` int(11) DEFAULT NULL,
+  `NUMBER_OF_CASES` int(11) DEFAULT NULL,
   `NUMBER_OF_FAILURE` int(11) DEFAULT NULL,
   `INVISIBLE_ENTRY` tinyint(4) DEFAULT '0',
-  `PRODUCT_UNDER_TEST` varchar(255) DEFAULT NULL,
+  `PRODUCT_UNDER_TASK` varchar(255) DEFAULT NULL,
   PRIMARY KEY (`SUITE_RESULT_ID`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
@@ -106,10 +106,10 @@ CREATE TABLE `case_result` (
 -- Table structure for table `task_result_metric`
 --
 
-DROP TABLE IF EXISTS `task_result_metric`;
+DROP TABLE IF EXISTS `case_result_metric`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8 */;
-CREATE TABLE `task_result_metric` (
+CREATE TABLE `case_result_metric` (
   `CASE_RESULT_METRIC_ID` int(11) NOT NULL AUTO_INCREMENT,
   `CASE_RESULT_ID` varchar(63) DEFAULT NULL,
   `METRIC_GROUP` varchar(63) DEFAULT NULL,

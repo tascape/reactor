@@ -1,6 +1,6 @@
 -- MySQL dump 10.13  Distrib 5.5.44, for debian-linux-gnu (x86_64)
 --
--- Host: localhost    Database: testharness
+-- Host: localhost    Database: reactor
 -- ------------------------------------------------------
 -- Server version	5.5.44-0ubuntu0.14.04.1
 
@@ -50,77 +50,77 @@ CREATE TABLE `suite_result` (
   `EXECUTION_RESULT` varchar(45) COLLATE utf8_bin DEFAULT NULL,
   `START_TIME` bigint(20) DEFAULT NULL,
   `STOP_TIME` bigint(20) DEFAULT NULL,
-  `NUMBER_OF_TESTS` int(11) DEFAULT NULL,
+  `NUMBER_OF_CASES` int(11) DEFAULT NULL,
   `NUMBER_OF_FAILURE` int(11) DEFAULT NULL,
   `INVISIBLE_ENTRY` tinyint(4) DEFAULT '0',
-  `PRODUCT_UNDER_TEST` varchar(255) COLLATE utf8_bin DEFAULT NULL,
+  `PRODUCT_UNDER_TASK` varchar(255) COLLATE utf8_bin DEFAULT NULL,
   PRIMARY KEY (`SUITE_RESULT_ID`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
--- Table structure for table `test_case`
+-- Table structure for table `task_case`
 --
 
-DROP TABLE IF EXISTS `test_case`;
+DROP TABLE IF EXISTS `task_case`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8 */;
-CREATE TABLE `test_case` (
-  `TEST_CASE_ID` int(11) NOT NULL AUTO_INCREMENT,
+CREATE TABLE `task_case` (
+  `TASK_CASE_ID` int(11) NOT NULL AUTO_INCREMENT,
   `SUITE_CLASS` varchar(255) COLLATE utf8_bin NOT NULL,
-  `TEST_CLASS` varchar(255) COLLATE utf8_bin NOT NULL,
-  `TEST_METHOD` varchar(255) COLLATE utf8_bin NOT NULL,
-  `TEST_DATA_INFO` varchar(255) COLLATE utf8_bin DEFAULT '',
-  `TEST_DATA` varchar(255) COLLATE utf8_bin DEFAULT '',
-  `TEST_ISSUES` varchar(255) COLLATE utf8_bin DEFAULT '',
-  PRIMARY KEY (`TEST_CASE_ID`)
+  `CASE_CLASS` varchar(255) COLLATE utf8_bin NOT NULL,
+  `CASE_METHOD` varchar(255) COLLATE utf8_bin NOT NULL,
+  `CASE_DATA_INFO` varchar(255) COLLATE utf8_bin DEFAULT '',
+  `CASE_DATA` varchar(255) COLLATE utf8_bin DEFAULT '',
+  `CASE_ISSUES` varchar(255) COLLATE utf8_bin DEFAULT '',
+  PRIMARY KEY (`CASE_CASE_ID`)
 ) ENGINE=InnoDB AUTO_INCREMENT=25 DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
--- Table structure for table `test_result`
+-- Table structure for table `case_result`
 --
 
-DROP TABLE IF EXISTS `test_result`;
+DROP TABLE IF EXISTS `case_result`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8 */;
-CREATE TABLE `test_result` (
-  `TEST_RESULT_ID` varchar(63) COLLATE utf8_bin NOT NULL,
+CREATE TABLE `case_result` (
+  `CASE_RESULT_ID` varchar(63) COLLATE utf8_bin NOT NULL,
   `SUITE_RESULT` varchar(63) COLLATE utf8_bin DEFAULT NULL,
-  `TEST_CASE_ID` int(11) DEFAULT '0',
+  `CASE_CASE_ID` int(11) DEFAULT '0',
   `EXECUTION_RESULT` varchar(45) COLLATE utf8_bin DEFAULT NULL,
   `AUT` varchar(255) COLLATE utf8_bin DEFAULT NULL,
   `START_TIME` bigint(20) DEFAULT NULL,
   `STOP_TIME` bigint(20) DEFAULT NULL,
   `RETRY` int(11) DEFAULT NULL,
-  `TEST_STATION` varchar(255) COLLATE utf8_bin DEFAULT NULL,
+  `CASE_STATION` varchar(255) COLLATE utf8_bin DEFAULT NULL,
   `LOG_DIR` varchar(255) COLLATE utf8_bin DEFAULT NULL,
   `EXTERNAL_ID` varchar(63) COLLATE utf8_bin DEFAULT NULL,
-  `TEST_ENV` varchar(45) COLLATE utf8_bin DEFAULT NULL,
-  PRIMARY KEY (`TEST_RESULT_ID`),
-  KEY `suite-test_idx` (`SUITE_RESULT`),
-  KEY `fk_test_case_idx` (`TEST_CASE_ID`),
+  `CASE_ENV` varchar(45) COLLATE utf8_bin DEFAULT NULL,
+  PRIMARY KEY (`CASE_RESULT_ID`),
+  KEY `suite-case_idx` (`SUITE_RESULT`),
+  KEY `fk_task_case_idx` (`TASK_CASE_ID`),
   CONSTRAINT `fk_suite_result` FOREIGN KEY (`SUITE_RESULT`) REFERENCES `suite_result` (`SUITE_RESULT_ID`) ON DELETE CASCADE ON UPDATE CASCADE,
-  CONSTRAINT `fk_test_case` FOREIGN KEY (`TEST_CASE_ID`) REFERENCES `test_case` (`TEST_CASE_ID`) ON UPDATE CASCADE
+  CONSTRAINT `fk_task_case` FOREIGN KEY (`TASK_CASE_ID`) REFERENCES `task_case` (`CASE_CASE_ID`) ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
--- Table structure for table `test_result_metric`
+-- Table structure for table `case_result_metric`
 --
 
-DROP TABLE IF EXISTS `test_result_metric`;
+DROP TABLE IF EXISTS `case_result_metric`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8 */;
-CREATE TABLE `test_result_metric` (
-  `TEST_RESULT_METRIC_ID` int(11) NOT NULL AUTO_INCREMENT,
-  `TEST_RESULT_ID` varchar(63) COLLATE utf8_bin DEFAULT NULL,
+CREATE TABLE `case_result_metric` (
+  `CASE_RESULT_METRIC_ID` int(11) NOT NULL AUTO_INCREMENT,
+  `CASE_RESULT_ID` varchar(63) COLLATE utf8_bin DEFAULT NULL,
   `METRIC_GROUP` varchar(63) COLLATE utf8_bin DEFAULT NULL,
   `METRIC_NAME` varchar(255) COLLATE utf8_bin DEFAULT NULL,
   `METRIC_VALUE` double DEFAULT NULL,
-  PRIMARY KEY (`TEST_RESULT_METRIC_ID`),
-  KEY `fk_test_result_idx` (`TEST_RESULT_ID`),
-  CONSTRAINT `fk_test_result` FOREIGN KEY (`TEST_RESULT_ID`) REFERENCES `test_result` (`TEST_RESULT_ID`) ON DELETE CASCADE ON UPDATE CASCADE
+  PRIMARY KEY (`CASE_RESULT_METRIC_ID`),
+  KEY `fk_case_result_idx` (`CASE_RESULT_ID`),
+  CONSTRAINT `fk_case_result` FOREIGN KEY (`CASE_RESULT_ID`) REFERENCES `case_result` (`CASE_RESULT_ID`) ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=InnoDB AUTO_INCREMENT=87 DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
 /*!40101 SET character_set_client = @saved_cs_client */;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;

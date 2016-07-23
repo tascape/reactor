@@ -17,7 +17,7 @@ package com.tascape.reactor;
 
 import com.tascape.reactor.db.DbHandler;
 import com.tascape.reactor.db.CaseResult;
-import com.tascape.reactor.db.caseResultMetric;
+import com.tascape.reactor.db.CaseResultMetric;
 import com.tascape.reactor.task.AbstractCase;
 import java.lang.reflect.Field;
 import java.sql.SQLException;
@@ -166,7 +166,7 @@ public class CaseRunListener extends RunListener {
         this.tcr.setExternalId(kase.getExternalId());
         kase.cleanBackgoundTasks();
 
-        List<caseResultMetric> resultMetrics = kase.getResultMetrics();
+        List<CaseResultMetric> resultMetrics = kase.getResultMetrics();
         if (!resultMetrics.isEmpty()) {
             db.saveCaseResultMetrics(tcr.getCaseResultId(), resultMetrics);
         }

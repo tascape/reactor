@@ -34,7 +34,7 @@ import javax.xml.bind.annotation.XmlRootElement;
 @MappedSuperclass
 @Table(name = "case_result_metric")
 @XmlRootElement
-public class caseResultMetric implements Serializable {
+public class CaseResultMetric implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
@@ -70,10 +70,10 @@ public class caseResultMetric implements Serializable {
     @ManyToOne
     private CaseResult caseResultId;
 
-    public caseResultMetric() {
+    public CaseResultMetric() {
     }
 
-    public caseResultMetric(Integer caseResultMetricId) {
+    public CaseResultMetric(Integer caseResultMetricId) {
         this.caseResultMetricId = caseResultMetricId;
     }
 
@@ -126,10 +126,10 @@ public class caseResultMetric implements Serializable {
 
     @Override
     public boolean equals(Object object) {
-        if (!(object instanceof caseResultMetric)) {
+        if (!(object instanceof CaseResultMetric)) {
             return false;
         }
-        caseResultMetric other = (caseResultMetric) object;
+        CaseResultMetric other = (CaseResultMetric) object;
         return !((this.caseResultMetricId == null && other.caseResultMetricId != null)
             || (this.caseResultMetricId != null && !this.caseResultMetricId.equals(other.caseResultMetricId)));
     }

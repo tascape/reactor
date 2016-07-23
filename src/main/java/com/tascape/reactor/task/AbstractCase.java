@@ -23,7 +23,7 @@ import com.tascape.reactor.driver.EntityDriver;
 import com.tascape.reactor.suite.AbstractSuite;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import com.tascape.reactor.AbstractCaseResource;
-import com.tascape.reactor.db.caseResultMetric;
+import com.tascape.reactor.db.CaseResultMetric;
 import com.tascape.reactor.driver.CaseDriver;
 import com.tascape.reactor.suite.Environment;
 import java.nio.file.Path;
@@ -78,7 +78,7 @@ public abstract class AbstractCase extends AbstractCaseResource {
 
     private final ExecutorService backgroundExecutorService;
 
-    private final List<caseResultMetric> resultMetrics = new LinkedList<>();
+    private final List<CaseResultMetric> resultMetrics = new LinkedList<>();
 
     private final Environment env;
 
@@ -191,12 +191,12 @@ public abstract class AbstractCase extends AbstractCaseResource {
         this.result = executionResult;
     }
 
-    public List<caseResultMetric> getResultMetrics() {
+    public List<CaseResultMetric> getResultMetrics() {
         return resultMetrics;
     }
 
     protected void putResultMetric(String group, String name, double value) {
-        caseResultMetric metric = new caseResultMetric();
+        CaseResultMetric metric = new CaseResultMetric();
         metric.setMetricGroup(group);
         metric.setMetricName(name);
         metric.setMetricValue(value);

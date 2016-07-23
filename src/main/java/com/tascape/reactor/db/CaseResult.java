@@ -15,7 +15,6 @@
  */
 package com.tascape.reactor.db;
 
-import com.sun.corba.se.spi.activation._ActivatorImplBase;
 import com.tascape.reactor.ExecutionResult;
 import java.io.PrintWriter;
 import java.io.StringWriter;
@@ -102,7 +101,7 @@ public class CaseResult {
     private TaskCase taskCaseId;
 
     @OneToMany(mappedBy = "caseResultId")
-    private List<com.tascape.reactor.db.caseResultMetric> caseResultMetricList;
+    private List<com.tascape.reactor.db.CaseResultMetric> caseResultMetricList;
 
     private ExecutionResult result = ExecutionResult.NA;
 
@@ -218,11 +217,11 @@ public class CaseResult {
     }
 
     @XmlTransient
-    public List<caseResultMetric> getCaseResultMetricList() {
+    public List<CaseResultMetric> getCaseResultMetricList() {
         return caseResultMetricList;
     }
 
-    public void setCaseResultMetricList(List<caseResultMetric> caseResultMetricList) {
+    public void setCaseResultMetricList(List<CaseResultMetric> caseResultMetricList) {
         this.caseResultMetricList = caseResultMetricList;
     }
 

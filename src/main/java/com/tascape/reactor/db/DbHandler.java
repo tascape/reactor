@@ -57,15 +57,15 @@ public abstract class DbHandler {
 
     static final SystemConfiguration SYS_CONFIG = SystemConfiguration.getInstance();
 
-    public static final String SYSPROP_DATABASE_TYPE = "qa.th.db.type";
+    public static final String SYSPROP_DATABASE_TYPE = "reactor.db.type";
 
-    public static final String SYSPROP_DATABASE_HOST = "qa.th.db.host";
+    public static final String SYSPROP_DATABASE_HOST = "reactor.db.host";
 
-    public static final String SYSPROP_DATABASE_SCHEMA = "qa.th.db.schema";
+    public static final String SYSPROP_DATABASE_SCHEMA = "reactor.db.schema";
 
-    public static final String SYSPROP_DATABASE_USER = "qa.th.db.user";
+    public static final String SYSPROP_DATABASE_USER = "reactor.db.user";
 
-    public static final String SYSPROP_DATABASE_PASS = "qa.th.db.pass";
+    public static final String SYSPROP_DATABASE_PASS = "reactor.db.pass";
 
     public static DbHandler getInstance() {
         String type = SystemConfiguration.getInstance().getDatabaseType();
@@ -615,9 +615,9 @@ public abstract class DbHandler {
         }
         List<Map<String, Object>> metrics;
         {
-            final String sql = "SELECT trm.* FROM " + caseResultMetric.TABLE_NAME + " trm JOIN "
+            final String sql = "SELECT trm.* FROM " + CaseResultMetric.TABLE_NAME + " trm JOIN "
                 + CaseResult.TABLE_NAME + " tr ON"
-                + " trm." + caseResultMetric.CASE_RESULT_ID + " = tr." + CaseResult.CASE_RESULT_ID
+                + " trm." + CaseResultMetric.CASE_RESULT_ID + " = tr." + CaseResult.CASE_RESULT_ID
                 + " WHERE " + CaseResult.SUITE_RESULT + " = ?;";
             try (Connection conn = this.getConnection(); PreparedStatement stmt = conn.prepareStatement(sql)) {
                 stmt.setString(1, execId);
@@ -765,19 +765,19 @@ public abstract class DbHandler {
         LOG.debug("trs imported");
     }
 
-    public void saveCaseResultMetrics(String trid, List<caseResultMetric> resultMetrics) throws SQLException {
+    public void saveCaseResultMetrics(String trid, List<CaseResultMetric> resultMetrics) throws SQLException {
         if (resultMetrics.isEmpty()) {
             return;
         }
-        final String sql = "INSERT INTO " + caseResultMetric.TABLE_NAME + " ("
-            + caseResultMetric.CASE_RESULT_ID + ", "
-            + caseResultMetric.METRIC_GROUP + ", "
-            + caseResultMetric.METRIC_NAME + ", "
-            + caseResultMetric.METRIC_VALUE + ") VALUES (?,?,?,?)";
+        final String sql = "INSERT INTO " + CaseResultMetric.TABLE_NAME + " ("
+            + CaseResultMetric.CASE_RESULT_ID + ", "
+            + CaseResultMetric.METRIC_GROUP + ", "
+            + CaseResultMetric.METRIC_NAME + ", "
+            + CaseResultMetric.METRIC_VALUE + ") VALUES (?,?,?,?)";
         try (Connection conn = this.getConnection()) {
             PreparedStatement stmt = conn.prepareStatement(sql);
             LOG.trace("save metric data for {}", trid);
-            for (caseResultMetric metric : resultMetrics) {
+            for (CaseResultMetric metric : resultMetrics) {
                 stmt.setString(1, trid);
                 stmt.setString(2, metric.getMetricGroup());
                 stmt.setString(3, metric.getMetricName());

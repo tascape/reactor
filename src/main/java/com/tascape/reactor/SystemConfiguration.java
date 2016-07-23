@@ -100,13 +100,13 @@ public final class SystemConfiguration {
         this.listSysProperties();
 
         try {
-            InputStream is = SystemConfiguration.class.getResourceAsStream("/th.properties");
+            InputStream is = SystemConfiguration.class.getResourceAsStream("/reactor.properties");
             this.properties.load(is);
         } catch (Exception ex) {
             LOG.warn("", ex);
         }
 
-        Path conf = Paths.get(System.getProperty("user.home"), ".th", "th.properties");
+        Path conf = Paths.get(System.getProperty("user.home"), ".reactor", "reactor.properties");
         this.loadSystemPropertiesFromPath(conf);
 
         String confFiles = System.getProperty(SYSPROP_CONF_FILES, "").trim();
