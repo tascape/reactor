@@ -21,8 +21,8 @@ if (type vagrant) && (type virtualbox) then
     echo "reactor.test.station=localhost" >> $PROP
     cat $PROP
 
-    echo "check report at http://localhost:18088/reactor-report/suites_result.xhtml"
-    open "http://localhost:18088/reactor-report/suites_result.xhtml" || echo "OK"
+    echo "check report at http://localhost:28088/reactor-report/suites_result.xhtml"
+    open "http://localhost:28088/reactor-report/suites_result.xhtml" || echo "OK"
 
 else
     echo "you need to first install vagrant (http://www.vagrantup.com/downloads.html) and virtualbox (https://www.virtualbox.org/wiki/Downloads)"
