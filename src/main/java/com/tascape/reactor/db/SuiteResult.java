@@ -305,7 +305,7 @@ public class SuiteResult implements Serializable {
 
     @Override
     public String toString() {
-        return "com.tascape.qa.th.db1.SuiteResult[ suiteResultId=" + suiteResultId + " ]";
+        return this.getClass().getName() + "[ suiteResultId=" + suiteResultId + " ]";
     }
 
     public String getProjectName() {

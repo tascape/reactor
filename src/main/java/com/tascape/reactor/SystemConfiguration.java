@@ -188,7 +188,7 @@ public final class SystemConfiguration {
     public Path getLogPath() {
         String p = this.getProperty(SYSPROP_LOG_PATH);
         if (StringUtils.isBlank(p)) {
-            return Paths.get(System.getProperty("user.home"), "qa", "th", "logs");
+            return Paths.get(System.getProperty("user.home"), "reactor", "logs");
         } else {
             return Paths.get(p);
         }
@@ -278,7 +278,7 @@ public final class SystemConfiguration {
     }
 
     public String getDatabaseUser() {
-        return this.properties.getProperty(DbHandler.SYSPROP_DATABASE_USER, "th");
+        return this.properties.getProperty(DbHandler.SYSPROP_DATABASE_USER, "reactor");
     }
 
     public String getDatabasePass() {

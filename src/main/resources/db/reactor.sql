@@ -73,7 +73,7 @@ CREATE TABLE `task_case` (
   `CASE_DATA_INFO` varchar(255) COLLATE utf8_bin DEFAULT '',
   `CASE_DATA` varchar(255) COLLATE utf8_bin DEFAULT '',
   `CASE_ISSUES` varchar(255) COLLATE utf8_bin DEFAULT '',
-  PRIMARY KEY (`CASE_CASE_ID`)
+  PRIMARY KEY (`TASK_CASE_ID`)
 ) ENGINE=InnoDB AUTO_INCREMENT=25 DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
@@ -87,7 +87,7 @@ DROP TABLE IF EXISTS `case_result`;
 CREATE TABLE `case_result` (
   `CASE_RESULT_ID` varchar(63) COLLATE utf8_bin NOT NULL,
   `SUITE_RESULT` varchar(63) COLLATE utf8_bin DEFAULT NULL,
-  `CASE_CASE_ID` int(11) DEFAULT '0',
+  `TASK_CASE_ID` int(11) DEFAULT '0',
   `EXECUTION_RESULT` varchar(45) COLLATE utf8_bin DEFAULT NULL,
   `AUT` varchar(255) COLLATE utf8_bin DEFAULT NULL,
   `START_TIME` bigint(20) DEFAULT NULL,
@@ -101,7 +101,7 @@ CREATE TABLE `case_result` (
   KEY `suite-case_idx` (`SUITE_RESULT`),
   KEY `fk_task_case_idx` (`TASK_CASE_ID`),
   CONSTRAINT `fk_suite_result` FOREIGN KEY (`SUITE_RESULT`) REFERENCES `suite_result` (`SUITE_RESULT_ID`) ON DELETE CASCADE ON UPDATE CASCADE,
-  CONSTRAINT `fk_task_case` FOREIGN KEY (`TASK_CASE_ID`) REFERENCES `task_case` (`CASE_CASE_ID`) ON UPDATE CASCADE
+  CONSTRAINT `fk_task_case` FOREIGN KEY (`TASK_CASE_ID`) REFERENCES `task_case` (`TASK_CASE_ID`) ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
 /*!40101 SET character_set_client = @saved_cs_client */;
 

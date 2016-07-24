@@ -142,6 +142,6 @@ public class SuiteProperty implements Serializable {
 
     @Override
     public String toString() {
-        return "com.tascape.qa.th.db.SuiteProperty[ suitePropertyId=" + suitePropertyId + " ]";
+        return this.getClass().getName() + "[ suitePropertyId=" + suitePropertyId + " ]";
     }
 }
