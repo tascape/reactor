@@ -49,22 +49,22 @@ public class CaseRunListener extends RunListener {
     }
 
     /**
-     * Called before any tests have been run.
+     * Called before any cases have been run.
      *
-     * @param description describes the tests to be run
+     * @param description describes the cases to be run
      *
      * @throws Exception for various issues
      */
     @Override
     public void testRunStarted(Description description) throws Exception {
-        LOG.debug("Test class started {}", description.getClassName());
+        LOG.debug("Case class started {}", description.getClassName());
         if (this.db == null || this.tcr == null) {
             return;
         }
 
-        Class<?> testClass = Class.forName(description.getClassName());
+        Class<?> caseClass = Class.forName(description.getClassName());
         try {
-            Field f = testClass.getField("AUT");
+            Field f = caseClass.getField("AUT");
             if (f != null) {
                 this.tcr.setAut(f.get(null) + "");
             }
@@ -87,9 +87,9 @@ public class CaseRunListener extends RunListener {
     }
 
     /**
-     * Called when an atomic kase flags that it assumes a condition that is false
+     * Called when an atomic case flags that it assumes a condition that is false
      *
-     * @param failure describes the kase that failed and the {@link AssumptionViolatedException} that was thrown
+     * @param failure describes the case that failed and the {@link AssumptionViolatedException} that was thrown
      */
     @Override
     public void testAssumptionFailure(Failure failure) {
@@ -98,9 +98,9 @@ public class CaseRunListener extends RunListener {
     }
 
     /**
-     * Called when an atomic kase is about to be started.
+     * Called when an atomic case is about to be started.
      *
-     * @param description the description of the kase that is about to be run (generally a class and method name)
+     * @param description the description of the case that is about to be run (generally a class and method name)
      *
      * @throws Exception for various issues
      */
@@ -108,9 +108,9 @@ public class CaseRunListener extends RunListener {
     public void testStarted(Description description) throws Exception {
         LOG.debug("Case method started {}.{}", description.getClassName(), description.getMethodName());
 
-        AbstractCase test = AbstractCase.getCase();
-        if (test != null) {
-            String aut = test.getApplicationUnderTask();
+        AbstractCase kase = AbstractCase.getCase();
+        if (kase != null) {
+            String aut = kase.getApplicationUnderTask();
             if (aut == null || aut.isEmpty()) {
                 return;
             }
@@ -122,9 +122,9 @@ public class CaseRunListener extends RunListener {
     }
 
     /**
-     * Called when an atomic kase fails.
+     * Called when an atomic case fails.
      *
-     * @param failure describes the kase that failed and the exception that was thrown
+     * @param failure describes the case that failed and the exception that was thrown
      *
      * @throws Exception for various issues
      */
@@ -140,14 +140,14 @@ public class CaseRunListener extends RunListener {
             return;
         }
 
-        AbstractCase test = AbstractCase.getCase();
+        AbstractCase kase = AbstractCase.getCase();
         this.tcr.setException(throwable);
     }
 
     /**
-     * Called when an atomic kase has finished, whether the kase succeeds or fails.
+     * Called when an atomic case has finished, whether the case succeeds or fails.
      *
-     * @param description the description of the kase that just ran
+     * @param description the description of the case that just ran
      *
      * @throws Exception for various issues
      */
@@ -173,15 +173,15 @@ public class CaseRunListener extends RunListener {
     }
 
     /**
-     * Called when all tests have finished
+     * Called when all cases have finished
      *
-     * @param result the summary of the kase run, including all the tests that failed
+     * @param result the summary of the case run, including all the cases that failed
      *
      * @throws Exception for various issues
      */
     @Override
     public void testRunFinished(Result result) throws Exception {
-        LOG.debug("Test class finished");
+        LOG.debug("Case class finished");
         boolean pass = result.wasSuccessful();
         LOG.info("PASS: {}, time: {} sec", pass, result.getRunTime() / 1000.0);
         if (this.throwable == null) {
@@ -197,15 +197,15 @@ public class CaseRunListener extends RunListener {
         this.tcr.setStopTime(System.currentTimeMillis());
         this.tcr.setResult(pass ? ExecutionResult.PASS : ExecutionResult.FAIL);
 
-        AbstractCase test = AbstractCase.getCase();
-        if (test != null) {
-            ExecutionResult er = test.getExecutionResult();
+        AbstractCase kase = AbstractCase.getCase();
+        if (kase != null) {
+            ExecutionResult er = kase.getExecutionResult();
             if (!ExecutionResult.NA.equals(er)) {
-                LOG.debug("Overwriting JUnit4 execution engine result with the one from test case - {}", er.result());
+                LOG.debug("Overwriting JUnit4 execution engine result with the one from case - {}", er.result());
                 this.tcr.setResult(er);
             }
         } else {
-            LOG.warn("Null test case? Test may have failed in @BeforeClass methods.");
+            LOG.warn("Null case? Case may have failed in environment setup.");
         }
         AbstractCase.setCase(null);
 
@@ -214,10 +214,9 @@ public class CaseRunListener extends RunListener {
     }
 
     /**
-     * Called when a kase will not be run, generally because a kase method is annotated with
- {@link org.junit.Ignore}.
+     * Called when a case will not be run, generally because a case method is annotated with {@link org.junit.Ignore}.
      *
-     * @param description describes the kase that will not be run
+     * @param description describes the case that will not be run
      *
      * @throws Exception for various issues
      */
@@ -239,7 +238,7 @@ public class CaseRunListener extends RunListener {
         if (!(throwable instanceof AssumptionViolatedException)) {
             return;
         }
-        LOG.info("Requeue test case {}", this.tcr.getTaskCase().format());
+        LOG.info("Requeue case {}", this.tcr.getTaskCase().format());
         this.tcr.setRetry(this.tcr.getRetry() + 1);
         this.tcr.setResult(ExecutionResult.QUEUED);
     }
