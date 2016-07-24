@@ -3,7 +3,7 @@
 * first time setup, run the following line in console
 
 ```
-cd && mkdir -p ~/reactor && wget https://raw.githubusercontent.com/tascape/reactor/master/doc/reactor.sh -O reactor.sh && bash reactor.sh
+mkdir -p ~/reactor && cd ~/reactor && wget https://raw.githubusercontent.com/tascape/reactor/master/doc/reactor.sh -O reactor.sh && bash reactor.sh
 ```
 
 
