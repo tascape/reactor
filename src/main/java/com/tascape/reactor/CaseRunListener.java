@@ -183,7 +183,7 @@ public class CaseRunListener extends RunListener {
     public void testRunFinished(Result result) throws Exception {
         LOG.debug("Test class finished");
         boolean pass = result.wasSuccessful();
-        LOG.debug("PASS: {}, time: {} sec", pass, result.getRunTime() / 1000.0);
+        LOG.info("PASS: {}, time: {} sec", pass, result.getRunTime() / 1000.0);
         if (this.throwable == null) {
             result.getFailures().stream().forEach((f) -> {
                 LOG.error("Failure {}", f.getDescription(), f.getException());
@@ -239,7 +239,7 @@ public class CaseRunListener extends RunListener {
         if (!(throwable instanceof AssumptionViolatedException)) {
             return;
         }
-        LOG.debug("Requeue test case {}", this.tcr.getTaskCase().format());
+        LOG.info("Requeue test case {}", this.tcr.getTaskCase().format());
         this.tcr.setRetry(this.tcr.getRetry() + 1);
         this.tcr.setResult(ExecutionResult.QUEUED);
     }

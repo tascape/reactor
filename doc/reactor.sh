@@ -3,12 +3,12 @@
  
 if (type vagrant) && (type virtualbox) then
 
+    mkdir -p $HOME/.reactor
+    mkdir -p $HOME/reactor
+
     echo "get latest vagrant file"
     wget https://raw.githubusercontent.com/tascape/reactor/master/doc/Vagrantfile -O Vagrantfile
     vagrant up
-
-    mkdir -p $HOME/.reactor
-    mkdir -p $HOME/reactor
 
     export PROP=$HOME/.reactor/reactor.properties
     echo "create reactor system properties file" $PROP
@@ -21,8 +21,8 @@ if (type vagrant) && (type virtualbox) then
     echo "reactor.test.station=localhost" >> $PROP
     cat $PROP
 
-    echo "check report at http://localhost:28088/reactor-report/suites_result.xhtml"
-    open "http://localhost:28088/reactor-report/suites_result.xhtml" || echo "OK"
+    echo "check report at http://localhost:28088/rr/suites_result.xhtml"
+    open "http://localhost:28088/rr/suites_result.xhtml" || echo "OK"
 
 else
     echo "you need to first install vagrant (http://www.vagrantup.com/downloads.html) and virtualbox (https://www.virtualbox.org/wiki/Downloads)"
