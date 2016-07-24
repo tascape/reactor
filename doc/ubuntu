@@ -17,12 +17,12 @@ echo "install mysql"
 DEBIAN_FRONTEND=noninteractive apt-get -y --force-yes install mysql-server
 sed -i '/bind-address/d' /etc/mysql/my.cnf
 
-echo "CREATE DATABASE reactor;" > mysql-th.txt
-echo "CREATE USER 'reactor'@'localhost' IDENTIFIED BY 'p@ssword';" >> mysql-th.txt
-echo "GRANT ALL ON reactor.* TO 'reactor'@'localhost';" >> mysql-th.txt
-echo "CREATE USER 'reactor'@'%' IDENTIFIED BY 'p@ssword';" >> mysql-th.txt
-echo "GRANT ALL ON reactor.* TO 'reactor'@'%';" >> mysql-th.txt
-mysql -u root < mysql-th.txt
+echo "CREATE DATABASE reactor;" > mysql-reactor.txt
+echo "CREATE USER 'reactor'@'localhost' IDENTIFIED BY 'p@ssword';" >> mysql-reactor.txt
+echo "GRANT ALL ON reactor.* TO 'reactor'@'localhost';" >> mysql-reactor.txt
+echo "CREATE USER 'reactor'@'%' IDENTIFIED BY 'p@ssword';" >> mysql-reactor.txt
+echo "GRANT ALL ON reactor.* TO 'reactor'@'%';" >> mysql-reactor.txt
+mysql -u root < mysql-reactor.txt
 
 wget "https://raw.githubusercontent.com/tascape/reactor/master/src/main/resources/db/reactor.sql" -O reactor.sql
 mysql -u reactor -pp@ssword reactor < reactor.sql
@@ -43,5 +43,5 @@ bash tomee.sh
 echo "install nginx"
 apt-get install -y --force-yes nginx
 echo "server {listen 8088;root /home/vagrant/qa/th/;index index.html index.htm;autoindex on;autoindex_localtime on; location /reactor-report/ {proxy_pass http://127.0.0.1:8080/reactor-report/;}}" > reactor-logs
-mv th-logs /etc/nginx/sites-enabled/reactor-logs
+mv reactor-logs /etc/nginx/sites-enabled/reactor-logs
 service nginx restart
