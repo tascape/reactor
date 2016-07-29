@@ -19,7 +19,7 @@ package com.tascape.reactor.exception;
  *
  * @author linsong wang
  */
-public class EntityCommunicationException extends Exception {
+public class EntityCommunicationException extends RuntimeException {
 
     private static final long serialVersionUID = 38948496372L;
 
