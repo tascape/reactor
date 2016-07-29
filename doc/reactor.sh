@@ -1,10 +1,9 @@
 #!/bin/bash
 
+mkdir -p $HOME/.reactor
+mkdir -p $HOME/reactor
  
 if (type vagrant) && (type virtualbox) then
-
-    mkdir -p $HOME/.reactor
-    mkdir -p $HOME/reactor
 
     echo "get latest vagrant file"
     wget https://raw.githubusercontent.com/tascape/reactor/master/doc/Vagrantfile -O Vagrantfile
