@@ -15,7 +15,7 @@ if (type vagrant) && (type virtualbox) then
     echo "# reactor system properties" > $PROP
     echo "# use -Dkey=value to override or add in commandline " >> $PROP
     echo "reactor.db.type=mysql" >> $PROP
-    echo "reactor.db.host=localhost:13306" >> $PROP
+    echo "reactor.db.host=localhost:23306" >> $PROP
     echo "reactor.log.path=$HOME/reactor/logs" >> $PROP
     echo "reactor.JOB_NAME=local-run" >> $PROP
     echo "reactor.test.station=localhost" >> $PROP

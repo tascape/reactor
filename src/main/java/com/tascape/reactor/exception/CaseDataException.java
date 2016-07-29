@@ -19,7 +19,7 @@ package com.tascape.reactor.exception;
  *
  * @author linsong wang
  */
-public class CaseDataException extends Exception {
+public class CaseDataException extends RuntimeException {
 
     private static final long serialVersionUID = 38943496372L;
 
