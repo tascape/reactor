@@ -16,8 +16,8 @@ if (type vagrant) && (type virtualbox) then
     echo "reactor.db.type=mysql" >> $PROP
     echo "reactor.db.host=localhost:23306" >> $PROP
     echo "reactor.log.path=$HOME/reactor/logs" >> $PROP
+    echo "reactor.case.station=localhost" >> $PROP
     echo "reactor.JOB_NAME=local-run" >> $PROP
-    echo "reactor.test.station=localhost" >> $PROP
     cat $PROP
 
     echo "check report at http://localhost:28088/rr/suites_result.xhtml"

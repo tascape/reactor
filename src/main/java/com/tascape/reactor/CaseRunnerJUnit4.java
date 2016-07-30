@@ -58,7 +58,7 @@ public class CaseRunnerJUnit4 extends AbstractCaseRunner implements Callable<Cas
 
             this.runTaskCase();
         } catch (Throwable ex) {
-            LOG.error("Cannot execute test case {}", this.tcr.getTaskCase().format(), ex);
+            LOG.error("Cannot execute case {}", this.tcr.getTaskCase().format(), ex);
             this.tcr.setResult(ExecutionResult.FAIL);
             this.tcr.setException(ex);
             this.db.updateCaseExecutionResult(this.tcr);

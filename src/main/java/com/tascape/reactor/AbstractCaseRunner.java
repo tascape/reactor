@@ -83,7 +83,7 @@ public abstract class AbstractCaseRunner {
                 } else if (newline.contains(" WARN  ")) {
                     newline = "<font color='9F6000'><b>" + newline + "</b></font>";
                 } else if (newline.contains(" ERROR ")
-                    || newline.contains("Failure in test")
+                    || newline.contains("Failure in case")
                     || newline.contains("AssertionError")) {
                     newline = "<font color='red'><b>" + newline + "</b></font>";
                 } else {

@@ -27,32 +27,32 @@ import org.slf4j.LoggerFactory;
  *
  * @author linsong wang
  */
-public class JacocoTest extends AbstractCase {
-    private static final Logger LOG = LoggerFactory.getLogger(JacocoTest.class);
+public class JacocoCase extends AbstractCase {
+    private static final Logger LOG = LoggerFactory.getLogger(JacocoCase.class);
 
-    public static final CaseDriver JACOCO = new CaseDriver(JacocoTest.class, JacocoClient.class);
+    public static final CaseDriver JACOCO = new CaseDriver(JacocoCase.class, JacocoClient.class);
 
     private final JacocoClient jacocoClient;
 
-    public JacocoTest() {
+    public JacocoCase() {
         this.jacocoClient = super.getEntityDriver(JACOCO);
     }
 
     @Before
     public void setUp() throws Exception {
-        LOG.debug("Run something before test case");
+        LOG.debug("Run something before case");
         LOG.debug("Please override");
     }
 
     @After
     public void tearDown() throws Exception {
-        LOG.debug("Run something after test case");
+        LOG.debug("Run something after case");
         LOG.debug("Please override");
     }
 
     @Override
     public String getApplicationUnderTask() {
         LOG.debug("Please override");
-        return "testharness";
+        return "reactor";
     }
 }
