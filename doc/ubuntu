@@ -3,8 +3,8 @@
 sudo apt-get update
 
 
-echo "install desktop"
-apt-get install -y --force-yes ubuntu-desktop
+#echo "install desktop"
+#apt-get install -y --force-yes ubuntu-desktop
 
 
 echo "install oracle java8"
@@ -46,13 +46,8 @@ wget "https://raw.githubusercontent.com/tascape/reactor-report/master/doc/tomee.
 bash tomee.sh
 
 
-echo "install nginx"
-apt-get install -y --force-yes nginx
+echo "install git maven nginx"
+apt-get install -y --force-yes git maven nginx
 echo "server {listen 8088;root /home/vagrant/reactor;index index.html index.htm;autoindex on;autoindex_localtime on; location /rr/ {proxy_pass http://127.0.0.1:8080/rr/;}}" > reactor-logs
 mv reactor-logs /etc/nginx/sites-enabled/reactor-logs
 service nginx restart
-
-
-echo "install git maven"
-apt-get install -y --force-yes git maven
-
