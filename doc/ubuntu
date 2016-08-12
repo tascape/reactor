@@ -34,10 +34,10 @@ wget "https://raw.githubusercontent.com/tascape/reactor/master/src/main/resource
 mysql -u reactor -pp@ssword reactor < reactor.sql
 service mysql restart
 
-(crontab -l 2>/dev/null; echo "*/17 * * * * mysqldump -u root --no-create-info reactor > /home/vagrant/reactor/reactor-data.sql") | crontab -
-if [[ -e /home/vagrant/reactor/reactor-data.sql ]]; then
+(crontab -l 2>/dev/null; echo "*/17 * * * * mysqldump -u root --no-create-info reactor > /home/vagrant/.reactor/reactor-data.sql") | crontab -
+if [[ -e /home/vagrant/.reactor/reactor-data.sql ]]; then
   echo "restore reactor db"
-  mysql -u root reactor < /home/vagrant/reactor/reactor-data.sql || echo "error restoring reactor db"
+  mysql -u root reactor < /home/vagrant/.reactor/reactor-data.sql || echo "error restoring reactor db"
 fi
 
 
@@ -48,6 +48,6 @@ bash tomee.sh
 
 echo "install git maven nginx"
 apt-get install -y --force-yes git maven nginx
-echo "server {listen 8088;root /home/vagrant/reactor;index index.html index.htm;autoindex on;autoindex_localtime on; location /rr/ {proxy_pass http://127.0.0.1:8080/rr/;}}" > reactor-logs
+echo "server {listen 8088;root /home/vagrant/.reactor;index index.html index.htm;autoindex on;autoindex_localtime on; location /rr/ {proxy_pass http://127.0.0.1:8080/rr/;}}" > reactor-logs
 mv reactor-logs /etc/nginx/sites-enabled/reactor-logs
 service nginx restart
