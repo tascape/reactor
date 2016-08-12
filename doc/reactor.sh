@@ -1,7 +1,6 @@
 #!/bin/bash
 
 mkdir -p $HOME/.reactor
-mkdir -p $HOME/reactor
  
 if (type vagrant) && (type virtualbox) then
 
@@ -15,7 +14,7 @@ if (type vagrant) && (type virtualbox) then
     echo "# use -Dkey=value to override or add in commandline " >> $PROP
     echo "reactor.db.type=mysql" >> $PROP
     echo "reactor.db.host=localhost:23306" >> $PROP
-    echo "reactor.log.path=$HOME/reactor/logs" >> $PROP
+    echo "reactor.log.path=$HOME/.reactor/logs" >> $PROP
     echo "reactor.case.station=localhost" >> $PROP
     echo "reactor.JOB_NAME=local-run" >> $PROP
     cat $PROP
