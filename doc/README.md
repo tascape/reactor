@@ -1,6 +1,6 @@
 ### case development environment
 
-* first time setup, run the following line in console
+* first time setup, run the following line in console, the user/pass of the newly create Ubuntu VM is vagrant/vagrant
 
 ```
 mkdir -p ~/.reactor && cd ~/.reactor && wget https://raw.githubusercontent.com/tascape/reactor/master/doc/reactor.sh -O reactor.sh && bash reactor.sh
