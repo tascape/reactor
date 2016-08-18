@@ -207,12 +207,12 @@ public class SshCommunication extends EntityCommunication {
             ssh.setUsernamePassword("ec2-user", "");
             ssh.connect();
 
-            File out = new File("/qa/logs/ssh.txt");
-            ssh.shell("tail -f /usr/share/oncue/logs/application.log", FileUtils.openOutputStream(out));
+            File out = new File("~/ssh.txt");
+            ssh.shell("tail -f /usr/share/app/logs/application.log", FileUtils.openOutputStream(out));
             Desktop.getDesktop().open(out);
-            ssh.shell("cat /usr/share/oncue/logs/daemon.log", System.out);
+            ssh.shell("cat /usr/share/app/logs/daemon.log", System.out);
 
-            ssh.upload(out, "/home/ec2-user/sh.txt", 1000);
+            ssh.upload(out, "/home/ubuntu/sh.txt", 1000);
 
             Thread.sleep(10000);
             ssh.disconnect();
