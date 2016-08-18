@@ -21,6 +21,7 @@ import com.jcraft.jsch.JSch;
 import com.jcraft.jsch.JSchException;
 import com.jcraft.jsch.Session;
 import com.jcraft.jsch.SftpException;
+import com.tascape.reactor.SystemConfiguration;
 import java.awt.Desktop;
 import java.io.File;
 import java.io.FileOutputStream;
@@ -56,6 +57,46 @@ public class SshCommunication extends EntityCommunication {
     private final int port;
 
     private Session session;
+
+    public static SshCommunication newInstance() throws JSchException {
+        return newInstance("");
+    }
+
+    public static SshCommunication newInstance(String name) throws JSchException {
+        SystemConfiguration sysConfig = SystemConfiguration.getInstance();
+        String h = sysConfig.getProperty(SshCommunication.SYSPROP_HOST + name);
+        if (h == null) {
+            h = sysConfig.getProperty(SshCommunication.SYSPROP_HOST, "localhost");
+        }
+        int p = sysConfig.getIntProperty(SshCommunication.SYSPROP_PORT + name);
+        if (p == Integer.MIN_VALUE) {
+            p = sysConfig.getIntProperty(SshCommunication.SYSPROP_PORT, 22);
+        }
+        SshCommunication ssh = new SshCommunication(h, p);
+
+        String k = sysConfig.getProperty(SshCommunication.SYSPROP_KEY + name);
+        if (k == null) {
+            k = sysConfig.getProperty(SshCommunication.SYSPROP_KEY);
+        }
+        String pp = sysConfig.getProperty(SshCommunication.SYSPROP_PASS + name);
+        if (pp == null) {
+            pp = sysConfig.getProperty(SshCommunication.SYSPROP_PASS);
+        }
+        if (null != k && null != pp) {
+            ssh.setPrivateKey(k, pp);
+        }
+
+        String u = sysConfig.getProperty(SshCommunication.SYSPROP_USER + name);
+        if (u == null) {
+            u = sysConfig.getProperty(SshCommunication.SYSPROP_USER);
+        }
+        String pw = sysConfig.getProperty(SshCommunication.SYSPROP_PASS + name);
+        if (pw == null) {
+            pw = sysConfig.getProperty(SshCommunication.SYSPROP_PASS);
+        }
+        ssh.setUsernamePassword(u, pw);
+        return ssh;
+    }
 
     /**
      *

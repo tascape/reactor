@@ -30,6 +30,7 @@ import java.util.List;
 import java.util.Properties;
 import java.util.regex.Pattern;
 import java.util.stream.Stream;
+import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Level;
 import org.slf4j.Logger;
@@ -41,6 +42,8 @@ import org.slf4j.LoggerFactory;
  */
 public final class SystemConfiguration {
     private static final Logger LOG = LoggerFactory.getLogger(SystemConfiguration.class);
+
+    public static final Path HOME_PATH = Paths.get(FileUtils.getUserDirectory().getAbsolutePath(), ".reactor");
 
     public static final String CONSTANT_LOG_KEEP_ALIVE_PREFIX = "lka_";
 
