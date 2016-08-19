@@ -58,11 +58,11 @@ public class SshCommunication extends EntityCommunication {
 
     private Session session;
 
-    public static SshCommunication newInstance() throws JSchException {
+    public static SshCommunication newInstance() throws Exception {
         return newInstance("");
     }
 
-    public static SshCommunication newInstance(String name) throws JSchException {
+    public static SshCommunication newInstance(String name) throws Exception {
         SystemConfiguration sysConfig = SystemConfiguration.getInstance();
         String h = sysConfig.getProperty(SshCommunication.SYSPROP_HOST + name);
         if (h == null) {
@@ -95,6 +95,7 @@ public class SshCommunication extends EntityCommunication {
             pw = sysConfig.getProperty(SshCommunication.SYSPROP_PASS);
         }
         ssh.setUsernamePassword(u, pw);
+        ssh.connect();
         return ssh;
     }
 
