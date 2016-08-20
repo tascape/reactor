@@ -20,7 +20,6 @@ import com.tascape.reactor.TaskSuite;
 import com.tascape.reactor.Utils;
 import com.jolbox.bonecp.BoneCP;
 import com.jolbox.bonecp.BoneCPConfig;
-import com.tascape.reactor.Reactor;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -225,60 +224,6 @@ public class PostgresqlHandler extends DbHandler {
                 conn.commit();
             } finally {
                 conn.setAutoCommit(autoCommit);
-            }
-        }
-    }
-
-    @Override
-    public void updateSuiteExecutionResult(String execId) throws SQLException {
-        LOG.debug("Update suite execution result with execution id {}", execId);
-        String lock = this.getDbLock(execId);
-
-        Connection conn = this.getConnection();
-        try {
-            if (!this.acquireExecutionLock(conn, lock)) {
-                throw new SQLException("Cannot acquire lock of name " + lock);
-            }
-
-            int total = 0, fail = 0;
-            final String sql1 = "SELECT " + CaseResult.EXECUTION_RESULT + " FROM "
-                + TaskCase.TABLE_NAME + " WHERE " + CaseResult.SUITE_RESULT
-                + " = ?;";
-            try (PreparedStatement stmt = this.getConnection().prepareStatement(sql1,
-                ResultSet.TYPE_FORWARD_ONLY,
-                ResultSet.CONCUR_READ_ONLY)) {
-                stmt.setString(1, execId);
-                stmt.setFetchSize(Integer.MIN_VALUE);
-                ResultSet rs = stmt.executeQuery();
-                while (rs.next()) {
-                    total++;
-                    String result = rs.getString(CaseResult.EXECUTION_RESULT);
-                    if (!result.equals(ExecutionResult.PASS.getName()) && !result.endsWith("/0")) {
-                        fail++;
-                    }
-                }
-            }
-
-            final String sql2 = "SELECT * FROM " + SuiteResult.TABLE_NAME
-                + " WHERE " + SuiteResult.SUITE_RESULT_ID + " = ?;";
-            try (PreparedStatement stmt = this.getConnection().prepareStatement(sql2,
-                ResultSet.TYPE_SCROLL_SENSITIVE,
-                ResultSet.CONCUR_UPDATABLE)) {
-                stmt.setString(1, execId);
-                ResultSet rs = stmt.executeQuery();
-                if (rs.first()) {
-                    rs.updateInt(SuiteResult.NUMBER_OF_CASES, total);
-                    rs.updateInt(SuiteResult.NUMBER_OF_FAILURE, fail);
-                    rs.updateString(SuiteResult.EXECUTION_RESULT, fail == 0 ? "PASS" : "FAIL");
-                    rs.updateLong(SuiteResult.STOP_TIME, System.currentTimeMillis());
-                    rs.updateRow();
-                }
-            }
-        } finally {
-            try {
-                this.releaseExecutionLock(conn, lock);
-            } finally {
-                conn.close();
             }
         }
     }

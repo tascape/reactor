@@ -149,7 +149,7 @@ public class SuiteResult implements Serializable {
         this.numberOfCases = rs.getInt(NUMBER_OF_CASES);
         this.numberOfFailure = rs.getInt(NUMBER_OF_FAILURE);
         this.invisibleEntry = rs.getBoolean(INVISIBLE_ENTRY);
-        this.productUnderTask = rs.getNString(PRODUCT_UNDER_TASK);
+        this.productUnderTask = rs.getString(PRODUCT_UNDER_TASK);
     }
 
     public void update(ResultSet rs) throws SQLException {
@@ -165,7 +165,7 @@ public class SuiteResult implements Serializable {
         rs.updateInt(NUMBER_OF_CASES, this.getNumberOfCases());
         rs.updateInt(NUMBER_OF_FAILURE, this.getNumberOfFailure());
         rs.updateBoolean(INVISIBLE_ENTRY, this.getInvisibleEntry());
-        rs.updateNString(PRODUCT_UNDER_TASK, this.getProductUnderTask());
+        rs.updateString(PRODUCT_UNDER_TASK, this.getProductUnderTask());
     }
 
     public SuiteResult(String suiteResultId) {

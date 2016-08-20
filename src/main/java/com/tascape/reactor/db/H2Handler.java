@@ -224,47 +224,6 @@ public final class H2Handler extends DbHandler {
     }
 
     @Override
-    public void updateSuiteExecutionResult(String execId) throws SQLException {
-        LOG.debug("Update suite execution result with execution id {}", execId);
-        int total = 0, fail = 0;
-
-        try (Connection conn = this.getConnection();) {
-            final String sql1 = "SELECT " + CaseResult.EXECUTION_RESULT
-                + " FROM " + CaseResult.TABLE_NAME
-                + " WHERE " + CaseResult.SUITE_RESULT + " = ?;";
-            try (PreparedStatement stmt = conn.prepareStatement(sql1)) {
-                stmt.setString(1, execId);
-                ResultSet rs = stmt.executeQuery();
-                while (rs.next()) {
-                    total++;
-                    String result = rs.getString(CaseResult.EXECUTION_RESULT);
-                    if (!result.equals(ExecutionResult.PASS.getName()) && !result.endsWith("/0")) {
-                        fail++;
-                    }
-                }
-            }
-        }
-
-        try (Connection conn = this.getConnection();) {
-            final String sql = "SELECT * FROM " + SuiteResult.TABLE_NAME
-                + " WHERE " + SuiteResult.SUITE_RESULT_ID + " = ?;";
-            try (PreparedStatement stmt = conn.prepareStatement(sql,
-                ResultSet.TYPE_SCROLL_SENSITIVE,
-                ResultSet.CONCUR_UPDATABLE)) {
-                stmt.setString(1, execId);
-                ResultSet rs = stmt.executeQuery();
-                if (rs.first()) {
-                    rs.updateInt(SuiteResult.NUMBER_OF_CASES, total);
-                    rs.updateInt(SuiteResult.NUMBER_OF_FAILURE, fail);
-                    rs.updateString(SuiteResult.EXECUTION_RESULT, fail == 0 ? "PASS" : "FAIL");
-                    rs.updateLong(SuiteResult.STOP_TIME, System.currentTimeMillis());
-                    rs.updateRow();
-                }
-            }
-        }
-    }
-
-    @Override
     protected Connection getConnection() throws SQLException {
         return connPool.getConnection();
     }

@@ -308,8 +308,6 @@ public abstract class DbHandler {
         }
     }
 
-    public abstract void updateSuiteExecutionResult(String execId) throws SQLException;
-
     public ExecutionResult updateSuiteExecutionResult(String execId, String productUnderTask) throws SQLException {
         LOG.debug("Update suite execution result with execution id {}", execId);
         String lock = this.getDbLock(execId);
@@ -364,8 +362,8 @@ public abstract class DbHandler {
                             rs.updateInt(SuiteResult.NUMBER_OF_FAILURE, fail);
                             rs.updateString(SuiteResult.EXECUTION_RESULT, fail == 0 ? "PASS" : "FAIL");
                             rs.updateLong(SuiteResult.STOP_TIME, System.currentTimeMillis());
-                            if (rs.getNString(SuiteResult.PRODUCT_UNDER_TASK).isEmpty()
-                                && !StringUtils.isEmpty(productUnderTask)) {
+                            if (rs.getString(SuiteResult.PRODUCT_UNDER_TASK).isEmpty()
+                                && StringUtils.isNotEmpty(productUnderTask)) {
                                 rs.updateString(SuiteResult.PRODUCT_UNDER_TASK, productUnderTask);
                             }
                             rs.updateRow();
