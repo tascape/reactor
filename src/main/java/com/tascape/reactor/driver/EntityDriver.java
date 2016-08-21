@@ -45,14 +45,19 @@ public abstract class EntityDriver extends AbstractCaseResource {
 
         Class c = this.getClass();
         while (!c.equals(EntityDriver.class)) {
+            LOG.trace("{} {}", this, c);
             Stream.of(c.getDeclaredFields())
                 .filter(f -> EntityCommunication.class.isAssignableFrom(f.getType()))
                 .forEach(f -> {
                     f.setAccessible(true);
                     try {
                         EntityCommunication ec = (EntityCommunication) f.get(this);
-                        ec.setDriver(this);
-                        ec.setCase(kase);
+                        if (ec != null) {
+                            ec.setDriver(this);
+                            ec.setCase(kase);
+                        } else {
+                            LOG.trace("null for {}", f);
+                        }
                     } catch (IllegalArgumentException | IllegalAccessException ex) {
                         LOG.warn("", ex);
                     }
