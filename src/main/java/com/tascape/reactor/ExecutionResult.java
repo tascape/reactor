@@ -92,6 +92,10 @@ public class ExecutionResult {
         return fail;
     }
 
+    public boolean isFailure() {
+        return !name.equals("PASS") && fail != 0;
+    }
+
     public static boolean isFailure(String result) {
         return !(result.equals("PASS") || result.endsWith("/0"));
     }

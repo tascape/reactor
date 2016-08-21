@@ -20,7 +20,6 @@ import com.tascape.reactor.Reactor;
 import com.tascape.reactor.data.CaseIterationData;
 import java.io.IOException;
 import java.util.Random;
-import javax.xml.xpath.XPathException;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.junit.After;
 import org.junit.Assert;
@@ -28,7 +27,6 @@ import org.junit.Before;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import static org.junit.Assert.*;
 import com.tascape.reactor.data.CaseDataProvider;
 
 /**
@@ -110,7 +108,7 @@ public class JUnit4Case extends AbstractCase {
     @Priority(level = 1)
     public void runNegativeAgain() throws Exception {
         LOG.info("Sample negative case again");
-        expectedException.expect(XPathException.class);
+        expectedException.expect(IOException.class);
         expectedException.expectMessage("Cannot resolve xyz");
         Thread.sleep(1000);
         this.doSomethingBadAgain();
@@ -119,11 +117,13 @@ public class JUnit4Case extends AbstractCase {
     @Test
     public void runMultiple() throws Exception {
         LOG.info("Sample multiple-result case");
-        this.doSomethingGood();
+        this.doSomething();
         ExecutionResult er = ExecutionResult.newMultiple();
-        Thread.sleep(500);
-        er.setPass(new Random().nextInt(20) + 100);
-        er.setFail(new Random().nextInt(20));
+        int total = 118;
+        int pass = new Random().nextInt(9) + 110;
+        LOG.debug("Mark case as {}", pass == total ? "PASS" : "FAIL");
+        er.setPass(pass);
+        er.setFail(total - pass);
         this.setExecutionResult(er);
     }
 
@@ -145,7 +145,11 @@ public class JUnit4Case extends AbstractCase {
 
     private void doSomethingGood() throws IOException {
         LOG.info("Do something good");
-        assertTrue(true);
+    }
+
+    private void doSomething() throws IOException, InterruptedException {
+        LOG.info("Do something");
+        Thread.sleep(1000);
     }
 
     private void doSomethingBad() throws IOException {
@@ -153,8 +157,8 @@ public class JUnit4Case extends AbstractCase {
         throw new IOException("something bad");
     }
 
-    private void doSomethingBadAgain() throws XPathException {
+    private void doSomethingBadAgain() throws IOException {
         LOG.info("Do something bad again");
-        throw new XPathException("Cannot resolve xyz");
+        throw new IOException("Cannot resolve xyz");
     }
 }

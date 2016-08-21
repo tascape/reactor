@@ -109,11 +109,11 @@ public final class SystemConfiguration {
             LOG.warn("", ex);
         }
 
-        Path conf = Paths.get(System.getProperty("user.home"), ".reactor", "reactor.properties");
+        Path conf = HOME_PATH.resolve("reactor.properties");
         this.loadSystemPropertiesFromPath(conf);
 
         String confFiles = System.getProperty(SYSPROP_CONF_FILES, "").trim();
-        if (!confFiles.isEmpty()) {
+        if (StringUtils.isNotBlank(confFiles)) {
             String[] paths = confFiles.split(System.getProperty("path.separator"));
             Stream.of(paths).forEach(path -> {
                 this.loadSystemPropertiesFromPath(Paths.get(path));
@@ -121,6 +121,7 @@ public final class SystemConfiguration {
         }
 
         List<String> keys = new ArrayList<>(System.getProperties().stringPropertyNames());
+        LOG.debug("Only load system properties starting with reactor.");
         keys.stream()
             .filter((key) -> (key.startsWith("reactor.")))
             .forEach((key) -> {
@@ -191,7 +192,7 @@ public final class SystemConfiguration {
     public Path getLogPath() {
         String p = this.getProperty(SYSPROP_LOG_PATH);
         if (StringUtils.isBlank(p)) {
-            return Paths.get(System.getProperty("user.home"), "reactor", "logs");
+            return HOME_PATH.resolve("logs");
         } else {
             return Paths.get(p);
         }
@@ -298,7 +299,7 @@ public final class SystemConfiguration {
     }
 
     public String getJobName() {
-        String value = this.getProperty("reactor." + SYSENV_JOB_NAME);
+        String value = this.getProperty(pre(SYSENV_JOB_NAME));
         if (value == null) {
             value = System.getenv().get(SYSENV_JOB_NAME);
         }
@@ -311,7 +312,7 @@ public final class SystemConfiguration {
     }
 
     public int getJobBuildNumber() {
-        String value = this.getProperty("reactor." + SYSENV_JOB_NUMBER);
+        String value = this.getProperty(pre(SYSENV_JOB_NUMBER));
         if (value == null) {
             value = System.getenv().get(SYSENV_JOB_NUMBER);
         }
@@ -324,7 +325,7 @@ public final class SystemConfiguration {
     }
 
     public String getJobBuildUrl() {
-        String value = this.getProperty("reactor." + SYSENV_JOB_BUILD_URL);
+        String value = this.getProperty(pre(SYSENV_JOB_BUILD_URL));
         if (value == null) {
             value = System.getenv().get(SYSENV_JOB_BUILD_URL);
         }
@@ -336,7 +337,7 @@ public final class SystemConfiguration {
         List<String> keys = new ArrayList<>(this.properties.stringPropertyNames());
         Collections.sort(keys);
         keys.stream()
-            .filter(key -> !key.startsWith("reactor.db."))
+            .filter(key -> !key.startsWith(pre("db.")))
             .forEach((key) -> {
                 LOG.debug(String.format("%50s : %s", key, this.properties.getProperty(key)));
             });
@@ -376,5 +377,9 @@ public final class SystemConfiguration {
         } catch (IOException ex) {
             throw new RuntimeException("Cannot load system properties from " + path, ex);
         }
+    }
+
+    private String pre(String name) {
+        return "reactor." + name;
     }
 }

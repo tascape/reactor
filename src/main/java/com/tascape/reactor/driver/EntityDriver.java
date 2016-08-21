@@ -19,6 +19,7 @@ import com.tascape.reactor.AbstractCaseResource;
 import com.tascape.reactor.comm.EntityCommunication;
 import com.tascape.reactor.task.AbstractCase;
 import java.nio.file.Path;
+import java.util.stream.Stream;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -28,8 +29,6 @@ import org.slf4j.LoggerFactory;
  */
 public abstract class EntityDriver extends AbstractCaseResource {
     private static final Logger LOG = LoggerFactory.getLogger(EntityDriver.class);
-
-    private EntityCommunication entityCommunication;
 
     private AbstractCase kase;
 
@@ -41,19 +40,24 @@ public abstract class EntityDriver extends AbstractCaseResource {
         return this.kase.getLogPath();
     }
 
-    public EntityCommunication getEntityCommunication() {
-        return entityCommunication;
-    }
-
-    public void setEntityCommunication(EntityCommunication entityCommunication) {
-        this.entityCommunication = entityCommunication;
-    }
-
     public void setCase(AbstractCase kase) {
         this.kase = kase;
-        if (this.entityCommunication != null) {
-            this.entityCommunication.setDriver(this);
-            this.entityCommunication.setCase(kase);
+
+        Class c = this.getClass();
+        while (!c.equals(EntityDriver.class)) {
+            Stream.of(c.getDeclaredFields())
+                .filter(f -> EntityCommunication.class.isAssignableFrom(f.getType()))
+                .forEach(f -> {
+                    f.setAccessible(true);
+                    try {
+                        EntityCommunication ec = (EntityCommunication) f.get(this);
+                        ec.setDriver(this);
+                        ec.setCase(kase);
+                    } catch (IllegalArgumentException | IllegalAccessException ex) {
+                        LOG.warn("", ex);
+                    }
+                });
+            c = c.getSuperclass();
         }
     }
 

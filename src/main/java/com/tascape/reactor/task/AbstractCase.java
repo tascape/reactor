@@ -189,6 +189,9 @@ public abstract class AbstractCase extends AbstractCaseResource {
 
     protected void setExecutionResult(ExecutionResult executionResult) {
         this.result = executionResult;
+        if (executionResult.isFailure()) {
+            throw new AssertionError("execution result: " + executionResult.result());
+        }
     }
 
     public List<CaseResultMetric> getResultMetrics() {

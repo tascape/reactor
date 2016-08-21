@@ -39,7 +39,7 @@ import org.slf4j.LoggerFactory;
 public class MySqlCommunication extends EntityCommunication {
     private static final Logger LOG = LoggerFactory.getLogger(MySqlCommunication.class);
 
-    public static final String TEMP_TABLE_NAME_SUFFIX = "_TEMP_TBL_TH_SUFFIX";
+    public static final String TEMP_TABLE_NAME_SUFFIX = "_TEMP_TBL_SUFFIX";
 
     private final String dbUrl;
 
