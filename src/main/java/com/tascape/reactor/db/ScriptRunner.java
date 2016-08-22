@@ -215,7 +215,7 @@ public class ScriptRunner {
 
     private void println(Object o) {
         if (logWriter != null) {
-            logWriter.println(o);
+//            logWriter.println(o);
         }
     }
 
