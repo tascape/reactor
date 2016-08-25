@@ -25,7 +25,7 @@ import org.slf4j.LoggerFactory;
  */
 public class CaseIterationData extends AbstractCaseData {
     private static final Logger LOG = LoggerFactory.getLogger(CaseIterationData.class);
-    
+
     public static final String USE_ITERATIONS = "useIterations";
 
     private int iteration = 1;
@@ -40,15 +40,14 @@ public class CaseIterationData extends AbstractCaseData {
         this.iterations = iterations;
     }
 
-    public CaseIterationData[] getData(String sysPropIterations) {
-        String n = SystemConfiguration.getInstance().getProperty(sysPropIterations);
-        return useIterations(n);
+    public CaseIterationData[] getData(String iterations) {
+        return useIterations(iterations);
     }
 
-    public CaseIterationData[] useIterations(String n) {
+    public CaseIterationData[] useIterations(String iterations) {
         int iters = 1;
         try {
-            iters = Integer.parseInt(n);
+            iters = Integer.parseInt(iterations);
         } catch (Exception ex) {
             LOG.warn(ex.getMessage());
         }
