@@ -129,7 +129,7 @@ public class SuiteRunner {
                 this.db.adjustSuiteExecutionResult(execId);
             }
         } finally {
-            AbstractSuite.getSuites().stream().forEach((suite) -> {
+            AbstractSuite.getSuites().stream().forEach((AbstractSuite suite) -> {
                 try {
                     suite.tearDown();
                 } catch (Exception ex) {

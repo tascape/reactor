@@ -374,6 +374,7 @@ public final class SystemConfiguration {
             Properties p = new Properties();
             p.load(is);
             this.properties.putAll(p);
+            System.getProperties().putAll(p);
         } catch (IOException ex) {
             throw new RuntimeException("Cannot load system properties from " + path, ex);
         }
