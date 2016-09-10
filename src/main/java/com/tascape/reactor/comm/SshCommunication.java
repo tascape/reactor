@@ -22,12 +22,18 @@ import com.jcraft.jsch.JSchException;
 import com.jcraft.jsch.Session;
 import com.jcraft.jsch.SftpException;
 import com.tascape.reactor.SystemConfiguration;
+import com.tascape.reactor.exception.EntityCommunicationException;
 import java.awt.Desktop;
+import java.io.BufferedReader;
+import java.io.Closeable;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.nio.charset.Charset;
+import java.util.HashSet;
+import java.util.Set;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
@@ -37,7 +43,7 @@ import org.slf4j.LoggerFactory;
  *
  * @author linsong wang
  */
-public class SshCommunication extends EntityCommunication {
+public class SshCommunication extends EntityCommunication implements Closeable {
     private static final Logger LOG = LoggerFactory.getLogger(SshCommunication.class);
 
     public static final String SYSPROP_HOST = "reactor.comm.ssh.HOST";
@@ -57,6 +63,8 @@ public class SshCommunication extends EntityCommunication {
     private final int port;
 
     private Session session;
+
+    private final Set<Channel> channels = new HashSet<>();
 
     public static SshCommunication newInstance() throws Exception {
         return newInstance("");
@@ -123,11 +131,30 @@ public class SshCommunication extends EntityCommunication {
         this.session.setPassword(password);
     }
 
-    public void shell(String command, OutputStream out) throws JSchException {
+    public void shell(String command, long timeout) throws JSchException, IOException {
+        Channel shell = this.session.openChannel("shell");
+        shell.setInputStream(IOUtils.toInputStream(command + "\n", Charset.defaultCharset()));
+        BufferedReader in = new BufferedReader(new InputStreamReader(shell.getInputStream()));
+        shell.connect();
+        channels.add(shell);
+        long end = System.currentTimeMillis() + timeout;
+        while (System.currentTimeMillis() < end) {
+            String line = in.readLine();
+            LOG.debug("{}", line);
+            if (line == null) {
+                return;
+            }
+        }
+        throw new EntityCommunicationException("timeout of execute shell command");
+    }
+
+    public Channel shell(String command, OutputStream out) throws JSchException {
         Channel shell = this.session.openChannel("shell");
         shell.setInputStream(IOUtils.toInputStream(command + "\n", Charset.defaultCharset()));
         shell.setOutputStream(out);
         shell.connect(2000);
+        channels.add(shell);
+        return shell;
     }
 
     public Channel shell(String command, File out) throws JSchException, IOException {
@@ -135,6 +162,7 @@ public class SshCommunication extends EntityCommunication {
         shell.setInputStream(IOUtils.toInputStream(command + "\n", Charset.defaultCharset()));
         shell.setOutputStream(FileUtils.openOutputStream(out));
         shell.connect();
+        channels.add(shell);
         return shell;
     }
 
@@ -143,6 +171,7 @@ public class SshCommunication extends EntityCommunication {
         channel.setInputStream(System.in);
         channel.setOutputStream(System.out);
         channel.connect();
+        channels.add(channel);
 
         new ChanneOperationTimer(channel, timeout).start();
         ChannelSftp sftp = (ChannelSftp) channel;
@@ -155,6 +184,7 @@ public class SshCommunication extends EntityCommunication {
         channel.setInputStream(System.in);
         channel.setOutputStream(System.out);
         channel.connect();
+        channels.add(channel);
         new ChanneOperationTimer(channel, timeout).start();
 
         ChannelSftp sftp = (ChannelSftp) channel;
@@ -175,6 +205,15 @@ public class SshCommunication extends EntityCommunication {
     public void disconnect() throws Exception {
         if (this.session != null) {
             this.session.disconnect();
+        }
+    }
+
+    @Override
+    public void close() throws IOException {
+        try {
+            this.disconnect();
+        } catch (Exception ex) {
+            throw new EntityCommunicationException(ex);
         }
     }
 
