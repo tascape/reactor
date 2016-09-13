@@ -31,6 +31,8 @@ import org.slf4j.LoggerFactory;
 public abstract class AbstractCaseResource {
     private static final Logger LOG = LoggerFactory.getLogger(AbstractCaseResource.class);
 
+    public static final SystemConfiguration SYS_CONFIG = SystemConfiguration.getInstance();
+
     private static final ThreadLocal<Path> CASE_LOG_PATH = new ThreadLocal<Path>() {
         @Override
         protected Path initialValue() {
