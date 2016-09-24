@@ -1,5 +1,6 @@
 /*
- * Copyright 2015 - 2016 Nebula Bay.
+ * Copyright (c) 2015 - present Nebula Bay.
+ * All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -31,6 +32,7 @@ public class SampleData extends AbstractCaseData {
                 caseParameter = "scenario one";
             }
 
+            @Override
             public String getValue() {
                 return "scenario one";
             }
@@ -40,6 +42,7 @@ public class SampleData extends AbstractCaseData {
                 caseParameter = "scenario two";
             }
 
+            @Override
             public String getValue() {
                 return "scenario two";
             }
@@ -50,6 +53,7 @@ public class SampleData extends AbstractCaseData {
                 setValue(caseParameter);
             }
 
+            @Override
             public String getValue() {
                 return "scenario three";
             }
