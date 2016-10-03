@@ -146,9 +146,7 @@ public abstract class AbstractSuite {
         return this.getClass().getName();
     }
 
-    public String getProjectName() {
-        return "";
-    }
+    public abstract String getProjectName();
 
     public abstract void setUpCaseClasses();
 
