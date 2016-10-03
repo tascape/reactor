@@ -56,9 +56,12 @@ public abstract class EntityCommunication extends AbstractCaseResource {
 
     @Override
     public Path getLogPath() {
-        if (this.kase == null) {
-            return super.getLogPath();
+        if (this.kase != null) {
+            return this.kase.getLogPath();
         }
-        return this.kase.getLogPath();
+        if (this.driver != null) {
+            return this.driver.getLogPath();
+        }
+        return super.getLogPath();
     }
 }
