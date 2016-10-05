@@ -278,6 +278,26 @@ public abstract class DbHandler {
         return false;
     }
 
+    public void updateSuiteProductUnderTask(String execId, String productUnderTask) throws SQLException {
+        if (StringUtils.isBlank(productUnderTask)) {
+            return;
+        }
+        final String sql = "SELECT * FROM " + SuiteResult.TABLE_NAME
+            + " WHERE " + SuiteResult.SUITE_RESULT_ID + " = ?;";
+        try (PreparedStatement stmt = this.getConnection().prepareStatement(sql,
+            ResultSet.TYPE_SCROLL_SENSITIVE,
+            ResultSet.CONCUR_UPDATABLE)) {
+            stmt.setString(1, execId);
+            ResultSet rs = stmt.executeQuery();
+            if (rs.first()) {
+                if (StringUtils.isBlank(rs.getString(SuiteResult.PRODUCT_UNDER_TASK))) {
+                    rs.updateString(SuiteResult.PRODUCT_UNDER_TASK, productUnderTask);
+                }
+                rs.updateRow();
+            }
+        }
+    }
+
     public void updateCaseExecutionResult(CaseResult tcr) throws SQLException {
         LOG.debug("Update case result {} ({}) to {}", tcr.getCaseResultId(), tcr.getTaskCase().format(),
             tcr.getResult().result());
@@ -309,7 +329,7 @@ public abstract class DbHandler {
         }
     }
 
-    public ExecutionResult updateSuiteExecutionResult(String execId, String productUnderTask) throws SQLException {
+    public ExecutionResult updateSuiteExecutionResult(String execId) throws SQLException {
         LOG.debug("Update suite execution result with execution id {}", execId);
         String lock = this.getDbLock(execId);
 
@@ -363,10 +383,6 @@ public abstract class DbHandler {
                             rs.updateInt(SuiteResult.NUMBER_OF_FAILURE, fail);
                             rs.updateString(SuiteResult.EXECUTION_RESULT, fail == 0 ? "PASS" : "FAIL");
                             rs.updateLong(SuiteResult.STOP_TIME, System.currentTimeMillis());
-                            if (rs.getString(SuiteResult.PRODUCT_UNDER_TASK).isEmpty()
-                                && StringUtils.isNotEmpty(productUnderTask)) {
-                                rs.updateString(SuiteResult.PRODUCT_UNDER_TASK, productUnderTask);
-                            }
                             rs.updateRow();
                             suiteResult.setPass(total - fail);
                             suiteResult.setFail(fail);

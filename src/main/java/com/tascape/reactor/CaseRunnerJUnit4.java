@@ -31,6 +31,8 @@ import org.junit.runner.Request;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import com.tascape.reactor.data.CaseData;
+import com.tascape.reactor.db.SuiteResult;
+import org.apache.commons.lang3.StringUtils;
 
 /**
  *
@@ -101,6 +103,18 @@ public class CaseRunnerJUnit4 extends AbstractCaseRunner implements Callable<Cas
             abstractSuite.setUp();
             AbstractSuite.addSuite(abstractSuite);
             env = AbstractSuite.getEnvionment(suiteClass);
+
+            SuiteResult suitResult = tcr.getSuiteResult();
+            if (StringUtils.isBlank(suitResult.getProductUnderTask())) {
+                LOG.debug("Getting product-under-task");
+                try {
+                    String productUnderTask = abstractSuite.getProductUnderTask();
+                    db.updateSuiteProductUnderTask(execId, productUnderTask);
+                    suitResult.setProductUnderTask(productUnderTask);
+                } catch (Exception ex) {
+                    LOG.warn("Cannot get product-under-task", ex);
+                }
+            }
 
             SuiteProperty prop = new SuiteProperty();
             prop.setSuiteResultId(tcr.getSuiteResultId());

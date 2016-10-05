@@ -16,6 +16,7 @@
  */
 package com.tascape.reactor.suite;
 
+import com.tascape.reactor.Utils;
 import com.tascape.reactor.task.JUnit4Case;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -44,6 +45,11 @@ public class JUnit4Suite extends AbstractSuite {
 
     @Override
     protected void tearDownEnvironment() {
+        try {
+            Utils.sleep(30000, "waiting for teardown");
+        } catch (InterruptedException ex) {
+            LOG.warn(ex.getMessage());
+        }
     }
 
     @Override

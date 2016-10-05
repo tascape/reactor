@@ -21,7 +21,7 @@ import com.tascape.reactor.db.DbHandler;
 import com.tascape.reactor.db.SuiteProperty;
 import com.tascape.reactor.db.TaskCase;
 import com.tascape.reactor.db.CaseResult;
-import com.tascape.reactor.exception.SuiteEnvironmentException;
+import com.tascape.reactor.db.SuiteResult;
 import com.tascape.reactor.suite.AbstractSuite;
 import java.io.File;
 import java.io.IOException;
@@ -51,6 +51,8 @@ public class SuiteRunner {
 
     private TaskSuite ts = null;
 
+    private SuiteResult suitResult = null;
+
     private DbHandler db = null;
 
     private final SystemConfiguration SYS_CONFIG = SystemConfiguration.getInstance();
@@ -69,6 +71,9 @@ public class SuiteRunner {
 
         this.db = DbHandler.getInstance();
         db.queueSuiteExecution(ts, this.execId);
+
+        this.suitResult = new SuiteResult();
+        suitResult.setSuiteResultId(execId);
     }
 
     @SuppressWarnings("UseSpecificCatch")
@@ -88,14 +93,19 @@ public class SuiteRunner {
 
         int numberOfFailures = 0;
         try {
-            List<CaseResult> tcrs = this.filter(this.db.getQueuedCaseResults(this.execId, loadLimit));
-            while (!tcrs.isEmpty()) {
-                List<Future<CaseResult>> futures = new ArrayList<>();
+            while (true) {
+                List<CaseResult> tcrs = this.filter(this.db.getQueuedCaseResults(this.execId, loadLimit));
+                if (tcrs.isEmpty()) {
+                    break;
+                }
 
-                for (CaseResult tcr : tcrs) {
+                List<Future<CaseResult>> futures = new ArrayList<>();
+                tcrs.forEach(tcr -> {
+                    tcr.setSuiteResult(suitResult);
+
                     LOG.debug("Submit case {}", tcr.getTaskCase().format());
                     futures.add(completionService.submit(new CaseRunnerJUnit4(db, tcr)));
-                }
+                });
                 LOG.debug("Total {} cases submitted", futures.size());
 
                 for (Future<CaseResult> f : futures) {
@@ -112,24 +122,13 @@ public class SuiteRunner {
                         numberOfFailures++;
                     }
                 }
+            }
 
-                tcrs = this.filter(this.db.getQueuedCaseResults(this.execId, 100));
-            }
-            String productUnderTask = "NA";
-            try {
-                LOG.debug("Getting suite-under-task");
-                if (AbstractSuite.getSuites().isEmpty()) {
-                    throw new SuiteEnvironmentException("Cannot setup suite environment");
-                }
-                productUnderTask = AbstractSuite.getSuites().get(0).getProductUnderTask();
-            } catch (Exception ex) {
-                LOG.warn("Cannot get product-under-task", ex);
-            } finally {
-                LOG.debug("No more case to run on this host, updating suite execution result");
-                this.db.updateSuiteExecutionResult(this.execId, productUnderTask);
-                this.db.adjustSuiteExecutionResult(execId);
-            }
+            LOG.debug("No more case to run on this host, updating suite execution result");
+            this.db.updateSuiteExecutionResult(this.execId);
+            this.db.adjustSuiteExecutionResult(execId);
         } finally {
+            executorService.shutdown();
             AbstractSuite.getSuites().stream().forEach((AbstractSuite suite) -> {
                 try {
                     suite.tearDown();
@@ -138,7 +137,6 @@ public class SuiteRunner {
                 }
             });
         }
-        executorService.shutdown();
 
         this.db.exportToJson(this.execId);
         this.db.saveJunitXml(this.execId);
