@@ -95,8 +95,12 @@ public abstract class AbstractSuite {
         });
     }
 
-    public void tearDown() throws Exception {
-        this.tearDownEnvironment();
+    public void tearDown() {
+        try {
+            this.tearDownEnvironment();
+        } catch (Throwable t) {
+            LOG.warn("Cannot tearing down properly", t);
+        }
     }
 
     public List<Class<? extends AbstractCase>> getCaseClasses() {
