@@ -24,7 +24,6 @@ import com.jcraft.jsch.Session;
 import com.jcraft.jsch.SftpException;
 import com.tascape.reactor.SystemConfiguration;
 import com.tascape.reactor.exception.EntityCommunicationException;
-import java.awt.Desktop;
 import java.io.BufferedReader;
 import java.io.Closeable;
 import java.io.File;
@@ -34,9 +33,12 @@ import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.nio.charset.Charset;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -83,26 +85,19 @@ public class SshCommunication extends EntityCommunication implements Closeable {
         }
         SshCommunication ssh = new SshCommunication(h, p);
 
-        String k = sysConfig.getProperty(SshCommunication.SYSPROP_KEY + name);
-        if (k == null) {
-            k = sysConfig.getProperty(SshCommunication.SYSPROP_KEY);
-        }
-        String pp = sysConfig.getProperty(SshCommunication.SYSPROP_PASS + name);
-        if (pp == null) {
-            pp = sysConfig.getProperty(SshCommunication.SYSPROP_PASS);
-        }
-        if (null != k && null != pp) {
-            ssh.setPrivateKey(k, pp);
-        }
-
         String u = sysConfig.getProperty(SshCommunication.SYSPROP_USER + name);
         if (u == null) {
             u = sysConfig.getProperty(SshCommunication.SYSPROP_USER);
+        }
+        String k = sysConfig.getProperty(SshCommunication.SYSPROP_KEY + name);
+        if (k == null) {
+            k = sysConfig.getProperty(SshCommunication.SYSPROP_KEY);
         }
         String pw = sysConfig.getProperty(SshCommunication.SYSPROP_PASS + name);
         if (pw == null) {
             pw = sysConfig.getProperty(SshCommunication.SYSPROP_PASS);
         }
+        ssh.setPrivateKey(k, pw);
         ssh.setUsernamePassword(u, pw);
         ssh.connect();
         return ssh;
@@ -120,7 +115,9 @@ public class SshCommunication extends EntityCommunication implements Closeable {
     }
 
     public void setPrivateKey(String key, String passphrase) throws JSchException {
-        this.jSch.addIdentity(key, passphrase);
+        if (StringUtils.isNotBlank(key)) {
+            this.jSch.addIdentity(key, passphrase);
+        }
     }
 
     public void setUsernamePassword(String username, String password) throws JSchException {
@@ -128,30 +125,27 @@ public class SshCommunication extends EntityCommunication implements Closeable {
         java.util.Properties config = new java.util.Properties();
         config.put("StrictHostKeyChecking", "no");
         session.setConfig(config);
-
         this.session.setPassword(password);
     }
 
-    public void shell(String command, long timeout) throws JSchException, IOException {
+    public List<String> shell(String command, long timeout) throws JSchException, IOException, Exception {
         Channel shell = this.session.openChannel("shell");
-        shell.setInputStream(IOUtils.toInputStream(command + "\n", Charset.defaultCharset()));
-        BufferedReader in = new BufferedReader(new InputStreamReader(shell.getInputStream()));
-        shell.connect();
-        channels.add(shell);
-        long end = System.currentTimeMillis() + timeout;
-        while (System.currentTimeMillis() < end) {
-            String line = in.readLine();
-            LOG.debug("{}", line);
-            if (line == null) {
-                return;
-            }
+        shell.setInputStream(IOUtils.toInputStream(command + "\nexit\n", Charset.defaultCharset()));
+        try (BufferedReader in = new BufferedReader(new InputStreamReader(shell.getInputStream()))) {
+            shell.connect();
+            channels.add(shell);
+            Thread thread = new ChanneOperationTimer(shell, timeout);
+            thread.start();
+            List<String> lines = in.lines().collect(Collectors.toList());
+            thread.interrupt();
+            lines.forEach(l -> LOG.debug("{}", l));
+            return lines;
         }
-        throw new EntityCommunicationException("timeout of execute shell command");
     }
 
     public Channel shell(String command, OutputStream out) throws JSchException {
         Channel shell = this.session.openChannel("shell");
-        shell.setInputStream(IOUtils.toInputStream(command + "\n", Charset.defaultCharset()));
+        shell.setInputStream(IOUtils.toInputStream(command + "\nexit\n", Charset.defaultCharset()));
         shell.setOutputStream(out);
         shell.connect(2000);
         channels.add(shell);
@@ -160,7 +154,7 @@ public class SshCommunication extends EntityCommunication implements Closeable {
 
     public Channel shell(String command, File out) throws JSchException, IOException {
         Channel shell = this.session.openChannel("shell");
-        shell.setInputStream(IOUtils.toInputStream(command + "\n", Charset.defaultCharset()));
+        shell.setInputStream(IOUtils.toInputStream(command + "\nexit\n", Charset.defaultCharset()));
         shell.setOutputStream(FileUtils.openOutputStream(out));
         shell.connect();
         channels.add(shell);
@@ -199,13 +193,19 @@ public class SshCommunication extends EntityCommunication implements Closeable {
     @Override
     public void connect() throws Exception {
         session.connect();
-        LOG.debug("connected: {}", session.getClientVersion());
+        LOG.debug("connected to {}:{} ({})", session.getHost(), session.getPort(), session.getServerVersion());
     }
 
     @Override
     public void disconnect() throws Exception {
-        if (this.session != null) {
-            this.session.disconnect();
+        try {
+            channels.forEach(c -> {
+                c.disconnect();
+            });
+        } finally {
+            if (this.session != null) {
+                this.session.disconnect();
+            }
         }
     }
 
@@ -226,6 +226,7 @@ public class SshCommunication extends EntityCommunication implements Closeable {
         public ChanneOperationTimer(Channel channel, long timeout) {
             this.channel = channel;
             this.timeout = timeout;
+            this.setDaemon(true);
         }
 
         @Override
@@ -233,7 +234,7 @@ public class SshCommunication extends EntityCommunication implements Closeable {
             try {
                 Thread.sleep(timeout);
             } catch (InterruptedException ex) {
-                LOG.warn("interrupted", ex);
+                LOG.trace("interrupted - {}", ex.getMessage());
             }
             if (channel != null) {
                 channel.disconnect();
@@ -241,24 +242,45 @@ public class SshCommunication extends EntityCommunication implements Closeable {
         }
     }
 
-    public static void main(String[] args) {
-        try {
-            SshCommunication ssh = new SshCommunication("localhost", 8022);
-            ssh.setPrivateKey("~/dev/aws/key.pem", "");
-            ssh.setUsernamePassword("ec2-user", "");
-            ssh.connect();
-
-            File out = new File("~/ssh.txt");
-            ssh.shell("tail -f /usr/share/app/logs/application.log", FileUtils.openOutputStream(out));
-            Desktop.getDesktop().open(out);
-            ssh.shell("cat /usr/share/app/logs/daemon.log", System.out);
-
-            ssh.upload(out, "/home/ubuntu/sh.txt", 1000);
-
-            Thread.sleep(10000);
+    public static void main(String[] args) throws Exception {
+        {
+            SystemConfiguration sys = SystemConfiguration.getInstance();
+            sys.getProperties().setProperty(SYSPROP_HOST, "localhost");
+            sys.getProperties().setProperty(SYSPROP_PORT, "2222");
+            sys.getProperties().setProperty(SYSPROP_USER, "vagrant");
+            sys.getProperties().setProperty(SYSPROP_PASS, "vagrant");
+            SshCommunication ssh = SshCommunication.newInstance();
+            runSsh(ssh);
             ssh.disconnect();
-        } catch (Exception ex) {
-            LOG.error("", ex);
         }
+        {
+            SshCommunication ssh = new SshCommunication("localhost", 2222);
+            ssh.setUsernamePassword("vagrant", "vagrant");
+            ssh.connect();
+            runSsh(ssh);
+            ssh.disconnect();
+        }
+        {
+            SshCommunication ssh = new SshCommunication("localhost", 2222);
+            ssh.setPrivateKey("~/.reactor/.vagrant/machines/default/virtualbox/private_key", "");
+            ssh.setUsernamePassword("vagrant", "");
+            ssh.connect();
+            runSsh(ssh);
+            ssh.disconnect();
+        }
+    }
+
+    private static void runSsh(SshCommunication ssh) throws Exception {
+        File out = File.createTempFile("ssh-", ".txt");
+        FileUtils.write(out, "ssh test", Charset.defaultCharset());
+        ssh.upload(out, "/home/vagrant/ssh.txt", 1000);
+
+        ssh.shell("ls -al && sleep 5", 6000);
+        ssh.shell("echo 'ssh' >> /home/vagrant/ssh.txt", 2000);
+        try (OutputStream os = FileUtils.openOutputStream(out)) {
+            ssh.shell("cat /home/vagrant/ssh.txt", os);
+        }
+        ssh.download("/home/vagrant/ssh.txt", out, 2000);
+        Thread.sleep(1000);
     }
 }
