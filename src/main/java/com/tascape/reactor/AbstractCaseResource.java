@@ -22,6 +22,8 @@ import java.io.IOException;
 import java.nio.charset.Charset;
 import java.nio.file.Path;
 import org.apache.commons.io.FileUtils;
+import org.json.JSONArray;
+import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -61,6 +63,14 @@ public abstract class AbstractCaseResource {
 
     public File saveAsTextFile(String prefix, CharSequence data) throws IOException {
         return this.saveIntoFile(prefix, "txt", data);
+    }
+
+    public File saveIntoFile(String prefix, JSONObject json) throws IOException {
+        return this.saveIntoFile(prefix, "json", json.toString(2));
+    }
+
+    public File saveIntoFile(String prefix, JSONArray json) throws IOException {
+        return this.saveIntoFile(prefix, "json", json.toString(2));
     }
 
     public File saveIntoFile(String prefix, String suffix, CharSequence data) throws IOException {

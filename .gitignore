@@ -29,3 +29,7 @@ nbdist/
 nbactions.xml
 nb-configuration.xml
 
+# macOS
+.DS_Store
+
+
