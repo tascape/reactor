@@ -46,6 +46,10 @@ public final class SystemConfiguration {
 
     public static final Path HOME_PATH = Paths.get(FileUtils.getUserDirectory().getAbsolutePath(), ".reactor");
 
+    public static final String CONSTANT_SYSPROP_PREFIX = "reactor.";
+
+    public static final String CONSTANT_SYSPROP_FILE = CONSTANT_SYSPROP_PREFIX + "properties";
+
     public static final String CONSTANT_LOG_KEEP_ALIVE_PREFIX = "lka_";
 
     public static final String CONSTANT_EXEC_ID_PREFIX = "rx_";
@@ -104,14 +108,23 @@ public final class SystemConfiguration {
         this.listSysProperties();
 
         try {
-            InputStream is = SystemConfiguration.class.getResourceAsStream("/reactor.properties");
+            InputStream is = SystemConfiguration.class.getResourceAsStream("/" + CONSTANT_SYSPROP_FILE);
             this.properties.load(is);
-        } catch (Exception ex) {
+        } catch (IOException ex) {
             LOG.warn("", ex);
         }
 
-        Path conf = HOME_PATH.resolve("reactor.properties");
+        Path conf = HOME_PATH.resolve(CONSTANT_SYSPROP_FILE);
         this.loadSystemPropertiesFromPath(conf);
+
+        List<String> keys = new ArrayList<>(System.getProperties().stringPropertyNames());
+        LOG.debug("Only load system properties starting with " + CONSTANT_SYSPROP_PREFIX);
+        Properties sysProps = new Properties();
+        keys.stream()
+            .filter((key) -> (key.startsWith(CONSTANT_SYSPROP_PREFIX)))
+            .forEach((key) -> {
+                sysProps.setProperty(key, System.getProperty(key));
+            });
 
         String confFiles = System.getProperty(SYSPROP_CONF_FILES, "").trim();
         if (StringUtils.isNotBlank(confFiles)) {
@@ -120,14 +133,8 @@ public final class SystemConfiguration {
                 this.loadSystemPropertiesFromPath(Paths.get(path));
             });
         }
-
-        List<String> keys = new ArrayList<>(System.getProperties().stringPropertyNames());
-        LOG.debug("Only load system properties starting with reactor.");
-        keys.stream()
-            .filter((key) -> (key.startsWith("reactor.")))
-            .forEach((key) -> {
-                this.properties.setProperty(key, System.getProperty(key));
-            });
+        this.properties.putAll(sysProps);
+        System.getProperties().putAll(sysProps);
 
         String execId = this.properties.getProperty(SYSPROP_EXECUTION_ID);
         if (StringUtils.isEmpty(execId)) {
@@ -143,7 +150,7 @@ public final class SystemConfiguration {
 
     public String getProperty(String name, String defaultValue) {
         String v = this.properties.getProperty(name);
-        if (v == null) {
+        if (StringUtils.isBlank(v)) {
             LOG.debug("System property '{}' is not defined, default value '{}' will be used", name, defaultValue);
             return defaultValue;
         }
@@ -158,7 +165,7 @@ public final class SystemConfiguration {
      */
     public int getIntProperty(String name) {
         String v = this.properties.getProperty(name);
-        if (v == null) {
+        if (StringUtils.isBlank(v)) {
             return Integer.MIN_VALUE;
         }
         return Integer.parseInt(v);
@@ -166,7 +173,7 @@ public final class SystemConfiguration {
 
     public int getIntProperty(String name, int defaultValue) {
         String v = this.getProperty(name);
-        if (v == null) {
+        if (StringUtils.isBlank(v)) {
             LOG.debug("System property '{}' is not defined, default value '{}' will be used", name, defaultValue);
             return defaultValue;
         }
@@ -175,7 +182,7 @@ public final class SystemConfiguration {
 
     public boolean getBooleanProperty(String name, boolean defaultValue) {
         String v = this.getProperty(name);
-        if (v == null) {
+        if (StringUtils.isBlank(v)) {
             LOG.debug("System property '{}' is not defined, default value '{}' will be used", name, defaultValue);
             return defaultValue;
         }
@@ -221,7 +228,7 @@ public final class SystemConfiguration {
             try {
                 hn = Utils.cmd("hostname").get(0);
             } catch (IOException | InterruptedException ex) {
-                LOG.warn("Cannot get host name", ex);
+                LOG.trace("Cannot get host name", ex);
                 hn = "unknow host";
             }
             this.properties.setProperty(SYSPROP_CASE_STATION, hn);
@@ -264,7 +271,7 @@ public final class SystemConfiguration {
 
     public int getCasePriority() {
         String v = this.getProperty(SYSPROP_CASE_PRIORITY);
-        if (v == null || v.isEmpty()) {
+        if (StringUtils.isBlank(v)) {
             return Priority.P3;
         }
         return Integer.parseInt(v);
@@ -301,24 +308,22 @@ public final class SystemConfiguration {
 
     public String getJobName() {
         String value = this.getProperty(pre(SYSENV_JOB_NAME));
-        if (value == null) {
+        if (StringUtils.isBlank(value)) {
             value = System.getenv().get(SYSENV_JOB_NAME);
         }
-        if (value == null) {
+        if (StringUtils.isBlank(value)) {
             value = System.getProperty("user.name") + "@" + StringUtils.substringBefore(this.getHostName(), ".");
-        } else {
-            value = value.split("/")[0];
         }
         return value.trim();
     }
 
     public int getJobBuildNumber() {
         String value = this.getProperty(pre(SYSENV_JOB_NUMBER));
-        if (value == null) {
+        if (StringUtils.isBlank(value)) {
             value = System.getenv().get(SYSENV_JOB_NUMBER);
         }
         try {
-            return value == null ? 0 : Integer.parseInt(value);
+            return StringUtils.isBlank(value) ? 0 : Integer.parseInt(value);
         } catch (NumberFormatException ex) {
             LOG.warn("Cannot parse {}={}", SYSENV_JOB_NUMBER, value, ex);
             return -1;
@@ -327,10 +332,10 @@ public final class SystemConfiguration {
 
     public String getJobBuildUrl() {
         String value = this.getProperty(pre(SYSENV_JOB_BUILD_URL));
-        if (value == null) {
+        if (StringUtils.isBlank(value)) {
             value = System.getenv().get(SYSENV_JOB_BUILD_URL);
         }
-        return value == null ? "#" : value;
+        return StringUtils.isBlank(value) ? "#" : value;
     }
 
     public void listAppProperties() {
@@ -382,6 +387,6 @@ public final class SystemConfiguration {
     }
 
     private String pre(String name) {
-        return "reactor." + name;
+        return CONSTANT_SYSPROP_PREFIX + name;
     }
 }

@@ -204,7 +204,7 @@ public class Utils {
                             p.destroy();
                         }
                     } catch (InterruptedException ex) {
-                        LOG.warn(ex.getMessage());
+                        LOG.trace(ex.getMessage());
                     }
                 }
             };

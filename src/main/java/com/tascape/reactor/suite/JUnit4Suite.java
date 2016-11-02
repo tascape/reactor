@@ -46,7 +46,7 @@ public class JUnit4Suite extends AbstractSuite {
     @Override
     protected void tearDownEnvironment() {
         try {
-            Utils.sleep(30000, "waiting for teardown");
+            Utils.sleep(20000, "waiting for teardown");
         } catch (InterruptedException ex) {
             LOG.warn(ex.getMessage());
         }
