@@ -121,7 +121,8 @@ public final class SystemConfiguration {
         LOG.debug("Only load system properties starting with " + CONSTANT_SYSPROP_PREFIX);
         Properties sysProps = new Properties();
         keys.stream()
-            .filter((key) -> (key.startsWith(CONSTANT_SYSPROP_PREFIX)))
+            .filter((key)
+                -> (key.startsWith(CONSTANT_SYSPROP_PREFIX)) && StringUtils.isNotBlank(System.getProperty(key)))
             .forEach((key) -> {
                 sysProps.setProperty(key, System.getProperty(key));
             });
