@@ -117,6 +117,21 @@
         <developerConnection>scm:git:git@github.com:tascape/reactor.git</developerConnection>
         <url>git@github.com:tascape/reactor.git</url>
     </scm>
+    
+    <reporting>
+        <plugins>
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>findbugs-maven-plugin</artifactId>
+                <version>3.0.4</version>
+                <configuration>
+                    <findbugsXmlOutput>true</findbugsXmlOutput>
+                    <findbugsXmlWithMessages>true</findbugsXmlWithMessages>
+                    <xmlOutput>true</xmlOutput>
+                </configuration>
+            </plugin>
+        </plugins>
+    </reporting>
 
     <distributionManagement>
         <snapshotRepository>
