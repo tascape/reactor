@@ -108,6 +108,7 @@ public final class SystemConfiguration {
         this.listSysProperties();
 
         try {
+            LOG.info("Load properties from /{} on classpath", CONSTANT_SYSPROP_FILE);
             InputStream is = SystemConfiguration.class.getResourceAsStream("/" + CONSTANT_SYSPROP_FILE);
             this.properties.load(is);
         } catch (IOException ex) {
@@ -116,9 +117,17 @@ public final class SystemConfiguration {
 
         Path conf = HOME_PATH.resolve(CONSTANT_SYSPROP_FILE);
         this.loadSystemPropertiesFromPath(conf);
+        String confFiles = System.getProperty(SYSPROP_CONF_FILES, "").trim();
+        if (StringUtils.isNotBlank(confFiles)) {
+            LOG.info("Load properties from {}", confFiles);
+            String[] paths = confFiles.split(System.getProperty("path.separator"));
+            Stream.of(paths).forEach(path -> {
+                this.properties.putAll(this.loadSystemPropertiesFromPath(Paths.get(path)));
+            });
+        }
 
+        LOG.info("Load system properties starting with {}", CONSTANT_SYSPROP_PREFIX);
         List<String> keys = new ArrayList<>(System.getProperties().stringPropertyNames());
-        LOG.debug("Only load system properties starting with " + CONSTANT_SYSPROP_PREFIX);
         Properties sysProps = new Properties();
         keys.stream()
             .filter((key)
@@ -126,16 +135,7 @@ public final class SystemConfiguration {
             .forEach((key) -> {
                 sysProps.setProperty(key, System.getProperty(key));
             });
-
-        String confFiles = System.getProperty(SYSPROP_CONF_FILES, "").trim();
-        if (StringUtils.isNotBlank(confFiles)) {
-            String[] paths = confFiles.split(System.getProperty("path.separator"));
-            Stream.of(paths).forEach(path -> {
-                this.loadSystemPropertiesFromPath(Paths.get(path));
-            });
-        }
         this.properties.putAll(sysProps);
-        System.getProperties().putAll(sysProps);
 
         String execId = this.properties.getProperty(SYSPROP_EXECUTION_ID);
         if (StringUtils.isEmpty(execId)) {
@@ -370,21 +370,20 @@ public final class SystemConfiguration {
         }
     }
 
-    private void loadSystemPropertiesFromPath(Path path) {
+    private Properties loadSystemPropertiesFromPath(Path path) {
         LOG.debug("Loading system properties from {}", path);
         File f = path.toFile();
+        Properties p = new Properties();
         if (!f.exists()) {
-            LOG.warn("Cannot find system properties file {}", path);
-            return;
+            LOG.warn("Cannot find properties file {}", path);
+        } else {
+            try (InputStream is = new FileInputStream(f)) {
+                p.load(is);
+            } catch (IOException ex) {
+                LOG.warn("Cannot load properties from {} - {}", path, ex.getMessage());
+            }
         }
-        try (InputStream is = new FileInputStream(f)) {
-            Properties p = new Properties();
-            p.load(is);
-            this.properties.putAll(p);
-            System.getProperties().putAll(p);
-        } catch (IOException ex) {
-            throw new RuntimeException("Cannot load system properties from " + path, ex);
-        }
+        return p;
     }
 
     private String pre(String name) {
