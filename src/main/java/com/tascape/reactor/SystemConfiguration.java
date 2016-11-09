@@ -116,10 +116,12 @@ public final class SystemConfiguration {
         }
 
         Path conf = HOME_PATH.resolve(CONSTANT_SYSPROP_FILE);
-        this.loadSystemPropertiesFromPath(conf);
+        Properties p = this.loadSystemPropertiesFromPath(conf);
+        this.properties.putAll(p);
+
         String confFiles = System.getProperty(SYSPROP_CONF_FILES, "").trim();
         if (StringUtils.isNotBlank(confFiles)) {
-            LOG.info("Load properties from {}", confFiles);
+            LOG.trace("Load properties from {}", confFiles);
             String[] paths = confFiles.split(System.getProperty("path.separator"));
             Stream.of(paths).forEach(path -> {
                 this.properties.putAll(this.loadSystemPropertiesFromPath(Paths.get(path)));
@@ -371,8 +373,8 @@ public final class SystemConfiguration {
     }
 
     private Properties loadSystemPropertiesFromPath(Path path) {
-        LOG.debug("Loading system properties from {}", path);
         File f = path.toFile();
+        LOG.debug("Loading properties from {}", f.getAbsolutePath());
         Properties p = new Properties();
         if (!f.exists()) {
             LOG.warn("Cannot find properties file {}", path);
