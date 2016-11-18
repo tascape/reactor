@@ -107,7 +107,7 @@ public class CaseRunListener extends RunListener {
      */
     @Override
     public void testStarted(Description description) throws Exception {
-        LOG.debug("Case method started {}.{}", description.getClassName(), description.getMethodName());
+        LOG.info("Case method started {}", description.getMethodName());
 
         AbstractCase kase = AbstractCase.getCase();
         if (kase != null) {
@@ -119,7 +119,7 @@ public class CaseRunListener extends RunListener {
 
             this.db.updateCaseExecutionResult(this.tcr);
         }
-        LOG.debug("Application under task: {}", this.tcr.getAut());
+        LOG.info("Application under task: {}", this.tcr.getAut());
     }
 
     /**

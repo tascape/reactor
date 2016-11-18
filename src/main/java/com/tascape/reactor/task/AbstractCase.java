@@ -143,7 +143,8 @@ public abstract class AbstractCase extends AbstractCaseResource {
         if (td == null) {
             LOG.debug("There is no injected case data, create a new instance of ", clazz);
             td = clazz.newInstance();
-        }
+        }        
+        LOG.info("Case data {}", td.getValue());
         return clazz.cast(td);
     }
 
