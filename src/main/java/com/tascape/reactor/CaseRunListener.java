@@ -107,7 +107,7 @@ public class CaseRunListener extends RunListener {
      */
     @Override
     public void testStarted(Description description) throws Exception {
-        LOG.info("Case method started {}", description.getMethodName());
+        LOG.info("Case method started: {}", description.getMethodName());
 
         AbstractCase kase = AbstractCase.getCase();
         if (kase != null) {
@@ -154,7 +154,7 @@ public class CaseRunListener extends RunListener {
      */
     @Override
     public void testFinished(Description description) throws Exception {
-        LOG.debug("Case method finished {}.{}", description.getClassName(), description.getMethodName());
+        LOG.info("Case method finished: {}", description.getMethodName());
         if (this.db == null || this.tcr == null) {
             return;
         }
@@ -184,7 +184,12 @@ public class CaseRunListener extends RunListener {
     public void testRunFinished(Result result) throws Exception {
         LOG.debug("Case class finished");
         boolean pass = result.wasSuccessful();
-        LOG.info("PASS: {}, time: {} sec", pass, result.getRunTime() / 1000.0);
+        float time = result.getRunTime() / 1000.0f;
+        if (pass) {
+            LOG.info("PASS: {}, time: {} sec", pass, time);
+        } else {
+            LOG.error("PASS: {}, time: {} sec", pass, time);
+        }
         if (this.throwable == null) {
             result.getFailures().stream().forEach((f) -> {
                 LOG.error("Failure {}", f.getDescription(), f.getException());

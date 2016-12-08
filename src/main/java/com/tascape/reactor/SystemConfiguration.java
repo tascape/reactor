@@ -154,7 +154,8 @@ public final class SystemConfiguration {
     public String getProperty(String name, String defaultValue) {
         String v = this.properties.getProperty(name);
         if (StringUtils.isBlank(v)) {
-            LOG.debug("System property '{}' is not defined, default value '{}' will be used", name, defaultValue);
+            LOG.debug("System property '{}' is not defined, or blank, default value '{}' will be used", name,
+                defaultValue);
             return defaultValue;
         }
         return v;

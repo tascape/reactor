@@ -40,6 +40,7 @@ import org.junit.rules.Timeout;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import com.tascape.reactor.data.CaseData;
+import org.junit.Assert;
 
 /**
  *
@@ -143,7 +144,7 @@ public abstract class AbstractCase extends AbstractCaseResource {
         if (td == null) {
             LOG.debug("There is no injected case data, create a new instance of ", clazz);
             td = clazz.newInstance();
-        }        
+        }
         LOG.info("Case data {}", td.getValue());
         return clazz.cast(td);
     }
@@ -194,6 +195,11 @@ public abstract class AbstractCase extends AbstractCaseResource {
         if (executionResult.isFailure()) {
             throw new AssertionError("execution result: " + executionResult.result());
         }
+    }
+
+    protected void setToBeImplemented() {
+        this.setExecutionResult(ExecutionResult.ACQUIRED);
+        Assert.fail("this is a to-be-implemented case");
     }
 
     public List<CaseResultMetric> getResultMetrics() {

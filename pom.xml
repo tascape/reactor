@@ -6,7 +6,7 @@
 
     <groupId>com.tascape</groupId>
     <artifactId>reactor</artifactId>
-    <version>1.2.6</version>
+    <version>1.2.7</version>
     <packaging>jar</packaging>
     <name>reactor</name>
 
@@ -52,7 +52,7 @@
         <dependency>
             <groupId>org.apache.commons</groupId>
             <artifactId>commons-lang3</artifactId>
-            <version>3.4</version>
+            <version>3.5</version>
         </dependency>
         <dependency>
             <groupId>org.apache.commons</groupId>
@@ -62,12 +62,12 @@
         <dependency>
             <groupId>com.google.guava</groupId>
             <artifactId>guava</artifactId>
-            <version>19.0</version>
+            <version>20.0</version>
         </dependency>
         <dependency>
             <groupId>com.h2database</groupId>
             <artifactId>h2</artifactId>
-            <version>1.4.192</version>
+            <version>1.4.193</version>
         </dependency>
         <dependency>
             <groupId>org.hamcrest</groupId>
@@ -87,7 +87,7 @@
         <dependency>
             <groupId>mysql</groupId>
             <artifactId>mysql-connector-java</artifactId>
-            <version>5.1.39</version>
+            <version>5.1.40</version>
         </dependency>
         <dependency>
             <groupId>org.jacoco</groupId>

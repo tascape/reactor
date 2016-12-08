@@ -144,6 +144,12 @@ public class JUnit4Case extends AbstractCase {
         Assert.assertEquals(0, System.currentTimeMillis() % 2);
     }
 
+    @Test
+    public void runCasePlaceholderForNotReadyFeature() throws Exception {
+        Thread.sleep(500);
+        super.setToBeImplemented();
+    }
+
     private void doSomethingGood() throws IOException {
         LOG.info("Do something good");
     }
