@@ -198,7 +198,7 @@ public abstract class AbstractCase extends AbstractCaseResource {
     }
 
     protected void setToBeImplemented() {
-        this.setExecutionResult(ExecutionResult.ACQUIRED);
+        this.setExecutionResult(ExecutionResult.TBI);
         Assert.fail("this is a to-be-implemented case");
     }
 

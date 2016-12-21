@@ -425,7 +425,7 @@ public abstract class DbHandler {
                             String[] pf = result.split("/");
                             switch (pf.length) {
                                 case 1:
-                                    if (result.equals(ExecutionResult.PASS.getName())) {
+                                    if (ExecutionResult.isPass(result)) {
                                         p = 1;
                                     } else {
                                         f = 1;
@@ -575,7 +575,7 @@ public abstract class DbHandler {
                             xsw.writeAttribute("result", result);
                             xsw.writeAttribute("time", (rs1.getLong(CaseResult.STOP_TIME)
                                 - rs1.getLong(CaseResult.START_TIME)) / 1000.0 + "");
-                            if (ExecutionResult.isFailure(result)) {
+                            if (!ExecutionResult.isPass(result)) {
                                 xsw.writeStartElement("failure");
                                 xsw.writeAttribute("type", "failure");
                                 xsw.writeEndElement();

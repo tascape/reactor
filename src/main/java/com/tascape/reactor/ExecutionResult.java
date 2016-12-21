@@ -17,12 +17,16 @@
 package com.tascape.reactor;
 
 import java.security.InvalidParameterException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  *
  * @author linsong wang
  */
 public class ExecutionResult {
+    private static final Logger LOG = LoggerFactory.getLogger(ExecutionResult.class);
+
     public static final ExecutionResult NA = new ExecutionResult("NA");
 
     public static final ExecutionResult QUEUED = new ExecutionResult("QUEUED");
@@ -36,6 +40,11 @@ public class ExecutionResult {
     public static final ExecutionResult FAIL = new ExecutionResult("FAIL");
 
     public static final ExecutionResult CANCEL = new ExecutionResult("CANCEL");
+
+    /**
+     * to be implemented
+     */
+    public static final ExecutionResult TBI = new ExecutionResult("TBI");
 
     public static synchronized ExecutionResult newMultiple() {
         return new ExecutionResult("MULTIPLE");
@@ -96,8 +105,15 @@ public class ExecutionResult {
     public boolean isFailure() {
         return !name.equals("PASS") && fail != 0;
     }
+    
+    public static boolean isPass(String result) {
+        return result.equals(ExecutionResult.PASS.name)
+            || result.equals(ExecutionResult.TBI.name)
+            || result.endsWith("/0");
+    }
 
-    public static boolean isFailure(String result) {
-        return !(result.equals("PASS") || result.endsWith("/0"));
+    public static void main(String[] args) {
+        LOG.debug("tbi {}", ExecutionResult.TBI.isFailure());
+        LOG.debug("{}", ExecutionResult.isPass(ExecutionResult.TBI.name));
     }
 }
