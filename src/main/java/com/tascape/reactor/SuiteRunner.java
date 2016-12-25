@@ -114,6 +114,10 @@ public class SuiteRunner {
                         CaseResult tcr = future.get();
                         String result = tcr.getResult().result();
                         LOG.debug("Get result of case {} - {}", tcr.getTaskCase().format(), result);
+                        if (result.equals(ExecutionResult.TBI.getName())) {
+                            LOG.warn("do not record this to-be-implemented case");
+                            continue;
+                        }
                         if (!ExecutionResult.PASS.getName().equals(result) && !result.endsWith("/0")) {
                             numberOfFailures++;
                         }

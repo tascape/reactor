@@ -105,11 +105,9 @@ public class ExecutionResult {
     public boolean isFailure() {
         return !name.equals("PASS") && fail != 0;
     }
-    
+
     public static boolean isPass(String result) {
-        return result.equals(ExecutionResult.PASS.name)
-            || result.equals(ExecutionResult.TBI.name)
-            || result.endsWith("/0");
+        return result.equals(ExecutionResult.PASS.name) || result.endsWith("/0");
     }
 
     public static void main(String[] args) {

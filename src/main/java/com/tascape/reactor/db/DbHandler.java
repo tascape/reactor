@@ -397,7 +397,7 @@ public abstract class DbHandler {
     }
 
     public ExecutionResult adjustSuiteExecutionResult(String execId) throws SQLException {
-        LOG.debug("Adjust suite execution result of execution id {} with iterations", execId);
+        LOG.debug("Adjust suite execution result of execution id {} with iterations and TBI", execId);
         String lock = this.getDbLock(execId);
 
         ExecutionResult suiteResult = ExecutionResult.newMultiple();
@@ -414,13 +414,20 @@ public abstract class DbHandler {
                     String sql = "SELECT tr.*, tc.* FROM "
                         + CaseResult.TABLE_NAME + " tr JOIN " + TaskCase.TABLE_NAME + " tc"
                         + " ON tr." + CaseResult.TASK_CASE_ID + " = tc." + TaskCase.TASK_CASE_ID
-                        + " WHERE " + CaseResult.SUITE_RESULT + " = ?;";
+                        + " WHERE " + CaseResult.SUITE_RESULT + " = ? ORDER BY tr." + CaseResult.START_TIME
+                        + " DESC;";
                     try (PreparedStatement stmt = this.getConnection().prepareStatement(sql)) {
                         stmt.setString(1, execId);
                         LOG.debug("{}", stmt);
                         ResultSet rs = stmt.executeQuery();
                         while (rs.next()) {
+                            LOG.trace("{}.{}", rs.getString(TaskCase.CASE_CLASS), rs.getString(TaskCase.CASE_METHOD));
                             String result = rs.getString(CaseResult.EXECUTION_RESULT);
+                            if (result.equals(ExecutionResult.TBI.getName())) {
+                                LOG.warn("skip TBI case {}.{}",
+                                    rs.getString(TaskCase.CASE_CLASS), rs.getString(TaskCase.CASE_METHOD));
+                                continue;
+                            }
                             int p = 0, f = 0;
                             String[] pf = result.split("/");
                             switch (pf.length) {
@@ -442,16 +449,19 @@ public abstract class DbHandler {
                             if (rs.getString(TaskCase.CASE_DATA_INFO).startsWith(iterDataInfo)) {
                                 String key = rs.getString(TaskCase.SUITE_CLASS) + rs.getString(TaskCase.CASE_CLASS)
                                     + rs.getString(TaskCase.CASE_METHOD);
+                                LOG.debug("aggregate result of run iterations {}", key);
                                 Boolean r = iterationCases.get(key);
                                 if (r == null) {
                                     iterationCases.put(key, f > 0 ? Boolean.FALSE : Boolean.TRUE);
                                 } else {
                                     iterationCases.put(key, f > 0 ? Boolean.FALSE : r);
                                 }
-                            } else {
-                                total += p + f;
-                                fail += f;
+                                continue;
                             }
+
+                            total += p + f;
+                            fail += f;
+                            LOG.trace("total {}, fail {}", total, fail);
                         }
                         LOG.debug("{} {}", total, fail);
                     }
