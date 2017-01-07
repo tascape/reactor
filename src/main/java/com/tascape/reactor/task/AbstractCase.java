@@ -197,7 +197,16 @@ public abstract class AbstractCase extends AbstractCaseResource {
         }
     }
 
+    @Deprecated
     protected void setToBeImplemented() {
+        this.setExecutionResult(ExecutionResult.TBI);
+        Assert.fail("this is a to-be-implemented case");
+    }
+
+    /**
+     * Sets the execution result to TBI. The execution of this case won't affect overall suite execution result.
+     */
+    protected void markAsToBeImplemented() {
         this.setExecutionResult(ExecutionResult.TBI);
         Assert.fail("this is a to-be-implemented case");
     }
