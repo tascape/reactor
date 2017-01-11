@@ -146,6 +146,9 @@ public abstract class AbstractCase extends AbstractCaseResource {
             td = clazz.newInstance();
         }
         LOG.info("Case data {}", td.getValue());
+        if (td.isToBeImplemented()) {
+            this.markAsToBeImplemented();
+        }
         return clazz.cast(td);
     }
 

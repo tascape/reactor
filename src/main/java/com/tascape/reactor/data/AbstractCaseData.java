@@ -51,6 +51,8 @@ public abstract class AbstractCaseData implements CaseData {
      */
     private int priority = Priority.NONE;
 
+    private boolean toBeImplemented = false;
+
     @Override
     public String getClassName() {
         return "";
@@ -89,6 +91,18 @@ public abstract class AbstractCaseData implements CaseData {
             throw new Exception("Cannot find case data using " + caseDataInfo);
         }
         return data[index];
+    }
+
+    @Override
+    public boolean isToBeImplemented() {
+        return this.toBeImplemented;
+    }
+
+    /**
+     * Marks the case corresponding to this data as to-be-implemented.
+     */
+    public void markAsToBeImplemented() {
+        this.toBeImplemented = true;
     }
 
     public static synchronized CaseData[] getCaseData(Class<? extends CaseData> klass, String method, String parameter)

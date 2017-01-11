@@ -31,6 +31,8 @@ public interface CaseData {
      */
     String getValue();
 
+    boolean isToBeImplemented();
+
     /**
      * For data-driven cases, the case external id is defined in corresponding case data. Please implement
      * this method to provide external id based on the case management system, such as TestRail, that is used for
