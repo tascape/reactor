@@ -45,6 +45,8 @@ public abstract class AbstractCaseData implements CaseData {
     private static final Map<Class<? extends CaseData>, Object> LOADED_PROVIDERS = new HashMap<>();
 
     private String value = null;
+    
+    private String description = "";
 
     /*
      * works together with Priority of case method. NONE means no data priority specified.
@@ -136,5 +138,14 @@ public abstract class AbstractCaseData implements CaseData {
     @Override
     public String getExternalId() {
         return "";
+    }
+
+    @Override
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
     }
 }
