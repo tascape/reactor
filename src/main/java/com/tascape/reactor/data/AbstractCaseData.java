@@ -47,6 +47,8 @@ public abstract class AbstractCaseData implements CaseData {
     private String value = null;
     
     private String description = "";
+    
+    protected String externalId = "";
 
     /*
      * works together with Priority of case method. NONE means no data priority specified.
@@ -137,7 +139,7 @@ public abstract class AbstractCaseData implements CaseData {
      */
     @Override
     public String getExternalId() {
-        return "";
+        return externalId;
     }
 
     @Override

@@ -146,6 +146,7 @@ public abstract class AbstractCase extends AbstractCaseResource {
             td = clazz.newInstance();
         }
         LOG.info("Case data {}: {}", td.getValue(), td.getDescription());
+        this.setExternalId(td.getExternalId());
         if (td.isToBeImplemented()) {
             this.markAsToBeImplemented();
         }
