@@ -109,6 +109,20 @@ public abstract class AbstractCaseResource {
         return png;
     }
 
+    /**
+     * Blocks current thread for specified milliseconds. Shortcut to Thread.sleep.
+     * Throws RuntimeException.
+     *
+     * @param millis milliseconds
+     */
+    public void delay(long millis) {
+        try {
+            Thread.sleep(millis);
+        } catch (InterruptedException ex) {
+            throw new RuntimeException(ex);
+        }
+    }
+
     protected File createDataFile(String prefix) throws IOException {
         return this.createDataFile(prefix, "txt");
     }
