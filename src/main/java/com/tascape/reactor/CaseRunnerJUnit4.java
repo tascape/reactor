@@ -103,8 +103,11 @@ public class CaseRunnerJUnit4 extends AbstractCaseRunner implements Callable<Cas
             try {
                 abstractSuite.setUp();
             } catch (Throwable t) {
-                abstractSuite.tearDown();
-                throw t;                
+                try {
+                    abstractSuite.tearDown();
+                } catch (Throwable t0) {
+                }
+                throw t;
             }
             AbstractSuite.addSuite(abstractSuite);
             env = AbstractSuite.getEnvionment(suiteClass);
@@ -132,7 +135,7 @@ public class CaseRunnerJUnit4 extends AbstractCaseRunner implements Callable<Cas
     private Path newLogFile() throws IOException {
         TaskCase tc = this.tcr.getTaskCase();
         String caseLogDir = tc.formatForLogPath() + "." + System.currentTimeMillis() + "."
-            + Thread.currentThread().getName();
+                + Thread.currentThread().getName();
         Path caseLogPath = sysConfig.getLogPath().resolve(this.execId).resolve(caseLogDir);
         LOG.debug("Create case execution log directory {}", caseLogPath);
         if (!caseLogPath.toFile().mkdirs()) {

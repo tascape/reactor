@@ -41,7 +41,7 @@ public abstract class AbstractSuite {
     private static final Logger LOG = LoggerFactory.getLogger(AbstractSuite.class);
 
     private static final ThreadLocal<Map<String, Environment>> ENVIRONMENTS
-        = new ThreadLocal<Map<String, Environment>>() {
+            = new ThreadLocal<Map<String, Environment>>() {
         @Override
         protected Map<String, Environment> initialValue() {
             return new HashMap<>();
@@ -79,10 +79,21 @@ public abstract class AbstractSuite {
         return 0;
     }
 
+    public boolean runFailFast() {
+        LOG.warn("this is no fail fast operations in suite, please override is you want");
+        return false;
+    }
+
     public void setUp() throws Exception {
         Environment env = AbstractSuite.getEnvionment(this.getClass().getName());
         if (env == null || env.isEmpty()) {
-            this.setUpEnvironment();
+            try {
+                this.setUpEnvironment();
+            } catch (Throwable t) {
+                if (!this.runFailFast()) {
+                    throw t;
+                }
+            }
             AbstractSuite.putEnvionment(this.getClass().getName(), this.suiteEnvironment);
             this.suiteEnvironment.setName(Thread.currentThread().getName() + " " + this.getEnvironmentName());
         }
