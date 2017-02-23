@@ -150,6 +150,7 @@ public abstract class AbstractCase extends AbstractCaseResource {
         if (td.isToBeImplemented()) {
             this.markAsToBeImplemented();
         }
+        td.setAbstractCase(this);
         return clazz.cast(td);
     }
 
@@ -199,12 +200,6 @@ public abstract class AbstractCase extends AbstractCaseResource {
         if (executionResult.isFailure()) {
             throw new AssertionError("execution result: " + executionResult.result());
         }
-    }
-
-    @Deprecated
-    protected void setToBeImplemented() {
-        this.setExecutionResult(ExecutionResult.TBI);
-        Assert.fail("this is a to-be-implemented case");
     }
 
     /**

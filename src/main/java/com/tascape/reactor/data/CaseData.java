@@ -16,11 +16,15 @@
  */
 package com.tascape.reactor.data;
 
+import com.tascape.reactor.task.AbstractCase;
+
 /**
  *
  * @author linsong wang
  */
 public interface CaseData {
+
+    void setAbstractCase(AbstractCase kase);
 
     String getClassName();
 

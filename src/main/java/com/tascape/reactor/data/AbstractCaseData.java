@@ -16,6 +16,7 @@
  */
 package com.tascape.reactor.data;
 
+import com.tascape.reactor.task.AbstractCase;
 import com.tascape.reactor.task.Priority;
 import java.lang.reflect.Method;
 import java.util.HashMap;
@@ -45,10 +46,12 @@ public abstract class AbstractCaseData implements CaseData {
     private static final Map<Class<? extends CaseData>, Object> LOADED_PROVIDERS = new HashMap<>();
 
     private String value = null;
-    
+
     private String description = "";
-    
+
     protected String externalId = "";
+
+    protected AbstractCase kase;
 
     /*
      * works together with Priority of case method. NONE means no data priority specified.
@@ -98,6 +101,11 @@ public abstract class AbstractCaseData implements CaseData {
     }
 
     @Override
+    public void setAbstractCase(AbstractCase kase) {
+        this.kase = kase;
+    }
+
+    @Override
     public boolean isToBeImplemented() {
         return this.toBeImplemented;
     }
@@ -110,7 +118,7 @@ public abstract class AbstractCaseData implements CaseData {
     }
 
     public static synchronized CaseData[] getCaseData(Class<? extends CaseData> klass, String method, String parameter)
-        throws Exception {
+            throws Exception {
         String key = klass + "." + method + "." + parameter;
         CaseData[] data = AbstractCaseData.LOADED_DATA.get(key);
         if (data == null) {

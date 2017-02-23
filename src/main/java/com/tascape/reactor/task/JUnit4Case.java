@@ -147,7 +147,7 @@ public class JUnit4Case extends AbstractCase {
     @Test
     public void runCasePlaceholderForNotReadyFeature() throws Exception {
         Thread.sleep(500);
-        super.setToBeImplemented();
+        super.markAsToBeImplemented();
     }
 
     private void doSomethingGood() throws IOException {

@@ -79,8 +79,15 @@ public abstract class AbstractSuite {
         return 0;
     }
 
+    /**
+     * This method provides suite a change to fail fast if setUpEnvironment() fails. Please override this method if
+     * fail fast is needed.
+     *
+     * @return false to throw Throwable from setUpEnvironment(), so that next task can retry setUpEnvironment().
+     *         true to ignore Throwable from setUpEnvironment(), this may lead to fail fast of subsequent tasks.
+     */
     public boolean runFailFast() {
-        LOG.warn("this is no fail fast operations in suite, please override is you want");
+        LOG.warn("there is no fail fast operations in suite, please override, and return true, if you want");
         return false;
     }
 
