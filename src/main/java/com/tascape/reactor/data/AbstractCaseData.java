@@ -158,4 +158,8 @@ public abstract class AbstractCaseData implements CaseData {
     public void setDescription(String description) {
         this.description = description;
     }
+
+    public AbstractCase getAbstractCase() {
+        return kase;
+    }
 }

@@ -73,7 +73,7 @@ public abstract class AbstractCaseRunner {
             pw.println("<html><body><pre>");
             pw.println("<a href='../'>Suite Log Directory</a><br /><a href='./'>Case Log Directory</a>");
             pw.println();
-            List<String> lines = FileUtils.readLines(logFile.toFile(),Charset.defaultCharset());
+            List<String> lines = FileUtils.readLines(logFile.toFile(), Charset.defaultCharset());
             List<File> files = new ArrayList<>(Arrays.asList(logFile.getParent().toFile().listFiles()));
 
             for (String line : lines) {
@@ -84,8 +84,8 @@ public abstract class AbstractCaseRunner {
                 } else if (newline.contains(" WARN  ")) {
                     newline = "<font color='9F6000'><b>" + newline + "</b></font>";
                 } else if (newline.contains(" ERROR ")
-                    || newline.contains("Failure in case")
-                    || newline.contains("AssertionError")) {
+                        || newline.contains("Failure in case")
+                        || newline.contains("AssertionError")) {
                     newline = "<font color='red'><b>" + newline + "</b></font>";
                 } else {
                     Matcher m = http.matcher(line);
@@ -95,22 +95,26 @@ public abstract class AbstractCaseRunner {
                         newline = newline.replace(url, a);
                     }
                 }
-                pw.println(newline);
+                boolean printLine = true;
                 for (File file : files) {
                     String path = file.getAbsolutePath();
                     String name = file.getName();
                     if (newline.contains(path)) {
                         if (name.endsWith(".png")) {
                             pw.printf("<a href=\"%s\" target=\"_blank\"><img src=\"%s\" width=\"360px\"/></a>",
-                                name, name);
+                                    name, name);
                         }
                         String a = String.format("<a href=\"%s\" target=\"_blank\">%s</a>", name, name);
                         int len = newline.indexOf("    ");
                         pw.printf((len > 0 ? newline.substring(0, len + 5) : "") + a);
                         pw.println();
                         files.remove(file);
+                        printLine = false;
                         break;
                     }
+                }
+                if (printLine) {
+                    pw.println(newline);
                 }
             }
 
