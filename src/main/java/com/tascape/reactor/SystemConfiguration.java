@@ -274,11 +274,7 @@ public final class SystemConfiguration {
     }
 
     public int getCasePriority() {
-        String v = this.getProperty(SYSPROP_CASE_PRIORITY);
-        if (StringUtils.isBlank(v)) {
-            return Priority.P3;
-        }
-        return Integer.parseInt(v);
+        return this.getIntProperty(SYSPROP_CASE_PRIORITY, Priority.NONE);
     }
 
     public String getDatabaseType() {

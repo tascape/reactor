@@ -28,7 +28,7 @@ import java.lang.annotation.Target;
  */
 @Target(value = {ElementType.METHOD, ElementType.TYPE})
 @Retention(RetentionPolicy.RUNTIME)
-    @SuppressWarnings("PackageVisibleField")
+@SuppressWarnings("PackageVisibleField")
 public @interface Priority {
     int NONE = -1;
 

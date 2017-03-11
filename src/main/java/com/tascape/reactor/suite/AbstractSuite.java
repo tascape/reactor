@@ -23,6 +23,7 @@ import com.tascape.reactor.driver.EntityDriver;
 import com.tascape.reactor.driver.CaseDriver;
 import com.tascape.reactor.driver.PoolableEntityDriver;
 import com.tascape.reactor.task.AbstractCase;
+import com.tascape.reactor.task.Priority;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -77,6 +78,17 @@ public abstract class AbstractSuite {
 
     public int getNumberOfEnvs() {
         return 0;
+    }
+
+    /**
+     * Gets the minimal priority of cases to run in this suite.
+     *
+     * @return Priority.P3
+     */
+    public int getPriority() {
+        LOG.warn("Please override to return the minimal priority, of which you would like to run cases in this suite. "
+                + "The default is Priority.P3");
+        return Priority.P3;
     }
 
     /**

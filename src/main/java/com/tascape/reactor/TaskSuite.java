@@ -45,13 +45,12 @@ public class TaskSuite {
     private String name;
 
     private final String projectName;
-    
+
     private final int numberOfEnvs;
 
     private List<TaskCase> cases = new ArrayList<>();
 
-    public TaskSuite(String suiteClass, Pattern caseClassRegex, Pattern caseMethodRegex, int priority)
-        throws Exception {
+    public TaskSuite(String suiteClass, Pattern caseClassRegex, Pattern caseMethodRegex) throws Exception {
         LOG.debug("Find cases in target suite {}", suiteClass);
         AbstractSuite suite = AbstractSuite.class.cast(Class.forName(suiteClass).newInstance());
         this.name = suite.getName();
@@ -75,7 +74,7 @@ public class TaskSuite {
 
         this.cases = this.filter(caseClassRegex, caseMethodRegex);
 
-        this.cases = this.filter(priority);
+        this.cases = this.filter(suite.getPriority());
 
         if (SystemConfiguration.getInstance().isShuffleCases()) {
             LOG.debug("do case shuffle");
@@ -113,11 +112,17 @@ public class TaskSuite {
         return tcs;
     }
 
+    /*
+     * runs all cases, which priority is less than or equal to the specified.
+     */
     private List<TaskCase> filter(int priority) {
+        LOG.debug("filter cases by priority {}", priority);
         List<TaskCase> tcs = new ArrayList<>();
-        this.cases.stream().filter((tc) -> !(tc.getPriority() > priority)).forEach((tc) -> {
-            tcs.add(tc);
-        });
+        this.cases.stream()
+                .filter(tc -> (tc.getPriority() <= priority))
+                .forEach(tc -> {
+                    tcs.add(tc);
+                });
         return tcs;
     }
 
@@ -141,7 +146,7 @@ public class TaskSuite {
                     tcs.add(tc);
                 } else {
                     LOG.trace("Calling class {}, method {}, with parameter {}", tdp.klass(), tdp.method(),
-                        tdp.parameter());
+                            tdp.parameter());
                     CaseData[] data = AbstractCaseData.getCaseData(tdp.klass(), tdp.method(), tdp.parameter());
                     LOG.debug("{} is a data-driven case, data size is {}", tc.format(), data.length);
                     int length = (data.length + "").length();
@@ -161,7 +166,8 @@ public class TaskSuite {
                     }
                 }
             } catch (Exception ex) {
-                LOG.warn("Cannot process case {}, skipping. Check @" +CaseDataProvider.class.getName(), tc.format(), ex);
+                LOG.warn("Cannot process case {}, skipping. Check {}", CaseDataProvider.class.getName(), tc.format());
+                LOG.warn("", ex);
             }
         });
         return tcs;

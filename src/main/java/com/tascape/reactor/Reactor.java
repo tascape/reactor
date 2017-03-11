@@ -39,9 +39,8 @@ public class Reactor {
             String suiteClass = config.getSuite();
             Pattern caseClassRegex = config.getCaseClassRegex();
             Pattern caseMethodRegex = config.getCaseMethodRegex();
-            int priority = config.getCasePriority();
             LOG.debug("Running suite class: {}", suiteClass);
-            TaskSuite ts = new TaskSuite(suiteClass, caseClassRegex, caseMethodRegex, priority);
+            TaskSuite ts = new TaskSuite(suiteClass, caseClassRegex, caseMethodRegex);
 
             if (ts.getCases().isEmpty()) {
                 throw new RuntimeException("No cases found based on system properties");
