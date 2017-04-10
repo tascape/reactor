@@ -34,6 +34,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import com.tascape.reactor.data.CaseData;
 import com.tascape.reactor.data.CaseDataProvider;
+import java.util.stream.Collectors;
 
 /**
  *
@@ -74,7 +75,9 @@ public class TaskSuite {
 
         this.cases = this.filter(caseClassRegex, caseMethodRegex);
 
-        this.cases = this.filter(suite.getPriority());
+        int priority = SystemConfiguration.getInstance().getIntProperty(SystemConfiguration.SYSPROP_CASE_PRIORITY,
+                suite.getPriority());
+        this.cases = this.filter(priority);
 
         if (SystemConfiguration.getInstance().isShuffleCases()) {
             LOG.debug("do case shuffle");
@@ -117,13 +120,9 @@ public class TaskSuite {
      */
     private List<TaskCase> filter(int priority) {
         LOG.debug("filter cases by priority {}", priority);
-        List<TaskCase> tcs = new ArrayList<>();
-        this.cases.stream()
+        return this.cases.stream()
                 .filter(tc -> (tc.getPriority() <= priority))
-                .forEach(tc -> {
-                    tcs.add(tc);
-                });
-        return tcs;
+                .collect(Collectors.toList());
     }
 
     private List<TaskCase> processAnnotations() {
