@@ -93,14 +93,12 @@ public abstract class AbstractSuite {
 
     /**
      * This method provides suite a change to fail fast if setUpEnvironment() fails. Please override this method if
-     * fail fast is needed.
+     * fail fast is needed - swallow the Throwable and mark some driver and/or communication objects as null.
      *
-     * @return false to throw Throwable from setUpEnvironment(), so that next task can retry setUpEnvironment().
-     *         true to ignore Throwable from setUpEnvironment(), this may lead to fail fast of subsequent tasks.
+     * @param t caused by setUpEnvironment
      */
-    public boolean runFailFast() {
+    public void runFailFast(Throwable t) throws Exception {
         LOG.warn("there is no fail fast operations in suite, please override, and return true, if you want");
-        return false;
     }
 
     public void setUp() throws Exception {
@@ -109,9 +107,7 @@ public abstract class AbstractSuite {
             try {
                 this.setUpEnvironment();
             } catch (Throwable t) {
-                if (!this.runFailFast()) {
-                    throw t;
-                }
+                this.runFailFast(t);
             }
             AbstractSuite.putEnvionment(this.getClass().getName(), this.suiteEnvironment);
             this.suiteEnvironment.setName(Thread.currentThread().getName() + " " + this.getEnvironmentName());
