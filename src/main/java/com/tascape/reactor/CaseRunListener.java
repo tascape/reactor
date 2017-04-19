@@ -58,7 +58,7 @@ public class CaseRunListener extends RunListener {
      */
     @Override
     public void testRunStarted(Description description) throws Exception {
-        LOG.debug("Case class started {}", description.getClassName());
+        LOG.trace("Case class started {}", description.getClassName());
         if (this.db == null || this.tcr == null) {
             return;
         }
@@ -182,7 +182,7 @@ public class CaseRunListener extends RunListener {
      */
     @Override
     public void testRunFinished(Result result) throws Exception {
-        LOG.debug("Case class finished");
+        LOG.trace("Case class finished");
         boolean pass = result.wasSuccessful();
         float time = result.getRunTime() / 1000.0f;
         if (pass) {

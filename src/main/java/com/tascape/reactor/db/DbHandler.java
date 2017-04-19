@@ -299,7 +299,7 @@ public abstract class DbHandler {
     }
 
     public void updateCaseExecutionResult(CaseResult tcr) throws SQLException {
-        LOG.debug("Update case result {} ({}) to {}", tcr.getCaseResultId(), tcr.getTaskCase().format(),
+        LOG.trace("Update case result {} ({}) to {}", tcr.getCaseResultId(), tcr.getTaskCase().format(),
             tcr.getResult().result());
         final String sql = "SELECT tr.* FROM " + CaseResult.TABLE_NAME + " tr INNER JOIN " + TaskCase.TABLE_NAME
             + " tc WHERE tr.TASK_CASE_ID=tc.TASK_CASE_ID AND "

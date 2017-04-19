@@ -96,6 +96,8 @@ public abstract class AbstractSuite {
      * fail fast is needed - swallow the Throwable and mark some driver and/or communication objects as null.
      *
      * @param t caused by setUpEnvironment
+     *
+     * @throws java.lang.Exception environment setup issue
      */
     public void runFailFast(Throwable t) throws Exception {
         LOG.warn("there is no fail fast operations in suite, please override, and return true, if you want");
