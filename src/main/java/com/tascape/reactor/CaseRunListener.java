@@ -23,6 +23,7 @@ import com.tascape.reactor.task.AbstractCase;
 import java.lang.reflect.Field;
 import java.sql.SQLException;
 import java.util.List;
+import org.junit.ToBeImplementedException;
 import org.junit.internal.AssumptionViolatedException;
 import org.junit.runner.Description;
 import org.junit.runner.Result;
@@ -132,7 +133,9 @@ public class CaseRunListener extends RunListener {
     @Override
     public void testFailure(Failure failure) throws Exception {
         this.throwable = failure.getException();
-        LOG.error("{} {}", failure.getDescription().getDisplayName(), this.throwable.getMessage());
+        if (!(this.throwable instanceof ToBeImplementedException)) {
+            LOG.error("{} {}", failure.getDescription().getDisplayName(), this.throwable.getMessage());
+        }
 
         if (this.db == null || this.tcr == null) {
             return;

@@ -40,7 +40,7 @@ import org.junit.rules.Timeout;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import com.tascape.reactor.data.CaseData;
-import org.junit.Assert;
+import org.junit.ToBeImplementedException;
 
 /**
  *
@@ -207,7 +207,7 @@ public abstract class AbstractCase extends AbstractCaseResource {
      */
     protected void markAsToBeImplemented() {
         this.setExecutionResult(ExecutionResult.TBI);
-        Assert.fail("this is a to-be-implemented case");
+        throw new ToBeImplementedException("this is a to-be-implemented case");
     }
 
     public List<CaseResultMetric> getResultMetrics() {
