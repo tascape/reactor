@@ -21,7 +21,7 @@ import com.tascape.reactor.Reactor;
 import com.tascape.reactor.data.CaseIterationData;
 import java.io.IOException;
 import java.util.Random;
-import org.apache.commons.lang3.RandomStringUtils;
+import org.apache.commons.text.RandomStringGenerator;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
@@ -139,7 +139,7 @@ public class JUnit4Case extends AbstractCase {
     @Test
     @CaseDataProvider(klass = CaseIterationData.class, method = "useIterations", parameter = "3")
     public void runIterations() throws Exception {
-        LOG.debug("case iteration {}", RandomStringUtils.randomAlphanumeric(10));
+        LOG.debug("case iteration {}", new RandomStringGenerator.Builder().withinRange('a', 'z').build().generate(10));
         Thread.sleep(500);
         Assert.assertEquals(0, System.currentTimeMillis() % 2);
     }

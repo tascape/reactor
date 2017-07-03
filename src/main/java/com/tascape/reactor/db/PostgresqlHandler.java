@@ -64,6 +64,7 @@ public class PostgresqlHandler extends DbHandler {
         connPoolConfig.setJdbcUrl("jdbc:postgresql://" + DB_HOST + "/" + DB_SCHEMA);
         connPoolConfig.setUsername(DB_USER);
         connPoolConfig.setPassword(DB_PASS);
+        connPoolConfig.setMaxConnectionsPerPartition(Integer.MAX_VALUE);
         connPoolConfig.setMaxConnectionAgeInSeconds(600);
         connPoolConfig.setDefaultAutoCommit(true);
         connPoolConfig.setIdleConnectionTestPeriodInSeconds(30);

@@ -64,6 +64,7 @@ public class MysqlHandler extends DbHandler {
         connPoolConfig.setJdbcUrl("jdbc:mysql://" + DB_HOST + "/" + DB_SCHEMA);
         connPoolConfig.setUsername(DB_USER);
         connPoolConfig.setPassword(DB_PASS);
+        connPoolConfig.setMaxConnectionsPerPartition(Integer.MAX_VALUE);
         connPoolConfig.setMaxConnectionAgeInSeconds(600);
         connPoolConfig.setDefaultAutoCommit(true);
         connPoolConfig.setIdleConnectionTestPeriodInSeconds(30);

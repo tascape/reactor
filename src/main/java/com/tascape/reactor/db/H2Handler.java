@@ -64,7 +64,7 @@ public final class H2Handler extends DbHandler {
             FileUtils.cleanDirectory(dir);
         }
         this.connPool = JdbcConnectionPool.create("jdbc:h2:" + this.dbPath + SYS_CONFIG.getExecId(), "sa", "sa");
-        connPool.setMaxConnections(10);
+        connPool.setMaxConnections(Integer.MAX_VALUE);
         try (Connection conn = this.getConnection()) {
             try {
                 conn.prepareStatement("SELECT * FROM case_result WHERE 0;").executeQuery();
