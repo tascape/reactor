@@ -132,11 +132,11 @@ public final class SystemConfiguration {
         List<String> keys = new ArrayList<>(System.getProperties().stringPropertyNames());
         Properties sysProps = new Properties();
         keys.stream()
-            .filter((key)
-                -> (key.startsWith(CONSTANT_SYSPROP_PREFIX)) && StringUtils.isNotBlank(System.getProperty(key)))
-            .forEach((key) -> {
-                sysProps.setProperty(key, System.getProperty(key));
-            });
+                .filter((key)
+                        -> (key.startsWith(CONSTANT_SYSPROP_PREFIX)) && StringUtils.isNotBlank(System.getProperty(key)))
+                .forEach((key) -> {
+                    sysProps.setProperty(key, System.getProperty(key));
+                });
         this.properties.putAll(sysProps);
 
         String execId = this.properties.getProperty(SYSPROP_EXECUTION_ID);
@@ -155,7 +155,7 @@ public final class SystemConfiguration {
         String v = this.properties.getProperty(name);
         if (StringUtils.isBlank(v)) {
             LOG.debug("System property '{}' is not defined, or blank, default value '{}' will be used", name,
-                defaultValue);
+                    defaultValue);
             return defaultValue;
         }
         return v;
@@ -297,6 +297,11 @@ public final class SystemConfiguration {
         return this.getProperty(DbHandler.SYSPROP_DATABASE_PASS, "p@ssword");
     }
 
+    public int getDatabasePoolSize() {
+        return this.getIntProperty(DbHandler.SYSPROP_DATABASE_POOL_SIZE,
+                this.getIntProperty(SYSPROP_EXECUTION_THREAD_COUNT) + 10);
+    }
+
     public String getProdUnderTask() {
         return this.getProperty(SYSPROP_PRODUCT_UNDER_TASK, "");
     }
@@ -343,10 +348,10 @@ public final class SystemConfiguration {
         List<String> keys = new ArrayList<>(this.properties.stringPropertyNames());
         Collections.sort(keys);
         keys.stream()
-            .filter(key -> !key.startsWith(pre("db.")))
-            .forEach((key) -> {
-                LOG.debug(String.format("%50s : %s", key, this.properties.getProperty(key)));
-            });
+                .filter(key -> !key.startsWith(pre("db.")))
+                .forEach((key) -> {
+                    LOG.debug(String.format("%50s : %s", key, this.properties.getProperty(key)));
+                });
     }
 
     public Properties getProperties() {

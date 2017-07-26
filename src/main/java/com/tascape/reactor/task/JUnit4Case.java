@@ -150,6 +150,17 @@ public class JUnit4Case extends AbstractCase {
         super.markAsToBeImplemented();
     }
 
+    @Test
+    public void runRequeue() throws Exception {
+        LOG.info("Sample requeue case");
+        if (System.currentTimeMillis() % 2 == 0) {
+            LOG.info("requeue case");
+            this.requeue();
+        } else{
+            LOG.info("not requeue case");            
+        }
+    }
+
     private void doSomethingGood() throws IOException {
         LOG.info("Do something good");
     }

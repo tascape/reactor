@@ -202,6 +202,11 @@ public abstract class AbstractCase extends AbstractCaseResource {
         }
     }
 
+    protected void requeue() {
+        this.result = ExecutionResult.QUEUED;
+        this.tcr.setCaseStation("");
+    }
+
     /**
      * Sets the execution result to TBI. The execution of this case won't affect overall suite execution result.
      */

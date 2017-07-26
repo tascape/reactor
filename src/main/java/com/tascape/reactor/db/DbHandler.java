@@ -68,6 +68,8 @@ public abstract class DbHandler {
 
     public static final String SYSPROP_DATABASE_PASS = "reactor.db.pass";
 
+    public static final String SYSPROP_DATABASE_POOL_SIZE = "reactor.db.pool.size";
+
     public static DbHandler getInstance() {
         String type = SystemConfiguration.getInstance().getDatabaseType();
         DbHandler dbh;

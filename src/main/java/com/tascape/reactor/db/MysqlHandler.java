@@ -48,6 +48,8 @@ public class MysqlHandler extends DbHandler {
 
     private static final String DB_PASS = SYS_CONFIG.getDatabasePass();
 
+    private static final int DB_POOL_SIZE = SYS_CONFIG.getDatabasePoolSize();
+
     static {
         try {
             Class.forName(DB_DRIVER).newInstance();
@@ -64,7 +66,7 @@ public class MysqlHandler extends DbHandler {
         connPoolConfig.setJdbcUrl("jdbc:mysql://" + DB_HOST + "/" + DB_SCHEMA);
         connPoolConfig.setUsername(DB_USER);
         connPoolConfig.setPassword(DB_PASS);
-        connPoolConfig.setMaxConnectionsPerPartition(Integer.MAX_VALUE);
+        connPoolConfig.setMaxConnectionsPerPartition(DB_POOL_SIZE);
         connPoolConfig.setMaxConnectionAgeInSeconds(600);
         connPoolConfig.setDefaultAutoCommit(true);
         connPoolConfig.setIdleConnectionTestPeriodInSeconds(30);
