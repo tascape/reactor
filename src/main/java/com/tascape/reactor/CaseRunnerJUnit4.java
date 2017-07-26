@@ -23,7 +23,6 @@ import com.tascape.reactor.db.TaskCase;
 import com.tascape.reactor.db.CaseResult;
 import com.tascape.reactor.suite.AbstractSuite;
 import com.tascape.reactor.suite.Environment;
-import java.io.IOException;
 import java.nio.file.Path;
 import java.util.concurrent.Callable;
 import org.junit.runner.JUnitCore;
@@ -49,8 +48,8 @@ public class CaseRunnerJUnit4 extends AbstractCaseRunner implements Callable<Cas
 
     @Override
     public CaseResult call() throws Exception {
-        this.tcr.setCaseEnv(Thread.currentThread().getName());
-        Path logFile = this.newLogFile();
+        tcr.setCaseEnv(Thread.currentThread().getName());
+        Path logFile = newLogFile(tcr.getTaskCase());
         try {
             if (!db.acquireCaseResult(this.tcr)) {
                 return null;
@@ -130,22 +129,5 @@ public class CaseRunnerJUnit4 extends AbstractCaseRunner implements Callable<Cas
             prop.setPropertyValue(env.getName());
             this.db.addSuiteExecutionProperty(prop);
         }
-    }
-
-    private Path newLogFile() throws IOException {
-        TaskCase tc = this.tcr.getTaskCase();
-        String caseLogDir = tc.formatForLogPath() + "." + System.currentTimeMillis() + "."
-                + Thread.currentThread().getName();
-        Path caseLogPath = sysConfig.getLogPath().resolve(this.execId).resolve(caseLogDir);
-        LOG.debug("Create case execution log directory {}", caseLogPath);
-        if (!caseLogPath.toFile().mkdirs()) {
-            throw new IOException("Cannot create log directory " + caseLogPath);
-        }
-        AbstractCaseResource.setCaseLogPath(caseLogPath);
-        this.tcr.setLogDir(caseLogDir);
-
-        Path logFile = caseLogPath.resolve("case.log");
-        LOG.debug("Create log file {}", logFile);
-        return addLog4jFileAppender(logFile);
     }
 }

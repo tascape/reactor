@@ -18,6 +18,7 @@ package com.tascape.reactor;
 
 import com.tascape.reactor.db.DbHandler;
 import com.tascape.reactor.db.CaseResult;
+import com.tascape.reactor.db.TaskCase;
 import java.io.File;
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -123,6 +124,22 @@ public abstract class AbstractCaseRunner {
         } catch (IOException ex) {
             LOG.warn(ex.getMessage());
         }
+    }
+
+    // https://stackoverflow.com/questions/5532864/thread-setnamename-caveats
+    Path newLogFile(TaskCase tc) throws IOException {
+        String caseLogDir = tc.formatForLogPath() + "." + System.currentTimeMillis() + "." + tcr.getCaseEnv();
+        Path caseLogPath = sysConfig.getLogPath().resolve(this.execId).resolve(caseLogDir);
+        LOG.debug("Create case execution log directory {}", caseLogPath);
+        if (!caseLogPath.toFile().mkdirs()) {
+            throw new IOException("Cannot create log directory " + caseLogPath);
+        }
+        AbstractCaseResource.setCaseLogPath(caseLogPath);
+        this.tcr.setLogDir(caseLogDir);
+
+        Path logFile = caseLogPath.resolve("case.log");
+        LOG.debug("Create log file {}", logFile);
+        return addLog4jFileAppender(logFile);
     }
 
     Path addLog4jFileAppender(final Path path) throws IOException {

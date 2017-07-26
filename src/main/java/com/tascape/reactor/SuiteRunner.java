@@ -37,6 +37,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.concurrent.ThreadFactory;
+import java.util.stream.Collectors;
 import javax.xml.stream.XMLStreamException;
 import org.apache.commons.io.FileUtils;
 import org.slf4j.Logger;
@@ -114,6 +115,10 @@ public class SuiteRunner {
                         CaseResult tcr = future.get();
                         String result = tcr.getResult().result();
                         LOG.debug("Get result of case {} - {}", tcr.getTaskCase().format(), result);
+                        if (result.equals(ExecutionResult.QUEUED.getName())) {
+                            LOG.warn("do not record this re-queued case");
+                            continue;
+                        }
                         if (result.equals(ExecutionResult.TBI.getName())) {
                             LOG.warn("do not record this to-be-implemented case");
                             continue;
@@ -153,14 +158,14 @@ public class SuiteRunner {
 
         List<SuiteProperty> sps = new ArrayList<>();
         SYS_CONFIG.getProperties().entrySet().stream()
-            .filter(key -> !key.toString().startsWith("reactor.db."))
-            .forEach(entry -> {
-                SuiteProperty sp = new SuiteProperty();
-                sp.setSuiteResultId(this.execId);
-                sp.setPropertyName(entry.getKey().toString());
-                sp.setPropertyValue(entry.getValue().toString());
-                sps.add(sp);
-            });
+                .filter(key -> !key.toString().startsWith("reactor.db."))
+                .forEach(entry -> {
+                    SuiteProperty sp = new SuiteProperty();
+                    sp.setSuiteResultId(this.execId);
+                    sp.setPropertyName(entry.getKey().toString());
+                    sp.setPropertyValue(entry.getValue().toString());
+                    sps.add(sp);
+                });
         this.db.setSuiteExecutionProperties(sps);
     }
 
@@ -185,11 +190,9 @@ public class SuiteRunner {
     }
 
     private List<CaseResult> filter(List<CaseResult> tcrs) {
-        List<CaseResult> tcrs0 = new ArrayList<>();
-        tcrs.stream().filter((tcr) -> (UNSUPPORTED_CASES.get(tcr.getTaskCase().format()) == null)).forEach((tcr) -> {
-            tcrs0.add(tcr);
-        });
-
+        List<CaseResult> tcrs0 = tcrs.stream()
+                .filter((tcr) -> !UNSUPPORTED_CASES.containsKey(tcr.getTaskCase().format()))
+                .collect(Collectors.toList());
         if (SystemConfiguration.getInstance().isShuffleCases()) {
             LOG.debug("do case shuffle");
             Collections.shuffle(tcrs0);

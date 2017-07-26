@@ -134,7 +134,7 @@ public class CaseRunListener extends RunListener {
     public void testFailure(Failure failure) throws Exception {
         this.throwable = failure.getException();
         if (!(this.throwable instanceof ToBeImplementedException)) {
-            LOG.error("{} {}", failure.getDescription().getDisplayName(), this.throwable.getMessage());
+            LOG.warn("{} {}", failure.getDescription().getDisplayName(), this.throwable.getMessage());
         }
 
         if (this.db == null || this.tcr == null) {
@@ -144,7 +144,6 @@ public class CaseRunListener extends RunListener {
             return;
         }
 
-        AbstractCase kase = AbstractCase.getCase();
         this.tcr.setException(throwable);
     }
 
