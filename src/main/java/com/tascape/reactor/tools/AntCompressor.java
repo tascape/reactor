@@ -29,52 +29,63 @@ import org.slf4j.LoggerFactory;
  *
  * @author linsong wang
  */
-public class AntFolderCompressor {
-    private static final Logger LOG = LoggerFactory.getLogger(AntFolderCompressor.class);
+public class AntCompressor {
+    private static final Logger LOG = LoggerFactory.getLogger(AntCompressor.class);
 
     public static void main(String[] args) throws IOException, OperationNotSupportedException {
-        LOG.info("tar/untar, usages:");
-        LOG.info("1. arguments 'tar folder-to-be-tarred'");
-        LOG.info("2. arguments 'untar file-to-be-untarred'");
+        LOG.info("tgz/untgz, usages:");
+        LOG.info("1. arguments 'tgz folder-to-be-tgzed'");
+        LOG.info("2. arguments 'untgz file-to-be-untgzed'");
 
-        AntFolderCompressor compressor = new AntFolderCompressor();
         switch (args[0]) {
-            case "tar":
-                compressor.tar(args[1]);
+            case "tgz":
+                AntCompressor.tgz(args[1]);
                 break;
-            case "untar":
-                compressor.untar(args[1]);
+            case "untgz":
+                AntCompressor.untgz(args[1]);
                 break;
             default:
-                throw new UnsupportedOperationException("only supports tar, untar");
+                throw new UnsupportedOperationException("only supports tgz, untgz");
         }
     }
 
-    public File tar(String folder) {
+    public static File tgz(String folder) {
         Project p = new Project();
         p.init();
 
         Tar tar = new Tar();
+        Tar.TarCompressionMethod method = new Tar.TarCompressionMethod();
+        method.setValue("gzip");
+        tar.setCompression(method);
+
         tar.setProject(p);
-        File tarFile = new File(folder + ".tar");
-        tar.setDestFile(tarFile);
+        File tgzFile = new File(folder + ".tgz");
+        tar.setDestFile(tgzFile);
         tar.setBasedir(new File("."));
         tar.setIncludes(folder + "/**");
         tar.perform();
-        LOG.info("output file is {}", tarFile);
-        return tarFile;
+        LOG.info("output file is {}", tgzFile);
+        return tgzFile;
     }
 
-    public void untar(String file) {
+    public static void untgz(String file) {
+        if (!file.endsWith("tgz")) {
+            throw new UnsupportedOperationException("only supports .tgz file");
+        }
+        File tgzFile = new File(file);
+
         Project p = new Project();
         p.init();
 
-        Untar tar = new Untar();
-        tar.setProject(p);
-        File tarFile = new File(file);
-        tar.setSrc(tarFile);
-        tar.setDest(new File("."));
+        Untar untar = new Untar();
+        Untar.UntarCompressionMethod method = new Untar.UntarCompressionMethod();
+        method.setValue("gzip");
+        untar.setCompression(method);
+
+        untar.setProject(p);
+        untar.setSrc(tgzFile);
+        untar.setDest(new File("."));
         LOG.info("output folder is {}");
-        tar.perform();
+        untar.perform();
     }
 }
