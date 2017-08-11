@@ -39,6 +39,8 @@ import org.slf4j.LoggerFactory;
 public class CaseRunListener extends RunListener {
     private static final Logger LOG = LoggerFactory.getLogger(CaseRunListener.class);
 
+    private static final int CASE_RETRY = SystemConfiguration.getInstance().getCaseRetry();
+
     private DbHandler db = null;
 
     private CaseResult tcr = null;
@@ -246,8 +248,12 @@ public class CaseRunListener extends RunListener {
         if (!(throwable instanceof AssumptionViolatedException)) {
             return;
         }
-        LOG.info("Requeue case {}", this.tcr.getTaskCase().format());
-        this.tcr.setRetry(this.tcr.getRetry() + 1);
-        this.tcr.setResult(ExecutionResult.QUEUED);
+
+        int retry = this.tcr.getRetry();
+        if (retry < CASE_RETRY) {
+            LOG.info("Requeue case {}", this.tcr.getTaskCase().format());
+            this.tcr.setRetry(retry + 1);
+            this.tcr.setResult(ExecutionResult.QUEUED);
+        }
     }
 }

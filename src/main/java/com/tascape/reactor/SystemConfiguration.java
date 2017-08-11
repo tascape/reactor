@@ -210,6 +210,11 @@ public final class SystemConfiguration {
         }
     }
 
+    /**
+     * Default is no retry.
+     *
+     * @return number of retries
+     */
     public int getCaseRetry() {
         return this.getIntProperty(SYSPROP_CASE_RETRY, 0);
     }
