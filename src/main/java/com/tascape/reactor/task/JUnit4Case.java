@@ -31,7 +31,7 @@ import org.slf4j.LoggerFactory;
 import com.tascape.reactor.data.CaseDataProvider;
 
 /**
- * Base case class for JUnit4 cases.
+ * Sample case class for JUnit4 test cases.
  *
  * @author linsong wang
  */
