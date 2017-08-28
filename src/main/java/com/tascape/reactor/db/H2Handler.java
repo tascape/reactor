@@ -126,8 +126,9 @@ public final class H2Handler extends DbHandler {
             + CaseResult.STOP_TIME + ", "
             + CaseResult.CASE_STATION + ", "
             + CaseResult.CASE_ENV + ", "
-            + CaseResult.LOG_DIR
-            + ") VALUES (?,?,?,?,?,?,?,?,?);";
+            + CaseResult.LOG_DIR + ", "
+            + CaseResult.RETRY
+            + ") VALUES (?,?,?,?,?,?,?,?,?,?);";
         Map<String, Integer> idMap = this.getCaseIds(cases);
 
         try (Connection conn = this.getConnection()) {
@@ -150,6 +151,7 @@ public final class H2Handler extends DbHandler {
                 stmt.setString(7, "?");
                 stmt.setString(8, "?");
                 stmt.setString(9, "");
+                stmt.setInt(10, 0);
                 LOG.debug("{}", stmt);
                 int i = stmt.executeUpdate();
             }

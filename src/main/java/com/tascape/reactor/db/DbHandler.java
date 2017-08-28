@@ -264,10 +264,10 @@ public abstract class DbHandler {
                 String host = rs.getString(CaseResult.CASE_STATION);
                 if (rs.getString(CaseResult.EXECUTION_RESULT).equals(ExecutionResult.QUEUED.result())) {
                     LOG.debug("Found case {} in DB with QUEUED state", tcr.getTaskCase().format());
-                    if (SYS_CONFIG.getHostName().equals(host)) {
-                        LOG.debug("This case Failed on current host, and was requeue. Skip...");
-                        return false;
-                    }
+//                    if (SYS_CONFIG.getHostName().equals(host)) {
+//                        LOG.debug("This case Failed on current host, and was requeue. Skip...");
+//                        return false;
+//                    }
                     rs.updateString(CaseResult.EXECUTION_RESULT, ExecutionResult.ACQUIRED.result());
                     rs.updateString(CaseResult.CASE_STATION, SYS_CONFIG.getHostName());
                     rs.updateRow();

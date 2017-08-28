@@ -79,7 +79,8 @@ public class CaseResult {
     @Column(name = "STOP_TIME")
     private Long stopTime;
 
-    private Integer retry = 2;
+    @Column(name = "RETRY")
+    private Integer retry = 0;
 
     @Column(name = "CASE_STATION")
     private String caseStation;
@@ -102,7 +103,7 @@ public class CaseResult {
     private TaskCase taskCaseId;
 
     @OneToMany(mappedBy = "caseResultId")
-    private List<com.tascape.reactor.db.CaseResultMetric> caseResultMetricList;
+    private List<CaseResultMetric> caseResultMetricList;
 
     private ExecutionResult result = ExecutionResult.NA;
 
@@ -279,7 +280,7 @@ public class CaseResult {
         }
         CaseResult other = (CaseResult) object;
         return !((this.caseResultId == null && other.caseResultId != null)
-            || (this.caseResultId != null && !this.caseResultId.equals(other.caseResultId)));
+                || (this.caseResultId != null && !this.caseResultId.equals(other.caseResultId)));
     }
 
     @Override

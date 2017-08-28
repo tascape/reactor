@@ -245,13 +245,14 @@ public class CaseRunListener extends RunListener {
         /**
          * todo: need to use a domain specific exception type
          */
-        if (!(throwable instanceof AssumptionViolatedException)) {
+
+        if (throwable == null) {
             return;
         }
 
         int retry = this.tcr.getRetry();
         if (retry < CASE_RETRY) {
-            LOG.info("Requeue case {}", this.tcr.getTaskCase().format());
+            LOG.info("Requeue/retry case {}", this.tcr.getTaskCase().format());
             this.tcr.setRetry(retry + 1);
             this.tcr.setResult(ExecutionResult.QUEUED);
         }

@@ -40,15 +40,17 @@ public class MysqlHandler extends DbHandler {
 
     private static final String DB_DRIVER = "com.mysql.jdbc.Driver";
 
-    private static final String DB_HOST = SYS_CONFIG.getDatabaseHost();
+    protected static final String DB_HOST = SYS_CONFIG.getDatabaseHost();
 
-    private static final String DB_SCHEMA = SYS_CONFIG.getDatabaseSchema();
+    protected static final String DB_SCHEMA = SYS_CONFIG.getDatabaseSchema();
 
-    private static final String DB_USER = SYS_CONFIG.getDatabaseUser();
+    protected static final String DB_USER = SYS_CONFIG.getDatabaseUser();
 
-    private static final String DB_PASS = SYS_CONFIG.getDatabasePass();
+    protected static final String DB_PASS = SYS_CONFIG.getDatabasePass();
 
-    private static final int DB_POOL_SIZE = SYS_CONFIG.getDatabasePoolSize();
+    protected static final int DB_POOL_SIZE = SYS_CONFIG.getDatabasePoolSize();
+
+    private static final String JDBC_URL = "jdbc:mysql://" + DB_HOST + "/" + DB_SCHEMA;
 
     static {
         try {
@@ -58,12 +60,12 @@ public class MysqlHandler extends DbHandler {
         }
     }
 
-    private BoneCP connPool;
+    protected BoneCP connPool;
 
     @Override
     protected void init() throws Exception {
         BoneCPConfig connPoolConfig = new BoneCPConfig();
-        connPoolConfig.setJdbcUrl("jdbc:mysql://" + DB_HOST + "/" + DB_SCHEMA);
+        connPoolConfig.setJdbcUrl(JDBC_URL);
         connPoolConfig.setUsername(DB_USER);
         connPoolConfig.setPassword(DB_PASS);
         connPoolConfig.setMaxConnectionsPerPartition(DB_POOL_SIZE);
@@ -205,6 +207,7 @@ public class MysqlHandler extends DbHandler {
                     rs.updateString(CaseResult.CASE_STATION, ".");
                     rs.updateString(CaseResult.CASE_ENV, ".");
                     rs.updateString(CaseResult.LOG_DIR, ".");
+                    rs.updateInt(CaseResult.RETRY, SYS_CONFIG.getCaseRetry());
 
                     rs.insertRow();
                     rs.last();
