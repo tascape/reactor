@@ -54,9 +54,9 @@ public abstract class AbstractCaseData implements CaseData {
     protected AbstractCase kase;
 
     /*
-     * works together with Priority of case method. NONE means no data priority specified.
+     * works together with Priority of case method.
      */
-    private int priority = Priority.NONE;
+    private int priority = Priority.P3;
 
     private boolean toBeImplemented = false;
 

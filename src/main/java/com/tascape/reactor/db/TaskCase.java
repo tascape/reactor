@@ -83,7 +83,7 @@ public class TaskCase {
     @OneToMany(mappedBy = "taskCaseId")
     private List<com.tascape.reactor.db.CaseResult> caseResultList;
 
-    private int priority = Priority.P0;
+    private int priority = Priority.P3;
 
     public TaskCase(TaskCase tc) {
         this.suiteClass = tc.getSuiteClass() + "";

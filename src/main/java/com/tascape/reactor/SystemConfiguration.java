@@ -279,7 +279,7 @@ public final class SystemConfiguration {
     }
 
     public int getCasePriority() {
-        return this.getIntProperty(SYSPROP_CASE_PRIORITY, Priority.NONE);
+        return this.getIntProperty(SYSPROP_CASE_PRIORITY, Priority.P3);
     }
 
     public String getDatabaseType() {

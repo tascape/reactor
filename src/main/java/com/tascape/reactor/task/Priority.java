@@ -30,7 +30,6 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.RUNTIME)
 @SuppressWarnings("PackageVisibleField")
 public @interface Priority {
-    int NONE = -1;
 
     int P0 = 0;
 

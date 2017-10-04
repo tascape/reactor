@@ -1,6 +1,5 @@
 *.class
 
-
 # Package Files #
 # *.jar
 # *.war
@@ -12,8 +11,9 @@ hs_err_pid*
 
 target/
 lib/
-/logs
-/th.log
+logs
+th.log
+*.log
 
 # eclipse
 .classpath
@@ -28,6 +28,10 @@ dist/
 nbdist/
 nbactions.xml
 nb-configuration.xml
+
+# intelliJ
+.idea/
+*.iml
 
 # macOS
 .DS_Store
