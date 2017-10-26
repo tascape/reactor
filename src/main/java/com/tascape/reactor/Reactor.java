@@ -16,7 +16,11 @@
  */
 package com.tascape.reactor;
 
+import com.tascape.reactor.exception.EntityCommunicationException;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.regex.Pattern;
+import org.apache.commons.lang3.SystemUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -27,14 +31,30 @@ import org.slf4j.LoggerFactory;
 public class Reactor {
     private static final Logger LOG = LoggerFactory.getLogger(Reactor.class);
 
+    private static void updatePath() {
+        if (SystemUtils.IS_OS_MAC || SystemUtils.IS_OS_LINUX) {
+            Map<String, String> env = System.getenv();
+            String path = env.get("PATH");
+            Map<String, String> envNew = new HashMap<>(env);
+            envNew.put("PATH", path + ":/usr/local/bin");
+            try {
+                Utils.setEnv(envNew);
+            } catch (Exception ex) {
+                throw new EntityCommunicationException(ex);
+            }
+        }
+    }
+
     public static void main(String[] args) {
+        updatePath();
+
         int exitCode = 0;
         try {
             SystemConfiguration config = SystemConfiguration.getInstance();
             config.listAppProperties();
 
             Utils.cleanDirectory(config.getLogPath().toFile().getAbsolutePath(), 240,
-                SystemConfiguration.CONSTANT_LOG_KEEP_ALIVE_PREFIX);
+                    SystemConfiguration.CONSTANT_LOG_KEEP_ALIVE_PREFIX);
 
             String suiteClass = config.getSuite();
             Pattern caseClassRegex = config.getCaseClassRegex();
