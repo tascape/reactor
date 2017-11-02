@@ -38,6 +38,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang3.RandomUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -244,12 +245,11 @@ public class SshCommunication extends EntityCommunication implements Closeable {
 
     public static void main(String[] args) throws Exception {
         {
-            SystemConfiguration sys = SystemConfiguration.getInstance();
-            sys.getProperties().setProperty(SYSPROP_HOST, "localhost");
-            sys.getProperties().setProperty(SYSPROP_PORT, "2222");
-            sys.getProperties().setProperty(SYSPROP_USER, "vagrant");
-            sys.getProperties().setProperty(SYSPROP_PASS, "vagrant");
-            SshCommunication ssh = SshCommunication.newInstance();
+            SYS_CONFIG.getProperties().setProperty(SYSPROP_HOST + "VAGRANT", "localhost");
+            SYS_CONFIG.getProperties().setProperty(SYSPROP_PORT + "VAGRANT", "2222");
+            SYS_CONFIG.getProperties().setProperty(SYSPROP_USER + "VAGRANT", "vagrant");
+            SYS_CONFIG.getProperties().setProperty(SYSPROP_PASS + "VAGRANT", "vagrant");
+            SshCommunication ssh = SshCommunication.newInstance("VAGRANT");
             runSsh(ssh);
             ssh.disconnect();
         }
@@ -276,7 +276,7 @@ public class SshCommunication extends EntityCommunication implements Closeable {
         ssh.upload(out, "/home/vagrant/ssh.txt", 1000);
 
         ssh.shell("ls -al && sleep 5", 6000);
-        ssh.shell("echo 'ssh' >> /home/vagrant/ssh.txt", 2000);
+        ssh.shell("echo 'test data " + RandomUtils.nextLong() + "' >> /home/vagrant/ssh.txt", 2000);
         try (OutputStream os = FileUtils.openOutputStream(out)) {
             ssh.shell("cat /home/vagrant/ssh.txt", os);
         }
