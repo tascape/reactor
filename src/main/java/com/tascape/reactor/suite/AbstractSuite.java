@@ -33,6 +33,7 @@ import org.junit.runner.JUnitCore;
 import org.junit.runner.Request;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import static com.tascape.reactor.SystemConfiguration.SYSPROP_CASE_SUITE;
 
 /**
  *
@@ -63,8 +64,6 @@ public abstract class AbstractSuite {
     private final List<Class<? extends AbstractCase>> caseClasses = new ArrayList<>();
 
     private final Environment suiteEnvironment = new Environment();
-
-    protected final SystemConfiguration SYSCONFIG = SystemConfiguration.getInstance();
 
     public static void addSuite(AbstractSuite suite) {
         SUITES.add(suite);
@@ -167,7 +166,7 @@ public abstract class AbstractSuite {
     }
 
     protected String getSuiteProperty(String name, String defValue) {
-        String value = this.SYSCONFIG.getProperty(name);
+        String value = SystemConfiguration.getInstance().getProperty(name);
         if (value == null) {
             value = defValue;
         }
@@ -214,7 +213,6 @@ public abstract class AbstractSuite {
      * @throws Exception any issue
      */
     public static void main(String[] args) throws Exception {
-        SystemConfiguration sysConfig = SystemConfiguration.getInstance();
         Field fClasses = ClassLoader.class.getDeclaredField("classes");
         ClassLoader cl = AbstractSuite.class.getClassLoader();
         fClasses.setAccessible(true);
@@ -230,7 +228,7 @@ public abstract class AbstractSuite {
             }
             suiteClassName = className;
         }
-        sysConfig.setSuite(suiteClassName);
+        System.setProperty(SYSPROP_CASE_SUITE, suiteClassName);
         Reactor.main(args);
     }
 }
