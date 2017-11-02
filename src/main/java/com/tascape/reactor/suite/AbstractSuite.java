@@ -33,7 +33,6 @@ import org.junit.runner.JUnitCore;
 import org.junit.runner.Request;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import static com.tascape.reactor.SystemConfiguration.SYSPROP_CASE_SUITE;
 
 /**
  *
@@ -43,7 +42,7 @@ public abstract class AbstractSuite {
     private static final Logger LOG = LoggerFactory.getLogger(AbstractSuite.class);
 
     private static final ThreadLocal<Map<String, Environment>> ENVIRONMENTS
-            = new ThreadLocal<Map<String, Environment>>() {
+        = new ThreadLocal<Map<String, Environment>>() {
         @Override
         protected Map<String, Environment> initialValue() {
             return new HashMap<>();
@@ -64,6 +63,8 @@ public abstract class AbstractSuite {
     private final List<Class<? extends AbstractCase>> caseClasses = new ArrayList<>();
 
     private final Environment suiteEnvironment = new Environment();
+
+    protected final SystemConfiguration SYSCONFIG = SystemConfiguration.getInstance();
 
     public static void addSuite(AbstractSuite suite) {
         SUITES.add(suite);
@@ -86,7 +87,7 @@ public abstract class AbstractSuite {
      */
     public int getPriority() {
         LOG.warn("Please override to return the minimal priority, of which you would like to run cases in this suite. "
-                + "The default is Priority.P3");
+            + "The default is Priority.P3");
         return Priority.P3;
     }
 
@@ -166,7 +167,7 @@ public abstract class AbstractSuite {
     }
 
     protected String getSuiteProperty(String name, String defValue) {
-        String value = SystemConfiguration.getInstance().getProperty(name);
+        String value = this.SYSCONFIG.getProperty(name);
         if (value == null) {
             value = defValue;
         }
@@ -213,6 +214,7 @@ public abstract class AbstractSuite {
      * @throws Exception any issue
      */
     public static void main(String[] args) throws Exception {
+        SystemConfiguration sysConfig = SystemConfiguration.getInstance();
         Field fClasses = ClassLoader.class.getDeclaredField("classes");
         ClassLoader cl = AbstractSuite.class.getClassLoader();
         fClasses.setAccessible(true);
@@ -228,7 +230,7 @@ public abstract class AbstractSuite {
             }
             suiteClassName = className;
         }
-        System.setProperty(SYSPROP_CASE_SUITE, suiteClassName);
+        sysConfig.setSuite(suiteClassName);
         Reactor.main(args);
     }
 }
