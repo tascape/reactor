@@ -33,6 +33,16 @@ public abstract class EntityDriver extends AbstractCaseResource {
 
     private AbstractCase kase;
 
+    protected String version;
+
+    public String getVersion() {
+        return this.version;
+    }
+
+    public void setVersion(String version) {
+        this.version = version;
+    }
+
     @Override
     public Path getLogPath() {
         if (this.kase == null) {
@@ -77,8 +87,6 @@ public abstract class EntityDriver extends AbstractCaseResource {
      * @return name
      */
     public abstract String getName();
-
-    public abstract String getVersion();
 
     public abstract void reset() throws Exception;
 }
