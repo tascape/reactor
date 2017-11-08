@@ -6,7 +6,7 @@
 
     <groupId>com.tascape</groupId>
     <artifactId>reactor</artifactId>
-    <version>1.2.30</version>
+    <version>1.2.31</version>
     <packaging>jar</packaging>
     <name>reactor</name>
 
@@ -67,7 +67,7 @@
         <dependency>
             <groupId>com.google.guava</groupId>
             <artifactId>guava</artifactId>
-            <version>23.0</version>
+            <version>22.0</version>
         </dependency>
         <dependency>
             <groupId>com.h2database</groupId>
