@@ -76,7 +76,7 @@ public class TaskSuite {
         this.cases = this.filter(caseClassRegex, caseMethodRegex);
 
         int priority = SystemConfiguration.getInstance().getIntProperty(SystemConfiguration.SYSPROP_CASE_PRIORITY,
-                suite.getPriority());
+            suite.getPriority());
         this.cases = this.filter(priority);
 
         if (SystemConfiguration.getInstance().isShuffleCases()) {
@@ -94,6 +94,11 @@ public class TaskSuite {
     }
 
     public String getProjectName() {
+        String pn = SystemConfiguration.getInstance().getSuiteProjectName();
+        if (StringUtils.isNotBlank(pn)) {
+            LOG.debug("Use suite project name defined in {}", SystemConfiguration.SYSPROP_SUITE_PROJECT_NAME);
+            return pn;
+        }
         return projectName;
     }
 
@@ -121,8 +126,8 @@ public class TaskSuite {
     private List<TaskCase> filter(int priority) {
         LOG.debug("filter cases by priority {}", priority);
         return this.cases.stream()
-                .filter(tc -> (tc.getPriority() <= priority))
-                .collect(Collectors.toList());
+            .filter(tc -> (tc.getPriority() <= priority))
+            .collect(Collectors.toList());
     }
 
     private List<TaskCase> processAnnotations() {
@@ -145,7 +150,7 @@ public class TaskSuite {
                     tcs.add(tc);
                 } else {
                     LOG.trace("Calling class {}, method {}, with parameter {}", tdp.klass(), tdp.method(),
-                            tdp.parameter());
+                        tdp.parameter());
                     CaseData[] data = AbstractCaseData.getCaseData(tdp.klass(), tdp.method(), tdp.parameter());
                     LOG.debug("{} is a data-driven case, data size is {}", tc.format(), data.length);
                     int length = (data.length + "").length();
