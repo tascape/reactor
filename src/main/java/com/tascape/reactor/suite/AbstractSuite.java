@@ -166,6 +166,14 @@ public abstract class AbstractSuite {
         this.caseClasses.add(clazz);
     }
 
+    protected <T extends AbstractCase> void addCaseClass(String clazz) throws ClassNotFoundException {
+        Class c = AbstractSuite.class.getClassLoader().loadClass(clazz);
+        if (caseClasses.contains(c)) {
+            throw new UnsupportedOperationException("Adding same case class multiple times is not supported yet.");
+        }
+        this.caseClasses.add(c);
+    }
+
     protected String getSuiteProperty(String name, String defValue) {
         String value = this.SYSCONFIG.getProperty(name);
         if (value == null) {

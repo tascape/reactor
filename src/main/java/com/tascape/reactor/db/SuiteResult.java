@@ -151,6 +151,7 @@ public class SuiteResult implements Serializable {
         this.numberOfFailure = rs.getInt(NUMBER_OF_FAILURE);
         this.invisibleEntry = rs.getBoolean(INVISIBLE_ENTRY);
         this.productUnderTask = rs.getString(PRODUCT_UNDER_TASK);
+        this.invisibleEntry = !SYS_CONFIG.getResultVisibility();
     }
 
     public void update(ResultSet rs) throws SQLException {
