@@ -23,6 +23,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
@@ -30,6 +31,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Properties;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -92,6 +94,8 @@ public final class SystemConfiguration {
 
     public static final String SYSPROP_CASE_LOG_LEVEL = "reactor.case.log.level";
 
+    public static final String SYSPROP_CASE_LIST_FILE = "reactor.case.list.file";
+
     public static final String SYSENV_JOB_NAME = "JOB_NAME";
 
     public static final String SYSENV_JOB_NUMBER = "BUILD_NUMBER";
@@ -134,11 +138,11 @@ public final class SystemConfiguration {
         List<String> keys = new ArrayList<>(System.getProperties().stringPropertyNames());
         Properties sysProps = new Properties();
         keys.stream()
-            .filter((key)
-                -> (key.startsWith(CONSTANT_SYSPROP_PREFIX)) && StringUtils.isNotBlank(System.getProperty(key)))
-            .forEach((key) -> {
-                sysProps.setProperty(key, System.getProperty(key));
-            });
+                .filter((key)
+                        -> (key.startsWith(CONSTANT_SYSPROP_PREFIX)) && StringUtils.isNotBlank(System.getProperty(key)))
+                .forEach((key) -> {
+                    sysProps.setProperty(key, System.getProperty(key));
+                });
         this.properties.putAll(sysProps);
 
         String execId = this.properties.getProperty(SYSPROP_EXECUTION_ID);
@@ -157,7 +161,7 @@ public final class SystemConfiguration {
         String v = this.properties.getProperty(name);
         if (StringUtils.isBlank(v)) {
             LOG.debug("System property '{}' is not defined, or blank, default value '{}' will be used", name,
-                defaultValue);
+                    defaultValue);
             return defaultValue;
         }
         return v;
@@ -310,7 +314,7 @@ public final class SystemConfiguration {
 
     public int getDatabasePoolSize() {
         return this.getIntProperty(DbHandler.SYSPROP_DATABASE_POOL_SIZE,
-            this.getIntProperty(SYSPROP_EXECUTION_THREAD_COUNT) + 10);
+                this.getIntProperty(SYSPROP_EXECUTION_THREAD_COUNT) + 10);
     }
 
     public String getProdUnderTask() {
@@ -320,6 +324,22 @@ public final class SystemConfiguration {
     public Level getCaseLogLevel() {
         String l = this.getProperty(SYSPROP_CASE_LOG_LEVEL, "DEBUG");
         return Level.toLevel(l);
+    }
+
+    public List<String> getCaseList() {
+        String pf = getProperty(SYSPROP_CASE_LIST_FILE);
+        if (pf != null) {
+            try {
+                return Files.readAllLines(Paths.get(pf)).stream()
+                        .filter(c -> StringUtils.isNotBlank(c))
+                        .map(c -> c.trim())
+                        .distinct()
+                        .collect(Collectors.toList());
+            } catch (IOException ex) {
+                LOG.warn("{}", ex.getLocalizedMessage());
+            }
+        }
+        return new ArrayList<>();
     }
 
     public String getJobName() {
@@ -359,10 +379,10 @@ public final class SystemConfiguration {
         List<String> keys = new ArrayList<>(this.properties.stringPropertyNames());
         Collections.sort(keys);
         keys.stream()
-            .filter(key -> !key.startsWith(pre("db.")))
-            .forEach((key) -> {
-                LOG.debug(String.format("%50s : %s", key, this.properties.getProperty(key)));
-            });
+                .filter(key -> !key.startsWith(pre("db.")))
+                .forEach((key) -> {
+                    LOG.debug(String.format("%50s : %s", key, this.properties.getProperty(key)));
+                });
     }
 
     public Properties getProperties() {
