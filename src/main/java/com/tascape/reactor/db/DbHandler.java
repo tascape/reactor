@@ -565,7 +565,7 @@ public abstract class DbHandler {
                     pwh.println("</style></head<body>");
                     pwh.printf("<h2>%s</h2>", rs.getString(SuiteResult.SUITE_NAME));
                     pwh.printf("<h3>%s</h3>", rs.getString(SuiteResult.PROJECT_NAME));
-                    pwh.printf("<h4>casess %d, failures %d</h4>",
+                    pwh.printf("<h4>total cases %d, failures %d</h4>",
                         rs.getInt(SuiteResult.NUMBER_OF_CASES), rs.getInt(SuiteResult.NUMBER_OF_FAILURE));
                     pwh.println("<table><thead><tr><th>index</th><th>case</th><th>result</th></thead><tbody>");
 
