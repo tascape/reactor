@@ -46,6 +46,7 @@ public class JUnit4Case extends AbstractCase {
     public void setUp() throws Exception {
         LOG.debug("Run something before case");
         LOG.debug("Please override");
+        LOG.info("Case full name: {}", this.getCaseFullName());
     }
 
     @After
@@ -132,7 +133,7 @@ public class JUnit4Case extends AbstractCase {
     @CaseDataProvider(klass = SampleData.class)
     public void runDataProvider() throws Exception {
         SampleData d = this.getCaseData(SampleData.class);
-        LOG.debug("case data '{}'", d.caseParameter);
+        LOG.debug("case data '{}'", d.getCaseParameter());
         Thread.sleep(500);
     }
 
@@ -156,8 +157,8 @@ public class JUnit4Case extends AbstractCase {
         if (System.currentTimeMillis() % 2 == 0) {
             LOG.info("requeue case");
             this.requeue();
-        } else{
-            LOG.info("not requeue case");            
+        } else {
+            LOG.info("not requeue case");
         }
     }
 
