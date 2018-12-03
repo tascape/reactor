@@ -195,7 +195,7 @@ public class TaskCase {
         }
         TaskCase other = (TaskCase) object;
         return !((this.taskCaseId == null && other.taskCaseId != null)
-            || (this.taskCaseId != null && !this.taskCaseId.equals(other.taskCaseId)));
+                || (this.taskCaseId != null && !this.taskCaseId.equals(other.taskCaseId)));
     }
 
     @Override
@@ -209,8 +209,13 @@ public class TaskCase {
 
     public String formatForLogPath() {
         return String.format("%s.%s.%s.%s",
-            StringUtils.substringAfterLast(this.suiteClass, "."),
-            StringUtils.substringAfterLast(this.caseClass, "."), this.caseMethod,
-            this.caseDataInfo.isEmpty() ? "" : StringUtils.substringAfterLast(this.caseDataInfo, "#"));
+                StringUtils.substringAfterLast(this.suiteClass, "."),
+                StringUtils.substringAfterLast(this.caseClass, "."), this.caseMethod,
+                this.caseDataInfo.isEmpty() ? "" : StringUtils.substringAfterLast(this.caseDataInfo, "#"));
+    }
+
+    public String getCaseName() {
+//        new String[]{caseClass, caseMethod, caseData
+        return "";
     }
 }

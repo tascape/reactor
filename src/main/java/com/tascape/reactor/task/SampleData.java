@@ -24,42 +24,38 @@ import com.tascape.reactor.data.AbstractCaseData;
  */
 public class SampleData extends AbstractCaseData {
 
-    public String caseParameter = "";
+    String caseParameter = "";
 
     private static final SampleData[] DATA = new SampleData[]{
         new SampleData() {
             {
-                caseParameter = "scenario one";
-            }
-
-            @Override
-            public String getValue() {
-                return "scenario one";
+                super.value = "scenario-one";
+                caseParameter = "paramter one for case to use";
             }
         },
         new SampleData() {
             {
-                caseParameter = "scenario two";
-            }
-
-            @Override
-            public String getValue() {
-                return "scenario two";
+                super.value = "scenario-two";
+                caseParameter = "paramter two for case to use";
             }
         },
         new SampleData() {
             {
-                caseParameter = "scenario three";
-                setValue(caseParameter);
-            }
-
-            @Override
-            public String getValue() {
-                return "scenario three";
+                super.value = "scenario-three";
+                caseParameter = "paramter three for case to use";
             }
         }};
 
     public SampleData[] getData() {
         return DATA;
+    }
+
+    /**
+     * Gets the actual data for case to use during execution.
+     *
+     * @return case data
+     */
+    public String getCaseParameter() {
+        return caseParameter;
     }
 }

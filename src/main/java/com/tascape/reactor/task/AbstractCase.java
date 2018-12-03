@@ -16,6 +16,7 @@
  */
 package com.tascape.reactor.task;
 
+import com.google.common.collect.Lists;
 import com.tascape.reactor.AbstractCaseRunner;
 import com.tascape.reactor.ExecutionResult;
 import com.tascape.reactor.data.AbstractCaseData;
@@ -40,6 +41,7 @@ import org.junit.rules.Timeout;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import com.tascape.reactor.data.CaseData;
+import org.apache.commons.lang3.StringUtils;
 import org.junit.ToBeImplementedException;
 
 /**
@@ -125,7 +127,7 @@ public abstract class AbstractCase extends AbstractCaseResource {
         EntityDriver driver = env.get(key);
         if (driver == null) {
             LOG.error("Cannot find driver of name={} and type={}, please check suite environemnt",
-                key, clazz.getName());
+                    key, clazz.getName());
             return null;
         }
         driver.setCase(this);
@@ -193,6 +195,16 @@ public abstract class AbstractCase extends AbstractCaseResource {
     protected void updateCaseDataFormat(String value) {
         this.caseData.setValue(value);
         this.tcr.getTaskCase().setCaseData(value);
+    }
+
+    protected String getCaseFullName() {
+        List<String> names = Lists.newArrayList(
+                getClass().getCanonicalName(),
+                testName.getMethodName());
+        if (caseData != null) {
+            names.add(caseData.getValue());
+        }
+        return StringUtils.join(names, ".");
     }
 
     protected void setExecutionResult(ExecutionResult executionResult) {
