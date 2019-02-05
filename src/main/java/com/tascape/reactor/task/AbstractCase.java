@@ -67,9 +67,12 @@ public abstract class AbstractCase extends AbstractCaseResource {
     @Rule
     public ExpectedException expectedException = ExpectedException.none();
 
-    @Rule
-    public Timeout globalTimeout = new Timeout(15, TimeUnit.MINUTES);
-
+    /*
+     * https://github.com/junit-team/junit4/wiki/timeout-for-tests
+     *
+     * @Rule
+     * public Timeout globalTimeout = new Timeout(15, TimeUnit.DAYS);
+     */
     protected String execId = sysConfig.getExecId();
 
     private final Path caseLogPath = AbstractCaseResource.getCaseLogPath();
