@@ -37,6 +37,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.concurrent.ThreadFactory;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 import javax.xml.stream.XMLStreamException;
 import org.apache.commons.io.FileUtils;
@@ -84,7 +85,8 @@ public class SuiteRunner {
         if (!dir.exists() && !dir.mkdirs()) {
             throw new IOException("Cannot create directory " + dir);
         }
-        ExecutorService executorService = this.getExecutorService();
+        int threadCount = this.getNumberOfThreads();
+        ExecutorService executorService = this.getExecutorService(threadCount);
         CompletionService<CaseResult> completionService = new ExecutorCompletionService<>(executorService);
 
         this.saveExectionProperties(dir);
@@ -136,20 +138,25 @@ public class SuiteRunner {
             LOG.debug("No more case to run on this host, updating suite execution result");
             this.db.updateSuiteExecutionResult(this.execId);
             this.db.adjustSuiteExecutionResult(execId);
+            return numberOfFailures;
         } finally {
             executorService.shutdown();
+            ExecutorService es = Executors.newFixedThreadPool(threadCount);
             AbstractSuite.getSuites().stream().forEach((AbstractSuite suite) -> {
-                try {
-                    suite.tearDown();
-                } catch (Exception ex) {
-                    LOG.warn("Error tearing down suite {}", suite.getClass(), ex);
-                }
+                es.submit(() -> {
+                    try {
+                        suite.tearDown();
+                    } catch (Exception ex) {
+                        LOG.warn("Error tearing down suite {}", suite.getClass(), ex);
+                    }
+                });
             });
-        }
+            es.shutdown();
+            es.awaitTermination(1, TimeUnit.HOURS);
 
-        this.db.exportToJson(this.execId);
-        this.db.saveJunitXml(this.execId);
-        return numberOfFailures;
+            this.db.exportToJson(this.execId);
+            this.db.saveJunitXml(this.execId);
+        }
     }
 
     private void saveExectionProperties(File dir) throws IOException, SQLException {
@@ -169,7 +176,7 @@ public class SuiteRunner {
         this.db.setSuiteExecutionProperties(sps);
     }
 
-    private ExecutorService getExecutorService() {
+    private int getNumberOfThreads() {
         int tc = SYS_CONFIG.getExecutionThreadCount();
         LOG.debug("thread count {}", tc);
         if (tc < 0) {
@@ -181,6 +188,10 @@ public class SuiteRunner {
             throw new RuntimeException("Invalid execution environment number");
         }
         int threadCount = (tc == 0) ? (env == 0 ? 1 : env) : (env == 0 ? tc : Math.min(tc, env));
+        return threadCount;
+    }
+
+    private ExecutorService getExecutorService(int threadCount) {
         LOG.debug("Start execution engine with {} thread(s)", threadCount);
         SYS_CONFIG.setExecutionThreadCount(threadCount);
         int len = ((threadCount - 1) + "").length();
