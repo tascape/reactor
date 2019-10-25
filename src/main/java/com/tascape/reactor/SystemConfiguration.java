@@ -27,6 +27,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Properties;
@@ -77,6 +78,8 @@ public final class SystemConfiguration {
     public static final String SYSPROP_SHUFFLE_CASES = "reactor.shuffle.cases";
 
     public static final String SYSPROP_RESULT_VISIBILITY = "reactor.result.visibility";
+
+    public static final String SYSPROP_DEBUG_CASE_LIST = "reactor.debug.case.list";
 
     public static final String SYSPROP_DEBUG_CLASS_REGEX = "reactor.debug.class.regex";
 
@@ -276,6 +279,21 @@ public final class SystemConfiguration {
 
     public void setSuite(String suiteClassName) {
         this.properties.setProperty(SYSPROP_CASE_SUITE, suiteClassName);
+    }
+
+    public List<String> getDebugCaseList() throws IOException {
+        String prop = this.getProperty(SYSPROP_DEBUG_CASE_LIST, "").trim();
+        if (prop.isEmpty()) {
+            LOG.debug("No case list is specified. Use -Dreactor.debug.case.list=full-class1.method1,full-class2.method2,"
+                    + " or -Dreactor.debug.case.list=@some-file.txt (one case per line in the file)");
+            return null;
+        }
+        if (prop.startsWith("@")) {
+            File file = new File(prop.substring(1));
+            LOG.debug("Reading case list from file {}", file);
+            return Files.readAllLines(file.toPath());
+        }
+        return Arrays.asList(StringUtils.split(prop, ','));
     }
 
     public Pattern getCaseClassRegex() {

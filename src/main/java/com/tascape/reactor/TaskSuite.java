@@ -51,7 +51,8 @@ public class TaskSuite {
 
     private List<TaskCase> cases = new ArrayList<>();
 
-    public TaskSuite(String suiteClass, Pattern caseClassRegex, Pattern caseMethodRegex) throws Exception {
+    public TaskSuite(String suiteClass, Pattern caseClassRegex, Pattern caseMethodRegex, List<String> caseList)
+            throws Exception {
         LOG.debug("Find cases in target suite {}", suiteClass);
         AbstractSuite suite = AbstractSuite.class.cast(Class.forName(suiteClass).newInstance());
         this.name = suite.getName();
@@ -75,8 +76,12 @@ public class TaskSuite {
 
         this.cases = this.filter(caseClassRegex, caseMethodRegex);
 
-        int priority = SystemConfiguration.getInstance().getIntProperty(SystemConfiguration.SYSPROP_CASE_PRIORITY,
-            suite.getPriority());
+        if ((caseList != null) && (!caseList.isEmpty())) {
+            this.cases = this.filter(caseList);
+        }
+
+        int priority = SystemConfiguration.getInstance()
+                .getIntProperty(SystemConfiguration.SYSPROP_CASE_PRIORITY, suite.getPriority());
         this.cases = this.filter(priority);
 
         if (SystemConfiguration.getInstance().isShuffleCases()) {
@@ -120,14 +125,25 @@ public class TaskSuite {
         return tcs;
     }
 
+    private List<TaskCase> filter(List<String> caseList) {
+        LOG.debug("Filter based on provided case list");
+        List<TaskCase> tcs = new ArrayList<>();
+        this.cases.stream().forEach((tc) -> {
+            if (caseList.contains(tc.getCaseClass() + "." + tc.getCaseMethod())) {
+                tcs.add(tc);
+            }
+        });
+        return tcs;
+    }
+
     /*
      * runs all cases, which priority is less than or equal to the specified.
      */
     private List<TaskCase> filter(int priority) {
         LOG.debug("filter cases by priority {}", priority);
         return this.cases.stream()
-            .filter(tc -> (tc.getPriority() <= priority))
-            .collect(Collectors.toList());
+                .filter(tc -> (tc.getPriority() <= priority))
+                .collect(Collectors.toList());
     }
 
     private List<TaskCase> processAnnotations() {
@@ -150,7 +166,7 @@ public class TaskSuite {
                     tcs.add(tc);
                 } else {
                     LOG.trace("Calling class {}, method {}, with parameter {}", tdp.klass(), tdp.method(),
-                        tdp.parameter());
+                            tdp.parameter());
                     CaseData[] data = AbstractCaseData.getCaseData(tdp.klass(), tdp.method(), tdp.parameter());
                     LOG.debug("{} is a data-driven case, data size is {}", tc.format(), data.length);
                     int length = (data.length + "").length();

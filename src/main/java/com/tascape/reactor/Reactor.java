@@ -18,6 +18,7 @@ package com.tascape.reactor;
 
 import com.tascape.reactor.exception.EntityCommunicationException;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.regex.Pattern;
 import org.apache.commons.lang3.SystemUtils;
@@ -59,11 +60,12 @@ public class Reactor {
             String suiteClass = config.getSuite();
             Pattern caseClassRegex = config.getCaseClassRegex();
             Pattern caseMethodRegex = config.getCaseMethodRegex();
+            List<String> caseList = config.getDebugCaseList();
             LOG.debug("Running suite class: {}", suiteClass);
-            TaskSuite ts = new TaskSuite(suiteClass, caseClassRegex, caseMethodRegex);
+            TaskSuite ts = new TaskSuite(suiteClass, caseClassRegex, caseMethodRegex, caseList);
 
             if (ts.getCases().isEmpty()) {
-                throw new RuntimeException("No cases found based on system properties");
+                throw new RuntimeException("No case found based on system properties");
             }
 
             SuiteRunner sr = new SuiteRunner(ts);

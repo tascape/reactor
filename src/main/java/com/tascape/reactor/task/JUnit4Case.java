@@ -29,6 +29,7 @@ import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import com.tascape.reactor.data.CaseDataProvider;
+import java.util.stream.IntStream;
 
 /**
  * Sample case class for JUnit4 test cases.
@@ -84,15 +85,25 @@ public class JUnit4Case extends AbstractCase {
         LOG.info("Sample external id case, set to aaa");
         this.setExternalId("aaa");
         Random r = new Random();
-        this.putResultMetric("JUnit4", "external-id-1", r.nextInt(100));
-        this.putResultMetric("JUnit4", "external-id-2", r.nextInt(100));
-        this.putResultMetric("JUnit4", "external-id-3", r.nextInt(100));
-        this.putResultMetric("JUnit4", "external-id-4", r.nextInt(400));
-        this.putResultMetric("JUnit4", "external-id-5", r.nextInt(100));
-        this.putResultMetric("JUnit4", "external-id-6", r.nextInt(100));
-        this.putResultMetric("JUnit4", "external-id-7", r.nextInt(100));
-        this.putResultMetric("JUnit4", "external-id-8", r.nextInt(800));
+        this.putResultMetric("JUnit4", "data-point-1", r.nextInt(100));
+        this.putResultMetric("JUnit4", "data-point-2", r.nextInt(100));
+        this.putResultMetric("JUnit4", "data-point-3", r.nextInt(100));
+        this.putResultMetric("JUnit4", "data-point-4", r.nextInt(400));
+        this.putResultMetric("JUnit4", "data-point-5", r.nextInt(100));
+        this.putResultMetric("JUnit4", "data-point-6", r.nextInt(100));
+        this.putResultMetric("JUnit4", "data-point-7", r.nextInt(100));
+        this.putResultMetric("JUnit4", "data-point-8", r.nextInt(800));
         this.doSomethingGood();
+    }
+
+    @Test
+    public void runMetrics() throws Exception {
+        LOG.info("Sample case to collect metrics");
+        this.doSomethingGood();
+        Random r = new Random();
+        IntStream.range(0, 10).forEach(i -> {
+            this.putResultMetric("JUnit4", "homepage-load-second", 0.5 + r.nextFloat() * 2);
+        });
     }
 
     @Test
@@ -141,8 +152,7 @@ public class JUnit4Case extends AbstractCase {
     @CaseDataProvider(klass = CaseIterationData.class, method = "useIterations", parameter = "3")
     public void runIterations() throws Exception {
         LOG.debug("case iteration {}", new RandomStringGenerator.Builder().withinRange('a', 'z').build().generate(10));
-        Thread.sleep(500);
-        Assert.assertEquals(0, System.currentTimeMillis() % 2);
+        Thread.sleep(200);
     }
 
     @Test
