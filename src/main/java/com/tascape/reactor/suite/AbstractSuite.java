@@ -24,11 +24,13 @@ import com.tascape.reactor.driver.CaseDriver;
 import com.tascape.reactor.driver.PoolableEntityDriver;
 import com.tascape.reactor.task.AbstractCase;
 import com.tascape.reactor.task.Priority;
-import java.lang.reflect.Field;
+import java.lang.invoke.MethodHandles;
+import java.lang.invoke.VarHandle;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Vector;
 import org.junit.runner.JUnitCore;
 import org.junit.runner.Request;
 import org.slf4j.Logger;
@@ -42,7 +44,7 @@ public abstract class AbstractSuite {
     private static final Logger LOG = LoggerFactory.getLogger(AbstractSuite.class);
 
     private static final ThreadLocal<Map<String, Environment>> ENVIRONMENTS
-        = new ThreadLocal<Map<String, Environment>>() {
+            = new ThreadLocal<Map<String, Environment>>() {
         @Override
         protected Map<String, Environment> initialValue() {
             return new HashMap<>();
@@ -87,7 +89,7 @@ public abstract class AbstractSuite {
      */
     public int getPriority() {
         LOG.warn("Please override to return the minimal priority, of which you would like to run cases in this suite. "
-            + "The default is Priority.P3");
+                + "The default is Priority.P3");
         return Priority.P3;
     }
 
@@ -223,16 +225,17 @@ public abstract class AbstractSuite {
      */
     public static void main(String[] args) throws Exception {
         SystemConfiguration sysConfig = SystemConfiguration.getInstance();
-        Field fClasses = ClassLoader.class.getDeclaredField("classes");
         ClassLoader cl = AbstractSuite.class.getClassLoader();
-        fClasses.setAccessible(true);
 
-        @SuppressWarnings("unchecked")
-        List<Class<?>> classes = (List<Class<?>>) fClasses.get(cl);
+        MethodHandles.Lookup lookup = MethodHandles.privateLookupIn(ClassLoader.class, MethodHandles.lookup());
+        VarHandle vh = lookup.findVarHandle(ClassLoader.class, "classes", Vector.class);
+        Vector<Class<?>> classes = (Vector<Class<?>>) vh.getAcquire(cl);
+
         String suiteClassName = "";
         String stop = AbstractSuite.class.getName() + "$1";
         for (Class<?> c : classes) {
             String className = c.getName();
+            LOG.debug("{}", className);
             if (className.equals(stop)) {
                 break;
             }
