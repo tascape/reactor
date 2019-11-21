@@ -46,8 +46,8 @@ public final class H2Handler extends DbHandler {
 
     static {
         try {
-            Class.forName(DB_DRIVER).newInstance();
-        } catch (ClassNotFoundException | InstantiationException | IllegalAccessException ex) {
+            Class.forName(DB_DRIVER);
+        } catch (ClassNotFoundException ex) {
             throw new RuntimeException("Cannot load database driver: " + DB_DRIVER, ex);
         }
     }
