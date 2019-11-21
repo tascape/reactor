@@ -35,3 +35,4 @@ nb-configuration.xml
 
 # macOS
 .DS_Store
+/nbproject/

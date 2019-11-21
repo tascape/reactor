@@ -248,6 +248,13 @@ public class Utils {
         return output;
     }
 
+    public static Process cmdAsync(String[] commands) throws IOException {
+        ProcessBuilder pb = new ProcessBuilder(commands);
+        pb.redirectErrorStream(true);
+        LOG.debug("Running command {}", pb.command().toString().replaceAll(",", ""));
+        return pb.start();
+    }
+
     public static Process cmd(String[] commands, final File file) throws IOException {
         return cmd(commands, file, null, new String[0]);
     }
@@ -313,12 +320,13 @@ public class Utils {
         return p;
     }
 
-    public static void waitForProcess(final Process process, final long timeout) throws InterruptedException {
+    public static void waitForProcess(final Process process, final int timeoutSeconds) {
         Thread t = new Thread() {
             @Override
             public void run() {
                 try {
-                    Thread.sleep(timeout);
+                    Thread.sleep(timeoutSeconds * 1000);
+                    LOG.warn("Timeed out in {} seconds", timeoutSeconds);
                 } catch (InterruptedException ex) {
                     LOG.warn(ex.getMessage());
                 } finally {
@@ -331,18 +339,28 @@ public class Utils {
         t.setDaemon(true);
         t.start();
         if (process != null) {
-            int exitValue = process.waitFor();
-            LOG.trace("process {} exits with {}", process, exitValue);
+            int exitValue;
+            try {
+                exitValue = process.waitFor();
+                LOG.debug("process {} exits with {}", process, exitValue);
+            } catch (InterruptedException ex) {
+                LOG.warn(ex.getMessage());
+            }
         }
     }
 
-    public static void waitForOutputLine(final Process process, String lineExpected, final long timeout) throws
-        IOException {
+    public static void waitForOutput(final Process process, final int timeoutSeconds) throws IOException {
+        waitForOutputLine(process, null, timeoutSeconds);
+    }
+
+    public static boolean waitForOutputLine(final Process process, String lineExpected, final int timeoutSeconds)
+        throws IOException {
         Thread t = new Thread() {
             @Override
             public void run() {
                 try {
-                    Thread.sleep(timeout);
+                    Thread.sleep(timeoutSeconds * 1000);
+                    LOG.warn("Timed out in {} seconds", timeoutSeconds);
                 } catch (InterruptedException ex) {
                     LOG.warn(ex.getMessage());
                 } finally {
@@ -352,19 +370,27 @@ public class Utils {
                 }
             }
         };
+        if (process == null) {
+            return false;
+        }
         t.setName(Thread.currentThread().getName() + "-" + t.hashCode());
         t.setDaemon(true);
         t.start();
 
         try (BufferedReader stdIn = new BufferedReader(new InputStreamReader(process.getInputStream()))) {
             for (String line = stdIn.readLine(); line != null;) {
-                if (line.contains(lineExpected)) {
-                    break;
+                LOG.debug(line);
+                if (StringUtils.isNotBlank(lineExpected) && line.contains(lineExpected)) {
+                    LOG.info("Found expected line '{}'", line);
+                    return true;
                 }
                 line = stdIn.readLine();
             }
+        } finally {
+            t.interrupt();
         }
-        t.interrupt();
+
+        return false;
     }
 
     public static void deleteFileAfterMinutes(final File file, final int minutes) {
@@ -494,7 +520,7 @@ public class Utils {
         return date.getTime();
     }
 
-    // dirty hack to update system env 
+    // dirty hack to update system env
     public static void setEnv(Map<String, String> newenv) throws Exception {
         try {
             Class<?> processEnvironmentClass = Class.forName("java.lang.ProcessEnvironment");
@@ -524,10 +550,9 @@ public class Utils {
     }
 
     public static void main(String[] args) throws Exception {
-        List<String> ss = Utils.cmd(new String[]{"adb", "devices"});
-        for (String s : ss) {
-            LOG.debug("{}", s);
+        {
+            Process p = cmdAsync(new String[]{"./ping.sh"});
+            waitForOutput(p, 11);
         }
-        System.exit(0);
     }
 }
