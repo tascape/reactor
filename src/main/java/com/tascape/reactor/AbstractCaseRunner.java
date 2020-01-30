@@ -32,7 +32,6 @@ import java.util.regex.Pattern;
 import org.apache.commons.io.FileUtils;
 import org.apache.log4j.Appender;
 import org.apache.log4j.FileAppender;
-import org.apache.log4j.PatternLayout;
 import org.apache.log4j.spi.Filter;
 import org.apache.log4j.spi.LoggingEvent;
 import org.slf4j.Logger;
@@ -82,11 +81,13 @@ public abstract class AbstractCaseRunner {
                 newline = newline.replaceAll("<", "&lt;");
                 if (newline.contains(" INFO  ")) {
                     newline = "<b>" + newline + "</b>";
+                } else if (newline.contains(" TRACE ")) {
+                    newline = "<font color='999999'><b>" + newline + "</b></font>";
                 } else if (newline.contains(" WARN  ")) {
                     newline = "<font color='9F6000'><b>" + newline + "</b></font>";
                 } else if (newline.contains(" ERROR ")
-                        || newline.contains("Failure in case")
-                        || newline.contains("AssertionError")) {
+                    || newline.contains("Failure in case")
+                    || newline.contains("AssertionError")) {
                     newline = "<font color='red'><b>" + newline + "</b></font>";
                 } else {
                     Matcher m = http.matcher(line);
@@ -103,7 +104,7 @@ public abstract class AbstractCaseRunner {
                     if (newline.contains(path)) {
                         if (name.endsWith(".png")) {
                             pw.printf("<a href=\"%s\" target=\"_blank\"><img src=\"%s\" width=\"360px\"/></a>",
-                                    name, name);
+                                name, name);
                         }
                         String a = String.format("<a href=\"%s\" target=\"_blank\">%s</a>", name, name);
                         int len = newline.indexOf("    ");
@@ -144,10 +145,9 @@ public abstract class AbstractCaseRunner {
 
     Path addLog4jFileAppender(final Path path) throws IOException {
         org.apache.log4j.Logger rootLogger = org.apache.log4j.Logger.getRootLogger();
+        rootLogger.setLevel(sysConfig.getCaseLogLevel());
 
-        String pattern = "%d{HH:mm:ss.SSS} %-5p %t %C{1}.%M:%L - %m%n";
         final String threadName = Thread.currentThread().getName();
-
         class ThreadFilter extends Filter {
             @Override
             public int decide(LoggingEvent event) {
@@ -158,9 +158,8 @@ public abstract class AbstractCaseRunner {
             }
         }
 
-        FileAppender fa = new FileAppender(new PatternLayout(pattern), path.toFile().getAbsolutePath());
+        FileAppender fa = new FileAppender(sysConfig.getCaseLogPattern(), path.toFile().getAbsolutePath());
         fa.addFilter(new ThreadFilter());
-        fa.setThreshold(sysConfig.getCaseLogLevel());
         fa.setImmediateFlush(true);
         fa.setAppend(true);
         fa.setName(path.toFile().getAbsolutePath());

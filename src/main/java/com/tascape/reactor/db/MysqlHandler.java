@@ -50,7 +50,7 @@ public class MysqlHandler extends DbHandler {
 
     protected static final int DB_POOL_SIZE = SYS_CONFIG.getDatabasePoolSize();
 
-    private static final String JDBC_URL = "jdbc:mysql://" + DB_HOST + "/" + DB_SCHEMA;
+    private static final String JDBC_URL = "jdbc:mysql://" + DB_HOST + "/" + DB_SCHEMA + "?useSSL=false";
 
     static {
         try {

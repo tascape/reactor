@@ -54,6 +54,7 @@ public class JUnit4Case extends AbstractCase {
     public void tearDown() throws Exception {
         LOG.debug("Run something after case");
         LOG.debug("Please override");
+        LOG.trace("Trace level log");
     }
 
     @Override

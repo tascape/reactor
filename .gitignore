@@ -26,7 +26,6 @@ build/
 nbbuild/
 dist/
 nbdist/
-nbactions.xml
 nb-configuration.xml
 
 # intelliJ

@@ -37,6 +37,7 @@ import java.util.stream.Stream;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Level;
+import org.apache.log4j.PatternLayout;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -97,6 +98,8 @@ public final class SystemConfiguration {
 
     public static final String SYSPROP_CASE_LOG_LEVEL = "reactor.case.log.level";
 
+    public static final String SYSPROP_CASE_LOG_PATTERN = "reactor.case.log.pattern";
+
     public static final String SYSPROP_CASE_LIST_FILE = "reactor.case.list.file";
 
     public static final String SYSENV_JOB_NAME = "JOB_NAME";
@@ -141,11 +144,11 @@ public final class SystemConfiguration {
         List<String> keys = new ArrayList<>(System.getProperties().stringPropertyNames());
         Properties sysProps = new Properties();
         keys.stream()
-                .filter((key)
-                        -> (key.startsWith(CONSTANT_SYSPROP_PREFIX)) && StringUtils.isNotBlank(System.getProperty(key)))
-                .forEach((key) -> {
-                    sysProps.setProperty(key, System.getProperty(key));
-                });
+            .filter((key)
+                -> (key.startsWith(CONSTANT_SYSPROP_PREFIX)) && StringUtils.isNotBlank(System.getProperty(key)))
+            .forEach((key) -> {
+                sysProps.setProperty(key, System.getProperty(key));
+            });
         this.properties.putAll(sysProps);
 
         String execId = this.properties.getProperty(SYSPROP_EXECUTION_ID);
@@ -164,7 +167,7 @@ public final class SystemConfiguration {
         String v = this.properties.getProperty(name);
         if (StringUtils.isBlank(v)) {
             LOG.debug("System property '{}' is not defined, or blank, default value '{}' will be used", name,
-                    defaultValue);
+                defaultValue);
             return defaultValue;
         }
         return v;
@@ -284,8 +287,9 @@ public final class SystemConfiguration {
     public List<String> getDebugCaseList() throws IOException {
         String prop = this.getProperty(SYSPROP_DEBUG_CASE_LIST, "").trim();
         if (prop.isEmpty()) {
-            LOG.debug("No case list is specified. Use -Dreactor.debug.case.list=full-class1.method1,full-class2.method2,"
-                    + " or -Dreactor.debug.case.list=@some-file.txt (one case per line in the file)");
+            LOG.debug(
+                "No case list is specified. Use -Dreactor.debug.case.list=full-class1.method1,full-class2.method2,"
+                + " or -Dreactor.debug.case.list=@some-file.txt (one case per line in the file)");
             return null;
         }
         if (prop.startsWith("@")) {
@@ -332,7 +336,7 @@ public final class SystemConfiguration {
 
     public int getDatabasePoolSize() {
         return this.getIntProperty(DbHandler.SYSPROP_DATABASE_POOL_SIZE,
-                this.getIntProperty(SYSPROP_EXECUTION_THREAD_COUNT) + 10);
+            this.getIntProperty(SYSPROP_EXECUTION_THREAD_COUNT) + 10);
     }
 
     public String getProdUnderTask() {
@@ -344,15 +348,21 @@ public final class SystemConfiguration {
         return Level.toLevel(l);
     }
 
+    public PatternLayout getCaseLogPattern() {
+        String pattern = "%d{HH:mm:ss.SSS} %-5p %t %C{1}.%M:%L - %m%n";
+        pattern = this.getProperty(SYSPROP_CASE_LOG_PATTERN, pattern);
+        return new PatternLayout(pattern);
+    }
+
     public List<String> getCaseList() {
         String pf = getProperty(SYSPROP_CASE_LIST_FILE);
         if (pf != null) {
             try {
                 return Files.readAllLines(Paths.get(pf)).stream()
-                        .filter(c -> StringUtils.isNotBlank(c))
-                        .map(c -> c.trim())
-                        .distinct()
-                        .collect(Collectors.toList());
+                    .filter(c -> StringUtils.isNotBlank(c))
+                    .map(c -> c.trim())
+                    .distinct()
+                    .collect(Collectors.toList());
             } catch (IOException ex) {
                 LOG.warn("{}", ex.getLocalizedMessage());
             }
@@ -397,10 +407,10 @@ public final class SystemConfiguration {
         List<String> keys = new ArrayList<>(this.properties.stringPropertyNames());
         Collections.sort(keys);
         keys.stream()
-                .filter(key -> !key.startsWith(pre("db.")))
-                .forEach((key) -> {
-                    LOG.debug(String.format("%50s : %s", key, this.properties.getProperty(key)));
-                });
+            .filter(key -> !key.startsWith(pre("db.")))
+            .forEach((key) -> {
+                LOG.debug(String.format("%50s : %s", key, this.properties.getProperty(key)));
+            });
     }
 
     public Properties getProperties() {
