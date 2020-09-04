@@ -1,7 +1,7 @@
 pipeline {
     agent {
         docker {
-            image 'tascape/reactor-builder' 
+            image 'tascape/reactor-builder:02' 
             args '-v /home/user/.m2:/root/.m2' 
         }
     }

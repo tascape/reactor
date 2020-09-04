@@ -536,7 +536,8 @@ public abstract class DbHandler {
 
         final String sql = "SELECT * FROM " + SuiteResult.TABLE_NAME + " WHERE "
             + SuiteResult.SUITE_RESULT_ID + " = ?;";
-        try (PreparedStatement stmt = this.getConnection().prepareStatement(sql)) {
+        try (PreparedStatement stmt = this.getConnection().prepareStatement(sql,
+                ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE)) {
             stmt.setString(1, execId);
             ResultSet rs = stmt.executeQuery();
             if (rs.first()) {
