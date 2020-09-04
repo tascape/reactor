@@ -1,7 +1,7 @@
 pipeline {
     agent {
         docker {
-            image 'maven:3-alpine' 
+            image 'tascape/reactor-builder' 
             args '-v /home/user/.m2:/root/.m2' 
         }
     }
