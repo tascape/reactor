@@ -19,6 +19,7 @@ package com.tascape.reactor.suite;
 import com.tascape.reactor.Utils;
 import com.tascape.reactor.task.JUnit4Case;
 import com.tascape.reactor.task.JUnit4CleanupCase;
+import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -31,8 +32,9 @@ public class JUnit4Suite extends AbstractSuite {
 
     @Override
     public void setUpCaseClasses() {
-        super.addCaseClass(JUnit4Case.class);
-        super.addCaseClass(JUnit4CleanupCase.class);
+        super.addCaseClasses(List.of(
+                JUnit4Case.class,
+                JUnit4CleanupCase.class));
     }
 
     @Override

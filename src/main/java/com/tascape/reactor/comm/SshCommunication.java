@@ -129,7 +129,7 @@ public class SshCommunication extends EntityCommunication implements Closeable {
         this.session.setPassword(password);
     }
 
-    public List<String> shell(String command, long timeout) throws JSchException, IOException, Exception {
+    public List<String> shell(String command, long timeout) throws JSchException, IOException {
         Channel shell = this.session.openChannel("shell");
         shell.setInputStream(IOUtils.toInputStream(command + "\nexit\n", Charset.defaultCharset()));
         try (BufferedReader in = new BufferedReader(new InputStreamReader(shell.getInputStream()))) {
@@ -181,8 +181,8 @@ public class SshCommunication extends EntityCommunication implements Closeable {
         channel.setOutputStream(System.out);
         channel.connect();
         channels.add(channel);
-        new ChanneOperationTimer(channel, timeout).start();
 
+        new ChanneOperationTimer(channel, timeout).start();
         ChannelSftp sftp = (ChannelSftp) channel;
         try (FileOutputStream out = FileUtils.openOutputStream(destFile)) {
             sftp.get(srcFile, out);
