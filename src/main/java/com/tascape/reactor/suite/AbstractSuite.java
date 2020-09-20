@@ -27,6 +27,7 @@ import com.tascape.reactor.task.Priority;
 import java.lang.invoke.MethodHandles;
 import java.lang.invoke.VarHandle;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -95,14 +96,16 @@ public abstract class AbstractSuite {
 
     /**
      * This method provides suite a change to fail fast if setUpEnvironment() fails. Please override this method if
-     * fail fast is needed - swallow the Throwable and mark some driver and/or communication objects as null.
+     * fail fast is needed - swallow the Throwable and mark some driver and/or communication objects as null, so the
+     * Framework will NOT try to run <cdoe>setUpEnvironment</code> again.
      *
      * @param t caused by setUpEnvironment
      *
      * @throws java.lang.Exception environment setup issue
      */
     public void runFailFast(Throwable t) throws Exception {
-        LOG.warn("there is no fail fast operations in suite, please override, and return true, if you want");
+        LOG.error("Environment setup failed", t);
+        LOG.warn("there is no fail fast operations in suite, please override if you need");
     }
 
     public void setUp() throws Exception {
@@ -161,15 +164,23 @@ public abstract class AbstractSuite {
         throw new UnsupportedOperationException("Cannot add non-poolable driver with the same key " + key);
     }
 
-    protected <T extends AbstractCase> void addCaseClass(Class<T> clazz) {
+    protected void addCaseClass(Class<? extends AbstractCase> clazz) {
         if (caseClasses.contains(clazz)) {
             throw new UnsupportedOperationException("Adding same case class multiple times is not supported yet.");
         }
         this.caseClasses.add(clazz);
     }
 
-    protected <T extends AbstractCase> void addCaseClass(String clazz) throws ClassNotFoundException {
+    protected void addCaseClasses(Collection<Class<? extends AbstractCase>> classes) {
+        classes.forEach(clazz -> this.addCaseClass(clazz));
+    }
+
+    protected void addCaseClass(String clazz) throws ClassNotFoundException {
         Class c = AbstractSuite.class.getClassLoader().loadClass(clazz);
+        if (!AbstractCase.class.isAssignableFrom(c)) {
+            throw new UnsupportedOperationException("Class with name " + clazz + " is not a subclass of "
+                    + AbstractCase.class + ".");
+        }
         if (caseClasses.contains(c)) {
             throw new UnsupportedOperationException("Adding same case class multiple times is not supported yet.");
         }

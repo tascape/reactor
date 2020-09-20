@@ -38,7 +38,7 @@ import org.slf4j.LoggerFactory;
 public class MysqlHandler extends DbHandler {
     private static final Logger LOG = LoggerFactory.getLogger(MysqlHandler.class);
 
-    private static final String DB_DRIVER = "com.mysql.jdbc.Driver";
+    private static final String DB_DRIVER = "com.mysql.cj.jdbc.Driver";
 
     protected static final String DB_HOST = SYS_CONFIG.getDatabaseHost();
 

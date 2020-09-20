@@ -105,6 +105,7 @@ public class CaseRunnerJUnit4 extends AbstractCaseRunner implements Callable<Cas
                 try {
                     abstractSuite.tearDown();
                 } catch (Throwable t0) {
+                    LOG.warn("Teardown failed");
                 }
                 throw t;
             }

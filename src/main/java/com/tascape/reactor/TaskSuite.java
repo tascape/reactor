@@ -34,6 +34,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import com.tascape.reactor.data.CaseData;
 import com.tascape.reactor.data.CaseDataProvider;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 /**
@@ -149,10 +151,16 @@ public class TaskSuite {
     private List<TaskCase> processAnnotations() {
         LOG.debug("Checking method annotation CaseDataProvider for each case");
         List<TaskCase> tcs = new ArrayList<>();
+        Map<String, Class<?>> loadedClasses = new HashMap<>();
 
         this.cases.stream().forEach((tc) -> {
             try {
-                Class<?> caseClass = Class.forName(tc.getCaseClass());
+                String className = tc.getCaseClass();
+                Class<?> caseClass = loadedClasses.get(className);
+                if (caseClass == null) {
+                    caseClass = Class.forName(tc.getCaseClass());
+                    loadedClasses.put(className, caseClass);
+                }
                 Method caseMethod = caseClass.getDeclaredMethod(tc.getCaseMethod());
 
                 Priority p = caseMethod.getAnnotation(Priority.class);
