@@ -97,7 +97,7 @@ public abstract class AbstractSuite {
     /**
      * This method provides suite a change to fail fast if setUpEnvironment() fails. Please override this method if
      * fail fast is needed - swallow the Throwable and mark some driver and/or communication objects as null, so the
-     * Framework will NOT try to run <cdoe>setUpEnvironment</code> again.
+     * Framework will NOT try to run <code>setUpEnvironment</code> again.
      *
      * @param t caused by setUpEnvironment
      *
