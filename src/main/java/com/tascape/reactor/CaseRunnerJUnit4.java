@@ -31,7 +31,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import com.tascape.reactor.data.CaseData;
 import com.tascape.reactor.db.SuiteResult;
+import java.nio.file.Files;
 import org.apache.commons.lang3.StringUtils;
+import org.junit.runner.Result;
 
 /**
  *
@@ -50,8 +52,10 @@ public class CaseRunnerJUnit4 extends AbstractCaseRunner implements Callable<Cas
     public CaseResult call() throws Exception {
         tcr.setCaseEnv(Thread.currentThread().getName());
         Path logFile = newLogFile(tcr.getTaskCase());
+        boolean acquired = false;
         try {
-            if (!db.acquireCaseResult(this.tcr)) {
+            acquired = db.acquireCaseResult(this.tcr);
+            if (!acquired) {
                 return null;
             }
 
@@ -67,7 +71,11 @@ public class CaseRunnerJUnit4 extends AbstractCaseRunner implements Callable<Cas
             throw ex;
         } finally {
             removeLog4jAppender(logFile);
-            this.generateHtml(logFile);
+            if (acquired) {
+                this.generateHtml(logFile);
+            } else {
+                Files.deleteIfExists(logFile.getParent());
+            }
         }
         return this.tcr;
     }
@@ -87,7 +95,8 @@ public class CaseRunnerJUnit4 extends AbstractCaseRunner implements Callable<Cas
         CaseRunListener trl = new CaseRunListener(this.db, this.tcr);
         JUnitCore core = new JUnitCore();
         core.addListener(trl);
-        core.run(Request.method(Class.forName(tc.getCaseClass()), tc.getCaseMethod()));
+        Result result = core.run(Request.method(Class.forName(tc.getCaseClass()), tc.getCaseMethod()));
+        LOG.debug("junit result: {}", result.wasSuccessful());
     }
 
     private void injectCaseEnvironment() throws Exception {

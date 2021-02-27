@@ -32,20 +32,6 @@ import org.slf4j.LoggerFactory;
 public class Reactor {
     private static final Logger LOG = LoggerFactory.getLogger(Reactor.class);
 
-    private static void updatePath() {
-        if (SystemUtils.IS_OS_MAC || SystemUtils.IS_OS_LINUX) {
-            Map<String, String> env = System.getenv();
-            String path = env.get("PATH");
-            Map<String, String> envNew = new HashMap<>(env);
-            envNew.put("PATH", path + ":/usr/local/bin");
-            try {
-                Utils.setEnv(envNew);
-            } catch (Exception ex) {
-                throw new EntityCommunicationException(ex);
-            }
-        }
-    }
-
     public static void main(String[] args) {
         updatePath();
 
@@ -78,6 +64,20 @@ public class Reactor {
                 LOG.error("Reactor finishes with exit code {}", exitCode);
             }
             System.exit(exitCode);
+        }
+    }
+
+    private static void updatePath() {
+        if (SystemUtils.IS_OS_MAC || SystemUtils.IS_OS_LINUX) {
+            Map<String, String> env = System.getenv();
+            String path = env.get("PATH");
+            Map<String, String> envNew = new HashMap<>(env);
+            envNew.put("PATH", path + ":/usr/local/bin");
+            try {
+                Utils.setEnv(envNew);
+            } catch (Exception ex) {
+                throw new EntityCommunicationException(ex);
+            }
         }
     }
 }

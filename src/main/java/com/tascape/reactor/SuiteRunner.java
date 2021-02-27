@@ -111,10 +111,13 @@ public class SuiteRunner {
                 });
                 LOG.debug("Total {} cases submitted", futures.size());
 
-                for (Future<CaseResult> f : futures) {
+                for (Future<CaseResult> f: futures) {
                     try {
                         Future<CaseResult> future = completionService.take();
                         CaseResult tcr = future.get();
+                        if (tcr == null) {
+                            continue;
+                        }
                         String result = tcr.getResult().result();
                         LOG.debug("Get result of case {} - {}", tcr.getTaskCase().format(), result);
                         if (result.equals(ExecutionResult.QUEUED.getName())) {

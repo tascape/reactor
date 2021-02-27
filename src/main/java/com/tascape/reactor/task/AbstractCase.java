@@ -74,9 +74,9 @@ public abstract class AbstractCase extends AbstractCaseResource {
      */
     protected String execId = sysConfig.getExecId();
 
-    private final Path caseLogPath = AbstractCaseResource.getCaseLogPath();
-
     protected CaseData caseData = AbstractCaseData.getCaseData();
+
+    private final Path caseLogPath = AbstractCaseResource.getCaseLogPath();
 
     private final CaseResult tcr = AbstractCaseRunner.getCaseResult();
 
@@ -91,8 +91,6 @@ public abstract class AbstractCase extends AbstractCaseResource {
     private final String suiteClass;
 
     private String externalId = "";
-
-    public abstract String getApplicationUnderTask();
 
     public AbstractCase() {
         this.result.setPass(0);
@@ -109,9 +107,36 @@ public abstract class AbstractCase extends AbstractCaseResource {
         AbstractCase.setCase(this); // TODO: move this to somewhere else
     }
 
+    public abstract String getApplicationUnderTask();
+
     @Override
     public Path getLogPath() {
         return caseLogPath;
+    }
+
+    /**
+     * External id is for exporting case result into other case management system, such as TestRail.
+     *
+     * @return external id for case result export
+     */
+    public String getExternalId() {
+        return externalId;
+    }
+
+    public ExecutionResult getExecutionResult() {
+        return result;
+    }
+
+    public void submitBackgroundTask(Runnable runnable) {
+        this.backgroundExecutorService.submit(runnable);
+    }
+
+    public void cleanBackgoundTasks() {
+        this.backgroundExecutorService.shutdownNow();
+    }
+
+    public List<CaseResultMetric> getResultMetrics() {
+        return resultMetrics;
     }
 
     protected <D extends EntityDriver> D getEntityDriver(CaseDriver caseDriver) {
@@ -159,15 +184,6 @@ public abstract class AbstractCase extends AbstractCaseResource {
     }
 
     /**
-     * External id is for exporting case result into other case management system, such as TestRail.
-     *
-     * @return external id for case result export
-     */
-    public String getExternalId() {
-        return externalId;
-    }
-
-    /**
      * This is called in case method to register external id (if any). Do not call this if case result will not be
      * exported into other case management system, such as TestRail.
      *
@@ -175,18 +191,6 @@ public abstract class AbstractCase extends AbstractCaseResource {
      */
     protected void setExternalId(String externalId) {
         this.externalId = externalId;
-    }
-
-    public ExecutionResult getExecutionResult() {
-        return result;
-    }
-
-    public void submitBackgroundTask(Runnable runnable) {
-        this.backgroundExecutorService.submit(runnable);
-    }
-
-    public void cleanBackgoundTasks() {
-        this.backgroundExecutorService.shutdownNow();
     }
 
     /**
@@ -227,10 +231,6 @@ public abstract class AbstractCase extends AbstractCaseResource {
     protected void markAsToBeImplemented() {
         this.setExecutionResult(ExecutionResult.TBI);
         throw new ToBeImplementedException("this is a to-be-implemented case");
-    }
-
-    public List<CaseResultMetric> getResultMetrics() {
-        return resultMetrics;
     }
 
     protected void putResultMetric(String group, String name, double value) {
