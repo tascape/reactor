@@ -31,7 +31,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import com.tascape.reactor.data.CaseData;
 import com.tascape.reactor.db.SuiteResult;
-import java.nio.file.Files;
+import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.junit.runner.Result;
 
@@ -74,7 +74,7 @@ public class CaseRunnerJUnit4 extends AbstractCaseRunner implements Callable<Cas
             if (acquired) {
                 this.generateHtml(logFile);
             } else {
-                Files.deleteIfExists(logFile.getParent());
+                FileUtils.deleteQuietly(logFile.getParent().toFile());
             }
         }
         return this.tcr;

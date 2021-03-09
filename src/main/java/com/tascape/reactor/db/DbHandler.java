@@ -273,7 +273,7 @@ public abstract class DbHandler {
                     rs.updateRow();
                     return true;
                 } else {
-                    LOG.debug("Csase {} was acquired by {}", tcr.getTaskCase().format(), host);
+                    LOG.debug("Case {} was acquired by {}", tcr.getTaskCase().format(), host);
                 }
             }
         }

@@ -45,8 +45,7 @@ import org.slf4j.LoggerFactory;
  *
  * @author linsong wang
  */
-public final class SystemConfiguration {
-    private static final Logger LOG = LoggerFactory.getLogger(SystemConfiguration.class);
+public class SystemConfiguration {
 
     public static final Path HOME_PATH = Paths.get(FileUtils.getUserDirectory().getAbsolutePath(), ".reactor");
 
@@ -108,13 +107,15 @@ public final class SystemConfiguration {
 
     public static final String SYSENV_JOB_BUILD_URL = "BUILD_URL";
 
-    private static final SystemConfiguration CONFIG = new SystemConfiguration();
+    private static final Logger LOG = LoggerFactory.getLogger(SystemConfiguration.class);
 
-    private final Properties properties = new Properties();
+    private static final SystemConfiguration CONFIG = new SystemConfiguration();
 
     public static SystemConfiguration getInstance() {
         return CONFIG;
     }
+
+    private final Properties properties = new Properties();
 
     private SystemConfiguration() {
         this.listSysProperties();
