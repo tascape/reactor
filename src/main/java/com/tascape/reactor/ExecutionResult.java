@@ -17,6 +17,8 @@
 package com.tascape.reactor;
 
 import java.security.InvalidParameterException;
+import java.util.Arrays;
+import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -25,6 +27,7 @@ import org.slf4j.LoggerFactory;
  * @author linsong wang
  */
 public class ExecutionResult {
+
     private static final Logger LOG = LoggerFactory.getLogger(ExecutionResult.class);
 
     public static final ExecutionResult NA = new ExecutionResult("NA");
@@ -41,6 +44,13 @@ public class ExecutionResult {
 
     public static final ExecutionResult CANCEL = new ExecutionResult("CANCEL");
 
+    public static final List<String> NON_FINISH_STATES = Arrays.asList(
+        NA.getName(),
+        QUEUED.getName(),
+        ACQUIRED.getName(),
+        RUNNING.getName()
+    );
+
     /**
      * to be implemented
      */
@@ -48,6 +58,10 @@ public class ExecutionResult {
 
     public static synchronized ExecutionResult newMultiple() {
         return new ExecutionResult("MULTIPLE");
+    }
+
+    public static boolean isPass(String result) {
+        return result.equals(ExecutionResult.PASS.name) || result.endsWith("/0");
     }
 
     private String name = "";
@@ -104,10 +118,6 @@ public class ExecutionResult {
 
     public boolean isFailure() {
         return !name.equals("PASS") && fail != 0;
-    }
-
-    public static boolean isPass(String result) {
-        return result.equals(ExecutionResult.PASS.name) || result.endsWith("/0");
     }
 
     public static void main(String[] args) {

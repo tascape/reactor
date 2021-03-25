@@ -20,6 +20,7 @@ import com.tascape.reactor.ExecutionResult;
 import com.tascape.reactor.Reactor;
 import com.tascape.reactor.SystemConfiguration;
 import com.tascape.reactor.TaskSuite;
+import com.tascape.reactor.Utils;
 import com.tascape.reactor.data.CaseIterationData;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -54,6 +55,7 @@ import org.slf4j.LoggerFactory;
  * @author linsong wang
  */
 public abstract class DbHandler {
+
     private static final Logger LOG = LoggerFactory.getLogger(DbHandler.class);
 
     static final SystemConfiguration SYS_CONFIG = SystemConfiguration.getInstance();
@@ -398,6 +400,34 @@ public abstract class DbHandler {
         return suiteResult;
     }
 
+    public boolean waitForExecution(String execId, int timeoutMinute) throws SQLException, InterruptedException {
+        LOG.info("Wait {} minutes for execution {} to finish", timeoutMinute, execId);
+        String EXEC_WAIT_INTERVAL = "reactor.exec.wait.interval";
+        int intervalMillis = SystemConfiguration.getInstance().getIntProperty(EXEC_WAIT_INTERVAL, 10000);
+        final String sql = "SELECT " + CaseResult.EXECUTION_RESULT + " FROM "
+            + CaseResult.TABLE_NAME + " WHERE " + CaseResult.SUITE_RESULT + " = ?;";
+        long end = System.currentTimeMillis() + timeoutMinute * 60000;
+        while (System.currentTimeMillis() < end) {
+            try (PreparedStatement stmt = this.getConnection().prepareStatement(sql)) {
+                stmt.setString(1, execId);
+                ResultSet rs = stmt.executeQuery();
+                while (rs.next()) {
+                    String result = rs.getString(CaseResult.EXECUTION_RESULT);
+                    if (ExecutionResult.NON_FINISH_STATES.contains(result)) {
+                        break;
+                    }
+                }
+                if (rs.isAfterLast()) {
+                    return true;
+                } else {
+                    Utils.sleep(intervalMillis, "wait for suite execution to finish");
+                }
+            }
+        }
+        LOG.warn("suite execution {} did not finish after {} minutes", execId, timeoutMinute);
+        return false;
+    }
+
     public ExecutionResult adjustSuiteExecutionResult(String execId) throws SQLException {
         LOG.debug("Adjust suite execution result of execution id {} with iterations and TBI", execId);
         String lock = this.getDbLock(execId);
@@ -529,7 +559,7 @@ public abstract class DbHandler {
         }
     }
 
-    public void saveJunitXml(String execId) throws IOException, SQLException, XMLStreamException {
+    public Path saveJunitXml(String execId) throws IOException, SQLException, XMLStreamException {
         Path path = SYS_CONFIG.getLogPath().resolve(execId).resolve("result.xml");
         Path html = SYS_CONFIG.getLogPath().resolve(execId).resolve("result.html");
         LOG.debug("Generate JUnit XML result");
@@ -537,7 +567,7 @@ public abstract class DbHandler {
         final String sql = "SELECT * FROM " + SuiteResult.TABLE_NAME + " WHERE "
             + SuiteResult.SUITE_RESULT_ID + " = ?;";
         try (PreparedStatement stmt = this.getConnection().prepareStatement(sql,
-                ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE)) {
+            ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE)) {
             stmt.setString(1, execId);
             ResultSet rs = stmt.executeQuery();
             if (rs.first()) {
@@ -618,9 +648,10 @@ public abstract class DbHandler {
                 LOG.error("No suite result of exec id {}", execId);
             }
         }
+        return path.getParent();
     }
 
-    public void exportToJson(String execId) throws IOException, SQLException, XMLStreamException {
+    public Path exportToJson(String execId) throws IOException, SQLException, XMLStreamException {
         Path path = SYS_CONFIG.getLogPath().resolve(execId).resolve("result.json");
         LOG.debug("Generate JSON result");
 
@@ -701,6 +732,7 @@ public abstract class DbHandler {
             sr.put("suite_properties", sps);
         }
         FileUtils.write(path.toFile(), new JSONObject().put("suite_result", sr).toString(2), Charset.defaultCharset());
+        return path.getParent();
     }
 
     public void importFromJson(String json) throws SQLException {
