@@ -21,6 +21,7 @@ import com.tascape.reactor.db.DbHandler;
 import java.io.File;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.Arrays;
 import org.apache.commons.io.FileUtils;
 import org.junit.After;
 import org.junit.Assert;
@@ -60,10 +61,13 @@ public class ReactorTask extends AbstractCase {
     }
 
     /**
-     * The task checks result database to determine if one suite execution finishes, and create result files (xml, html formats).
+     * The task checks result database to determine if one suite execution finishes, and create result files (xml,
+     * html, and json formats).
+     * This is useful when you run concurrency testing of one suite over multiple execution hosts, where each
+     * result.html may not include all test results of all test cases due to timing.
      *
-     * This is useful when you run concurrency testing of one suite over multiple execution hosts.
-     * The wait timeout can be specified with system property <code>reactor.task.EXEC_TIMEOUT_MINUTES</code>.
+     * The target task execution id is specified with system property <code>reactor.task.EXEC_ID</code>.
+     * The wait timeout is specified with system property <code>reactor.task.EXEC_TIMEOUT_MINUTES</code>.
      *
      * @throws Exception for any error
      */
@@ -79,10 +83,13 @@ public class ReactorTask extends AbstractCase {
         boolean finished = reactorDb.waitForExecution(taskExecId, taskExecTimeoutMinute);
         Assert.assertTrue(finished);
         Path path = reactorDb.saveJunitXml(taskExecId);
-        LOG.debug("copy result.html into current work directory");
-        String html = "result.html";
-        File destFile = Paths.get("").resolve(html).toFile();
-        FileUtils.copyFile(path.resolve(html).toFile(), destFile);
-        LOG.info("result html is {}", destFile);
+        reactorDb.exportToJson(taskExecId);
+        LOG.debug("copy result.* into current work directory");
+        for (String ext : Arrays.asList("xml", "html", "json")) {
+            String file = "result." + ext;
+            File destFile = Paths.get("").resolve(file).toFile();
+            FileUtils.copyFile(path.resolve(file).toFile(), destFile);
+            LOG.info(destFile.getAbsolutePath());
+        }
     }
 }

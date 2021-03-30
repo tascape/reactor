@@ -27,6 +27,7 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.nio.charset.Charset;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -560,8 +561,12 @@ public abstract class DbHandler {
     }
 
     public Path saveJunitXml(String execId) throws IOException, SQLException, XMLStreamException {
-        Path path = SYS_CONFIG.getLogPath().resolve(execId).resolve("result.xml");
-        Path html = SYS_CONFIG.getLogPath().resolve(execId).resolve("result.html");
+        Path path = SYS_CONFIG.getLogPath().resolve(execId);
+        if (!path.toFile().exists()) {
+            path.toFile().mkdirs();
+        }
+        Path xml = path.resolve("result.xml");
+        Path html = path.resolve("result.html");
         LOG.debug("Generate JUnit XML result");
 
         final String sql = "SELECT * FROM " + SuiteResult.TABLE_NAME + " WHERE "
@@ -572,7 +577,7 @@ public abstract class DbHandler {
             ResultSet rs = stmt.executeQuery();
             if (rs.first()) {
                 try (
-                    OutputStream os = new FileOutputStream(path.toFile());
+                    OutputStream os = new FileOutputStream(xml.toFile());
                     PrintWriter pwh = new PrintWriter(html.toFile())) {
                     XMLStreamWriter xsw = XMLOutputFactory.newInstance().createXMLStreamWriter(os);
                     xsw.writeStartDocument();
@@ -648,11 +653,15 @@ public abstract class DbHandler {
                 LOG.error("No suite result of exec id {}", execId);
             }
         }
-        return path.getParent();
+        return xml.getParent();
     }
 
     public Path exportToJson(String execId) throws IOException, SQLException, XMLStreamException {
-        Path path = SYS_CONFIG.getLogPath().resolve(execId).resolve("result.json");
+        Path path = SYS_CONFIG.getLogPath().resolve(execId);
+        if (!path.toFile().exists()) {
+            path.toFile().mkdirs();
+        }
+        Path json = path.resolve("result.json");
         LOG.debug("Generate JSON result");
 
         JSONObject sr = new JSONObject();
@@ -731,8 +740,8 @@ public abstract class DbHandler {
             }
             sr.put("suite_properties", sps);
         }
-        FileUtils.write(path.toFile(), new JSONObject().put("suite_result", sr).toString(2), Charset.defaultCharset());
-        return path.getParent();
+        FileUtils.write(json.toFile(), new JSONObject().put("suite_result", sr).toString(2), Charset.defaultCharset());
+        return json.getParent();
     }
 
     public void importFromJson(String json) throws SQLException {
