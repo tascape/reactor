@@ -16,7 +16,6 @@
  */
 package com.tascape.reactor;
 
-import com.tascape.reactor.exception.EntityCommunicationException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -76,7 +75,7 @@ public class Reactor {
             try {
                 Utils.setEnv(envNew);
             } catch (Exception ex) {
-                throw new EntityCommunicationException(ex);
+                LOG.warn("this is not allowed anymore: " + ex.getLocalizedMessage());
             }
         }
     }
