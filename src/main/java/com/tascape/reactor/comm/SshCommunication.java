@@ -48,6 +48,7 @@ import org.slf4j.LoggerFactory;
  * @author linsong wang
  */
 public class SshCommunication extends EntityCommunication implements Closeable {
+
     private static final Logger LOG = LoggerFactory.getLogger(SshCommunication.class);
 
     public static final String SYSPROP_HOST = "reactor.comm.ssh.HOST";
@@ -162,15 +163,40 @@ public class SshCommunication extends EntityCommunication implements Closeable {
         return shell;
     }
 
+    /**
+     * Uploads a file to remote server, creates directory structure as needed.
+     *
+     * @param srcFile source file
+     * @param destFile destination file full path from root, /home/user/dir1/dir2/file.txt
+     * @param timeout in ms
+     * @throws JSchException ssh error
+     * @throws SftpException sftp error
+     * @throws IOException io error
+     */
     public void upload(File srcFile, String destFile, long timeout) throws JSchException, SftpException, IOException {
         Channel channel = this.session.openChannel("sftp");
         channel.setInputStream(System.in);
         channel.setOutputStream(System.out);
-        channel.connect();
+        channel.connect(5000);
         channels.add(channel);
 
         new ChanneOperationTimer(channel, timeout).start();
         ChannelSftp sftp = (ChannelSftp) channel;
+        sftp.cd("/");
+        String[] dirs = destFile.split("/");
+        dirs[0] = "";
+        dirs[dirs.length - 1] = "";
+        for (String dir : dirs) {
+            if (StringUtils.isBlank(dir)) {
+                continue;
+            }
+            try {
+                sftp.mkdir(dir);
+            } catch (SftpException ex) {
+                LOG.debug(ex.getLocalizedMessage());
+            }
+            sftp.cd(dir);
+        }
         sftp.put(FileUtils.openInputStream(srcFile), destFile);
         sftp.exit();
     }
@@ -220,6 +246,7 @@ public class SshCommunication extends EntityCommunication implements Closeable {
     }
 
     private static class ChanneOperationTimer extends Thread {
+
         private final Channel channel;
 
         private final long timeout;

@@ -405,7 +405,7 @@ public abstract class DbHandler {
         LOG.info("Wait {} minutes for execution {} to finish", timeoutMinute, execId);
         String EXEC_WAIT_INTERVAL = "reactor.exec.wait.interval";
         int intervalMillis = SystemConfiguration.getInstance().getIntProperty(EXEC_WAIT_INTERVAL, 10000);
-        final String sql = "SELECT " + CaseResult.EXECUTION_RESULT + " FROM "
+        final String sql = "SELECT " + CaseResult.EXECUTION_RESULT +", " + CaseResult.LOG_DIR + " FROM "
             + CaseResult.TABLE_NAME + " WHERE " + CaseResult.SUITE_RESULT + " = ?;";
         long end = System.currentTimeMillis() + timeoutMinute * 60000;
         while (System.currentTimeMillis() < end) {
@@ -415,10 +415,12 @@ public abstract class DbHandler {
                 while (rs.next()) {
                     String result = rs.getString(CaseResult.EXECUTION_RESULT);
                     if (ExecutionResult.NON_FINISH_STATES.contains(result)) {
+                        LOG.debug("{}: {}", rs.getString(CaseResult.LOG_DIR), result);
                         break;
                     }
                 }
                 if (rs.isAfterLast()) {
+                    LOG.debug("call case execution done");
                     return true;
                 } else {
                     Utils.sleep(intervalMillis, "wait for suite execution to finish");
