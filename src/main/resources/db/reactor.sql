@@ -24,7 +24,7 @@ DROP TABLE IF EXISTS `suite_property`;
 /*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `suite_property` (
   `SUITE_PROPERTY_ID` int(11) NOT NULL AUTO_INCREMENT,
-  `SUITE_RESULT_ID` varchar(63) COLLATE utf8_bin NOT NULL,
+  `SUITE_RESULT_ID` varchar(255) COLLATE utf8_bin NOT NULL,
   `PROPERTY_NAME` varchar(255) COLLATE utf8_bin DEFAULT NULL,
   `PROPERTY_VALUE` varchar(255) COLLATE utf8_bin DEFAULT NULL,
   PRIMARY KEY (`SUITE_PROPERTY_ID`),
@@ -41,7 +41,7 @@ DROP TABLE IF EXISTS `suite_result`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `suite_result` (
-  `SUITE_RESULT_ID` varchar(63) COLLATE utf8_bin NOT NULL,
+  `SUITE_RESULT_ID` varchar(255) COLLATE utf8_bin NOT NULL,
   `SUITE_NAME` varchar(255) COLLATE utf8_bin DEFAULT NULL,
   `PROJECT_NAME` varchar(255) COLLATE utf8_bin DEFAULT '',
   `JOB_NAME` varchar(255) COLLATE utf8_bin DEFAULT NULL,
@@ -85,8 +85,8 @@ DROP TABLE IF EXISTS `case_result`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `case_result` (
-  `CASE_RESULT_ID` varchar(63) COLLATE utf8_bin NOT NULL,
-  `SUITE_RESULT` varchar(63) COLLATE utf8_bin DEFAULT NULL,
+  `CASE_RESULT_ID` varchar(255) COLLATE utf8_bin NOT NULL,
+  `SUITE_RESULT` varchar(255) COLLATE utf8_bin DEFAULT NULL,
   `TASK_CASE_ID` int(11) DEFAULT '0',
   `EXECUTION_RESULT` varchar(45) COLLATE utf8_bin DEFAULT NULL,
   `AUT` varchar(255) COLLATE utf8_bin DEFAULT NULL,
@@ -95,7 +95,7 @@ CREATE TABLE `case_result` (
   `RETRY` int(11) DEFAULT NULL,
   `CASE_STATION` varchar(255) COLLATE utf8_bin DEFAULT NULL,
   `LOG_DIR` varchar(255) COLLATE utf8_bin DEFAULT NULL,
-  `EXTERNAL_ID` varchar(63) COLLATE utf8_bin DEFAULT NULL,
+  `EXTERNAL_ID` varchar(255) COLLATE utf8_bin DEFAULT NULL,
   `CASE_ENV` varchar(45) COLLATE utf8_bin DEFAULT NULL,
   PRIMARY KEY (`CASE_RESULT_ID`),
   KEY `suite-case_idx` (`SUITE_RESULT`),
@@ -114,8 +114,8 @@ DROP TABLE IF EXISTS `case_result_metric`;
 /*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `case_result_metric` (
   `CASE_RESULT_METRIC_ID` int(11) NOT NULL AUTO_INCREMENT,
-  `CASE_RESULT_ID` varchar(63) COLLATE utf8_bin DEFAULT NULL,
-  `METRIC_GROUP` varchar(63) COLLATE utf8_bin DEFAULT NULL,
+  `CASE_RESULT_ID` varchar(255) COLLATE utf8_bin DEFAULT NULL,
+  `METRIC_GROUP` varchar(255) COLLATE utf8_bin DEFAULT NULL,
   `METRIC_NAME` varchar(255) COLLATE utf8_bin DEFAULT NULL,
   `METRIC_VALUE` double DEFAULT NULL,
   PRIMARY KEY (`CASE_RESULT_METRIC_ID`),

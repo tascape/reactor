@@ -193,7 +193,7 @@ public class SshCommunication extends EntityCommunication implements Closeable {
             try {
                 sftp.mkdir(dir);
             } catch (SftpException ex) {
-                LOG.debug(ex.getLocalizedMessage());
+                LOG.trace(ex.getLocalizedMessage());
             }
             sftp.cd(dir);
         }
