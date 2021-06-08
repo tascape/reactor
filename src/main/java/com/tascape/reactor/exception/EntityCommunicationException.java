@@ -31,4 +31,8 @@ public class EntityCommunicationException extends RuntimeException {
     public EntityCommunicationException(Exception ex) {
         super(ex);
     }
+
+    public EntityCommunicationException(String message, Exception ex) {
+        super(message, ex);
+    }
 }
