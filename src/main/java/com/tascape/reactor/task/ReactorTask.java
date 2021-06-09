@@ -42,16 +42,13 @@ public class ReactorTask extends AbstractCase {
 
     private final DbHandler reactorDb = DbHandler.getInstance();
 
-    public ReactorTask() {
-    }
-
     @Before
-    public void setUp() throws Exception {
+    public void setUp() {
         LOG.debug("Run something before a task");
     }
 
     @After
-    public void tearDown() throws Exception {
+    public void tearDown() {
         LOG.debug("Run something after a task");
     }
 
@@ -84,10 +81,11 @@ public class ReactorTask extends AbstractCase {
         Assert.assertTrue(finished);
         Path path = reactorDb.saveJunitXml(taskExecId);
         reactorDb.exportToJson(taskExecId);
+        Path currentPath = Paths.get("");
         LOG.debug("copy result.* into current work directory");
         for (String ext : Arrays.asList("xml", "html", "json")) {
             String file = "result." + ext;
-            File destFile = Paths.get("").resolve(file).toFile();
+            File destFile = currentPath.resolve(file).toFile();
             FileUtils.copyFile(path.resolve(file).toFile(), destFile);
             LOG.info(destFile.getAbsolutePath());
         }

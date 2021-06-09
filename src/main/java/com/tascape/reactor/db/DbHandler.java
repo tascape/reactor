@@ -410,24 +410,26 @@ public abstract class DbHandler {
         long end = System.currentTimeMillis() + timeoutMinute * 60000;
         while (System.currentTimeMillis() < end) {
             try (PreparedStatement stmt = this.getConnection().prepareStatement(sql)) {
+                stmt.closeOnCompletion();
                 stmt.setString(1, execId);
                 ResultSet rs = stmt.executeQuery();
                 while (rs.next()) {
                     String result = rs.getString(CaseResult.EXECUTION_RESULT);
                     if (ExecutionResult.NON_FINISH_STATES.contains(result)) {
                         LOG.debug("{}: {}", rs.getString(CaseResult.LOG_DIR), result);
+                        rs.refreshRow();
                         break;
                     }
                 }
                 if (rs.isAfterLast()) {
-                    LOG.debug("call case execution done");
+                    LOG.debug("suite execution is done");
                     return true;
                 } else {
                     Utils.sleep(intervalMillis, "wait for suite execution to finish");
                 }
             }
         }
-        LOG.warn("suite execution {} did not finish after {} minutes", execId, timeoutMinute);
+        LOG.warn("suite execution did not finish yet", execId);
         return false;
     }
 
