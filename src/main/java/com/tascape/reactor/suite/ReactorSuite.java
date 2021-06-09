@@ -27,6 +27,7 @@ import org.slf4j.LoggerFactory;
  * @author linsong wang
  */
 public class ReactorSuite extends AbstractSuite {
+    private static final Logger LOG = LoggerFactory.getLogger(ReactorSuite.class);
 
     @Override
     public void setUpCaseClasses() {

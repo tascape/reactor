@@ -22,12 +22,12 @@ import com.tascape.reactor.SystemConfiguration;
 import com.tascape.reactor.TaskSuite;
 import com.tascape.reactor.Utils;
 import com.tascape.reactor.data.CaseIterationData;
-import com.tascape.reactor.exception.EntityCommunicationException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.nio.charset.Charset;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -73,8 +73,6 @@ public abstract class DbHandler {
 
     public static final String SYSPROP_DATABASE_POOL_SIZE = "reactor.db.pool.size";
 
-    private static final String LOCK_MSG = "Cannot acquire lock of name ";
-
     public static DbHandler getInstance() {
         String type = SystemConfiguration.getInstance().getDatabaseType();
         DbHandler dbh;
@@ -94,7 +92,7 @@ public abstract class DbHandler {
         try {
             dbh.init();
         } catch (Exception ex) {
-            throw new EntityCommunicationException("Cannot connect to db", ex);
+            throw new RuntimeException("Cannot connect to db", ex);
         }
         return dbh;
     }
@@ -102,14 +100,6 @@ public abstract class DbHandler {
     protected abstract void init() throws Exception;
 
     protected abstract Connection getConnection() throws SQLException;
-
-    private PreparedStatement prepareStatement(String sql) throws SQLException {
-        return this.getConnection().prepareStatement(sql);
-    }
-
-    private PreparedStatement prepareUpdatableStatement(String sql) throws SQLException {
-        return this.getConnection().prepareStatement(sql, ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE);
-    }
 
     protected String getDbLock(String execId) {
         return Reactor.class.getSimpleName() + "." + execId;
@@ -120,22 +110,22 @@ public abstract class DbHandler {
         final String sql = "SELECT * FROM " + SuiteResult.TABLE_NAME + " WHERE "
             + SuiteResult.SUITE_RESULT_ID + " = ?";
 
-        try (PreparedStatement stmt = this.prepareStatement(sql)) {
+        try (Connection conn = this.getConnection()) {
+            PreparedStatement stmt = conn.prepareStatement(sql);
             stmt.setMaxRows(1);
             stmt.setString(1, id);
 
-            try (ResultSet rs = stmt.executeQuery()) {
-                SuiteResult tsr = new SuiteResult();
-                if (rs.first()) {
-                    tsr.setSuiteResultId(rs.getString(SuiteResult.SUITE_RESULT_ID));
-                    tsr.setJobName(rs.getString(SuiteResult.JOB_NAME));
-                    tsr.setJobBuildNumber(rs.getInt(SuiteResult.JOB_BUILD_NUMBER));
-                    tsr.setJobBuildUrl(rs.getString(SuiteResult.JOB_BUILD_URL));
-                } else {
-                    LOG.warn("no suite result with execution id {}", id);
-                }
-                return tsr;
+            ResultSet rs = stmt.executeQuery();
+            SuiteResult tsr = new SuiteResult();
+            if (rs.first()) {
+                tsr.setSuiteResultId(rs.getString(SuiteResult.SUITE_RESULT_ID));
+                tsr.setJobName(rs.getString(SuiteResult.JOB_NAME));
+                tsr.setJobBuildNumber(rs.getInt(SuiteResult.JOB_BUILD_NUMBER));
+                tsr.setJobBuildUrl(rs.getString(SuiteResult.JOB_BUILD_URL));
+            } else {
+                LOG.warn("no suite result with execution id {}", id);
             }
+            return tsr;
         }
     }
 
@@ -145,7 +135,7 @@ public abstract class DbHandler {
         try (Connection conn = this.getConnection()) {
             try {
                 if (!this.acquireExecutionLock(conn, lock)) {
-                    throw new SQLException(LOCK_MSG + lock);
+                    throw new SQLException("Cannot acquire lock of name " + lock);
                 }
 
                 if (this.queueTaskSuite(suite, execId)) {
@@ -171,7 +161,8 @@ public abstract class DbHandler {
             + SuiteProperty.SUITE_RESULT_ID + ", "
             + SuiteProperty.PROPERTY_NAME + ", "
             + SuiteProperty.PROPERTY_VALUE + ") VALUES (?,?,?)";
-        try (PreparedStatement stmt = this.prepareStatement(sql)) {
+        try (Connection conn = this.getConnection()) {
+            PreparedStatement stmt = conn.prepareStatement(sql);
             stmt.setString(1, prop.getSuiteResultId());
             stmt.setString(2, StringUtils.left(prop.getPropertyName(), 255));
             stmt.setString(3, StringUtils.left(prop.getPropertyValue(), 255));
@@ -196,21 +187,21 @@ public abstract class DbHandler {
             .map((sc) -> " OR " + TaskCase.SUITE_CLASS + "='" + sc + "'")
             .reduce(sql0, String::concat);
         sql += sql0.substring(4);
-        try (PreparedStatement stmt = this.prepareStatement(sql)) {
+        try (Connection conn = this.getConnection()) {
+            PreparedStatement stmt = conn.prepareStatement(sql);
             LOG.debug("{}", stmt.toString());
-            try (ResultSet rs = stmt.executeQuery()) {
-                while (rs.next()) {
-                    TaskCase tc = new TaskCase();
-                    tc.setSuiteClass(rs.getString(TaskCase.SUITE_CLASS));
-                    tc.setCaseClass(rs.getString(TaskCase.CASE_CLASS));
-                    tc.setCaseMethod(rs.getString(TaskCase.CASE_METHOD));
-                    tc.setCaseDataInfo(rs.getString(TaskCase.CASE_DATA_INFO));
-                    tc.setCaseData(rs.getString(TaskCase.CASE_DATA));
-                    idMap.put(tc.format(), rs.getInt(TaskCase.TASK_CASE_ID));
-                }
-                LOG.debug("Found {} cases exist", idMap.size());
-                return idMap;
+            ResultSet rs = stmt.executeQuery();
+            while (rs.next()) {
+                TaskCase tc = new TaskCase();
+                tc.setSuiteClass(rs.getString(TaskCase.SUITE_CLASS));
+                tc.setCaseClass(rs.getString(TaskCase.CASE_CLASS));
+                tc.setCaseMethod(rs.getString(TaskCase.CASE_METHOD));
+                tc.setCaseDataInfo(rs.getString(TaskCase.CASE_DATA_INFO));
+                tc.setCaseData(rs.getString(TaskCase.CASE_DATA));
+                idMap.put(tc.format(), rs.getInt(TaskCase.TASK_CASE_ID));
             }
+            LOG.debug("Found {} cases exist", idMap.size());
+            return idMap;
         }
     }
 
@@ -226,33 +217,34 @@ public abstract class DbHandler {
             + "LIMIT ?;";
         List<CaseResult> tcrs = new ArrayList<>();
 
-        try (PreparedStatement stmt = this.prepareStatement(sql)) {
+        try (Connection conn = this.getConnection()) {
+            PreparedStatement stmt = conn.prepareStatement(sql);
             stmt.setString(1, ExecutionResult.QUEUED.getName());
             stmt.setString(2, execId);
             stmt.setInt(3, limit);
-            try (ResultSet rs = stmt.executeQuery()) {
-                while (rs.next()) {
-                    CaseResult tcr = new CaseResult();
-                    tcr.setCaseResultId(rs.getString(CaseResult.CASE_RESULT_ID));
-                    tcr.setSuiteResultId(execId);
-                    tcr.setStartTime(rs.getLong(CaseResult.START_TIME));
-                    tcr.setStopTime(rs.getLong(CaseResult.STOP_TIME));
-                    tcr.setRetry(rs.getInt(CaseResult.RETRY));
+            ResultSet rs = stmt.executeQuery();
 
-                    TaskCase tc = new TaskCase();
-                    tc.setSuiteClass(rs.getString(TaskCase.SUITE_CLASS));
-                    tc.setCaseClass(rs.getString(TaskCase.CASE_CLASS));
-                    tc.setCaseMethod(rs.getString(TaskCase.CASE_METHOD));
-                    tc.setCaseDataInfo(rs.getString(TaskCase.CASE_DATA_INFO));
-                    tc.setCaseData(rs.getString(TaskCase.CASE_DATA));
-                    tcr.setTaskCase(tc);
+            while (rs.next()) {
+                CaseResult tcr = new CaseResult();
+                tcr.setCaseResultId(rs.getString(CaseResult.CASE_RESULT_ID));
+                tcr.setSuiteResultId(execId);
+                tcr.setStartTime(rs.getLong(CaseResult.START_TIME));
+                tcr.setStopTime(rs.getLong(CaseResult.STOP_TIME));
+                tcr.setRetry(rs.getInt(CaseResult.RETRY));
 
-                    tcr.setCaseStation(rs.getString(CaseResult.CASE_STATION));
-                    tcr.setCaseEnv(rs.getString(CaseResult.CASE_ENV));
-                    tcr.setLogDir(rs.getString(CaseResult.LOG_DIR));
-                    tcr.setExternalId(rs.getString(CaseResult.EXTERNAL_ID));
-                    tcrs.add(tcr);
-                }
+                TaskCase tc = new TaskCase();
+                tc.setSuiteClass(rs.getString(TaskCase.SUITE_CLASS));
+                tc.setCaseClass(rs.getString(TaskCase.CASE_CLASS));
+                tc.setCaseMethod(rs.getString(TaskCase.CASE_METHOD));
+                tc.setCaseDataInfo(rs.getString(TaskCase.CASE_DATA_INFO));
+                tc.setCaseData(rs.getString(TaskCase.CASE_DATA));
+                tcr.setTaskCase(tc);
+
+                tcr.setCaseStation(rs.getString(CaseResult.CASE_STATION));
+                tcr.setCaseEnv(rs.getString(CaseResult.CASE_ENV));
+                tcr.setLogDir(rs.getString(CaseResult.LOG_DIR));
+                tcr.setExternalId(rs.getString(CaseResult.EXTERNAL_ID));
+                tcrs.add(tcr);
             }
         }
 
@@ -266,24 +258,25 @@ public abstract class DbHandler {
         final String sql = "SELECT * FROM " + CaseResult.TABLE_NAME + " WHERE "
             + CaseResult.CASE_RESULT_ID + " = ? LIMIT 1;";
 
-        try (PreparedStatement stmt = this.prepareUpdatableStatement(sql)) {
+        try (Connection conn = this.getConnection()) {
+            PreparedStatement stmt = conn.prepareStatement(sql,
+                ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE);
             stmt.setString(1, tcr.getCaseResultId());
-            try (ResultSet rs = stmt.executeQuery()) {
-                if (rs.next()) {
-                    String host = rs.getString(CaseResult.CASE_STATION);
-                    if (rs.getString(CaseResult.EXECUTION_RESULT).equals(ExecutionResult.QUEUED.result())) {
-                        LOG.debug("Found case {} in DB with QUEUED state", tcr.getTaskCase().format());
+            ResultSet rs = stmt.executeQuery();
+            if (rs.next()) {
+                String host = rs.getString(CaseResult.CASE_STATION);
+                if (rs.getString(CaseResult.EXECUTION_RESULT).equals(ExecutionResult.QUEUED.result())) {
+                    LOG.debug("Found case {} in DB with QUEUED state", tcr.getTaskCase().format());
 //                    if (SYS_CONFIG.getHostName().equals(host)) {
 //                        LOG.debug("This case Failed on current host, and was requeue. Skip...");
 //                        return false;
 //                    }
-                        rs.updateString(CaseResult.EXECUTION_RESULT, ExecutionResult.ACQUIRED.result());
-                        rs.updateString(CaseResult.CASE_STATION, SYS_CONFIG.getHostName());
-                        rs.updateRow();
-                        return true;
-                    } else {
-                        LOG.debug("Case {} was acquired by {}", tcr.getTaskCase().format(), host);
-                    }
+                    rs.updateString(CaseResult.EXECUTION_RESULT, ExecutionResult.ACQUIRED.result());
+                    rs.updateString(CaseResult.CASE_STATION, SYS_CONFIG.getHostName());
+                    rs.updateRow();
+                    return true;
+                } else {
+                    LOG.debug("Case {} was acquired by {}", tcr.getTaskCase().format(), host);
                 }
             }
         }
@@ -294,16 +287,18 @@ public abstract class DbHandler {
         if (StringUtils.isBlank(productUnderTask)) {
             return;
         }
-        final String sql = "SELECT * FROM " + SuiteResult.TABLE_NAME + " WHERE " + SuiteResult.SUITE_RESULT_ID + " = ?;";
-        try (PreparedStatement stmt = this.prepareUpdatableStatement(sql)) {
+        final String sql = "SELECT * FROM " + SuiteResult.TABLE_NAME
+            + " WHERE " + SuiteResult.SUITE_RESULT_ID + " = ?;";
+        try (PreparedStatement stmt = this.getConnection().prepareStatement(sql,
+            ResultSet.TYPE_SCROLL_SENSITIVE,
+            ResultSet.CONCUR_UPDATABLE)) {
             stmt.setString(1, execId);
-            try (ResultSet rs = stmt.executeQuery()) {
-                if (rs.first()) {
-                    if (StringUtils.isBlank(rs.getString(SuiteResult.PRODUCT_UNDER_TASK))) {
-                        rs.updateString(SuiteResult.PRODUCT_UNDER_TASK, productUnderTask);
-                    }
-                    rs.updateRow();
+            ResultSet rs = stmt.executeQuery();
+            if (rs.first()) {
+                if (StringUtils.isBlank(rs.getString(SuiteResult.PRODUCT_UNDER_TASK))) {
+                    rs.updateString(SuiteResult.PRODUCT_UNDER_TASK, productUnderTask);
                 }
+                rs.updateRow();
             }
         }
     }
@@ -315,24 +310,26 @@ public abstract class DbHandler {
             + " tc WHERE tr.TASK_CASE_ID=tc.TASK_CASE_ID AND "
             + CaseResult.CASE_RESULT_ID + " = ?;";
 
-        try (PreparedStatement stmt = this.prepareUpdatableStatement(sql)) {
+        try (Connection conn = this.getConnection()) {
+            PreparedStatement stmt = conn.prepareStatement(sql,
+                ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE);
             stmt.setString(1, tcr.getCaseResultId());
-            try (ResultSet rs = stmt.executeQuery()) {
-                if (rs.first()) {
-                    // rs.updateString(TaskCase.CASE_DATA, tcr.getTaskCase().getCaseData()); TODO: update case data into task case table
-                    rs.updateString(CaseResult.EXECUTION_RESULT, tcr.getResult().result());
-                    rs.updateString(CaseResult.AUT, tcr.getAut());
-                    rs.updateLong(CaseResult.START_TIME, tcr.getStartTime());
-                    rs.updateLong(CaseResult.STOP_TIME, tcr.getStopTime());
-                    rs.updateInt(CaseResult.RETRY, tcr.getRetry());
-                    rs.updateString(CaseResult.CASE_STATION, tcr.getCaseStation());
-                    rs.updateString(CaseResult.CASE_ENV, tcr.getCaseEnv());
-                    rs.updateString(CaseResult.LOG_DIR, tcr.getLogDir());
-                    rs.updateString(CaseResult.EXTERNAL_ID, tcr.getExternalId());
-                    rs.updateRow();
-                } else {
-                    LOG.warn("Cannot update case result");
-                }
+            ResultSet rs = stmt.executeQuery();
+            if (rs.first()) {
+// TODO: update case data into task case table
+//                rs.updateString(TaskCase.CASE_DATA, tcr.getTaskCase().getCaseData());
+                rs.updateString(CaseResult.EXECUTION_RESULT, tcr.getResult().result());
+                rs.updateString(CaseResult.AUT, tcr.getAut());
+                rs.updateLong(CaseResult.START_TIME, tcr.getStartTime());
+                rs.updateLong(CaseResult.STOP_TIME, tcr.getStopTime());
+                rs.updateInt(CaseResult.RETRY, tcr.getRetry());
+                rs.updateString(CaseResult.CASE_STATION, tcr.getCaseStation());
+                rs.updateString(CaseResult.CASE_ENV, tcr.getCaseEnv());
+                rs.updateString(CaseResult.LOG_DIR, tcr.getLogDir());
+                rs.updateString(CaseResult.EXTERNAL_ID, tcr.getExternalId());
+                rs.updateRow();
+            } else {
+                LOG.warn("Cannot update case result");
             }
         }
     }
@@ -346,7 +343,7 @@ public abstract class DbHandler {
         try (Connection conn = this.getConnection()) {
             try {
                 if (!this.acquireExecutionLock(conn, lock)) {
-                    throw new SQLException(LOCK_MSG + lock);
+                    throw new SQLException("Cannot acquire lock of name " + lock);
                 }
 
                 {
@@ -373,7 +370,7 @@ public abstract class DbHandler {
                                 total += p + f;
                                 fail += f;
                             } else {
-                                throw new EntityCommunicationException("Cannot parse case execution result " + result);
+                                throw new RuntimeException("Cannot parse case execution result " + result);
                             }
                         }
                     }
@@ -408,30 +405,29 @@ public abstract class DbHandler {
         LOG.info("Wait {} minutes for execution {} to finish", timeoutMinute, execId);
         String EXEC_WAIT_INTERVAL = "reactor.exec.wait.interval";
         int intervalMillis = SystemConfiguration.getInstance().getIntProperty(EXEC_WAIT_INTERVAL, 10000);
-        final String sql = "SELECT " + CaseResult.EXECUTION_RESULT + ", " + CaseResult.LOG_DIR + " FROM "
+        final String sql = "SELECT " + CaseResult.EXECUTION_RESULT +", " + CaseResult.LOG_DIR + " FROM "
             + CaseResult.TABLE_NAME + " WHERE " + CaseResult.SUITE_RESULT + " = ?;";
-        try (PreparedStatement stmt = this.prepareStatement(sql)) {
-            stmt.setString(1, execId);
-            long end = System.currentTimeMillis() + timeoutMinute * 60000;
-            while (System.currentTimeMillis() < end) {
-                try (ResultSet rs = stmt.executeQuery()) {
-                    while (rs.next()) {
-                        String result = rs.getString(CaseResult.EXECUTION_RESULT);
-                        if (ExecutionResult.NON_FINISH_STATES.contains(result)) {
-                            LOG.debug("{}: {}", rs.getString(CaseResult.LOG_DIR), result);
-                            break;
-                        }
+        long end = System.currentTimeMillis() + timeoutMinute * 60000;
+        while (System.currentTimeMillis() < end) {
+            try (PreparedStatement stmt = this.getConnection().prepareStatement(sql)) {
+                stmt.setString(1, execId);
+                ResultSet rs = stmt.executeQuery();
+                while (rs.next()) {
+                    String result = rs.getString(CaseResult.EXECUTION_RESULT);
+                    if (ExecutionResult.NON_FINISH_STATES.contains(result)) {
+                        LOG.debug("{}: {}", rs.getString(CaseResult.LOG_DIR), result);
+                        break;
                     }
-                    if (rs.isAfterLast()) {
-                        LOG.debug("call case execution done");
-                        return true;
-                    } else {
-                        Utils.sleep(intervalMillis, "wait for suite execution to finish");
-                    }
+                }
+                if (rs.isAfterLast()) {
+                    LOG.debug("call case execution done");
+                    return true;
+                } else {
+                    Utils.sleep(intervalMillis, "wait for suite execution to finish");
                 }
             }
         }
-        LOG.warn("suite execution {} did not finish after checking for {} minutes", execId, timeoutMinute);
+        LOG.warn("suite execution {} did not finish after {} minutes", execId, timeoutMinute);
         return false;
     }
 
@@ -444,7 +440,7 @@ public abstract class DbHandler {
         try (Connection conn = this.getConnection()) {
             try {
                 if (!this.acquireExecutionLock(conn, lock)) {
-                    throw new SQLException(LOCK_MSG + lock);
+                    throw new SQLException("Cannot acquire lock of name " + lock);
                 }
 
                 {
@@ -455,7 +451,7 @@ public abstract class DbHandler {
                         + " ON tr." + CaseResult.TASK_CASE_ID + " = tc." + TaskCase.TASK_CASE_ID
                         + " WHERE " + CaseResult.SUITE_RESULT + " = ? ORDER BY tr." + CaseResult.START_TIME
                         + " DESC;";
-                    try (PreparedStatement stmt = this.prepareStatement(sql)) {
+                    try (PreparedStatement stmt = this.getConnection().prepareStatement(sql)) {
                         stmt.setString(1, execId);
                         LOG.debug("{}", stmt);
                         ResultSet rs = stmt.executeQuery();
@@ -513,7 +509,8 @@ public abstract class DbHandler {
                 {
                     final String sql = "SELECT * FROM " + SuiteResult.TABLE_NAME
                         + " WHERE " + SuiteResult.SUITE_RESULT_ID + " = ?;";
-                    try (PreparedStatement stmt = this.prepareUpdatableStatement(sql)) {
+                    try (PreparedStatement stmt = this.getConnection().prepareStatement(sql,
+                        ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE)) {
                         stmt.setString(1, execId);
                         ResultSet rs = stmt.executeQuery();
                         if (rs.first()) {
@@ -543,12 +540,13 @@ public abstract class DbHandler {
         try (Connection conn = this.getConnection()) {
             try {
                 if (!this.acquireExecutionLock(conn, lock)) {
-                    throw new SQLException(LOCK_MSG + lock);
+                    throw new SQLException("Cannot acquire lock of name " + lock);
                 }
 
                 final String sql = "SELECT * FROM " + SuiteResult.TABLE_NAME
                     + " WHERE " + SuiteResult.SUITE_RESULT_ID + " = ?;";
-                try (PreparedStatement stmt = this.prepareUpdatableStatement(sql)) {
+                try (PreparedStatement stmt = this.getConnection().prepareStatement(sql,
+                    ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE)) {
                     stmt.setString(1, execId);
                     ResultSet rs = stmt.executeQuery();
                     if (rs.first()) {
@@ -575,7 +573,8 @@ public abstract class DbHandler {
 
         final String sql = "SELECT * FROM " + SuiteResult.TABLE_NAME + " WHERE "
             + SuiteResult.SUITE_RESULT_ID + " = ?;";
-        try (PreparedStatement stmt = this.prepareUpdatableStatement(sql)) {
+        try (PreparedStatement stmt = this.getConnection().prepareStatement(sql,
+            ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE)) {
             stmt.setString(1, execId);
             ResultSet rs = stmt.executeQuery();
             if (rs.first()) {
@@ -612,7 +611,7 @@ public abstract class DbHandler {
                         + TaskCase.TABLE_NAME + " tc ON "
                         + "tr." + CaseResult.TASK_CASE_ID + " = tc." + TaskCase.TASK_CASE_ID
                         + " WHERE " + CaseResult.SUITE_RESULT + " = ?;";
-                    try (PreparedStatement stmt1 = this.prepareStatement(sql1)) {
+                    try (PreparedStatement stmt1 = this.getConnection().prepareStatement(sql1)) {
                         stmt1.setString(1, execId);
                         ResultSet rs1 = stmt1.executeQuery();
                         int i = 0;
@@ -671,7 +670,7 @@ public abstract class DbHandler {
         {
             final String sql = "SELECT * FROM " + SuiteResult.TABLE_NAME + " WHERE "
                 + SuiteResult.SUITE_RESULT_ID + " = ?;";
-            try (PreparedStatement stmt = this.prepareStatement(sql)) {
+            try (Connection conn = this.getConnection(); PreparedStatement stmt = conn.prepareStatement(sql)) {
                 stmt.setString(1, execId);
                 List<Map<String, Object>> l = dumpResultSetToList(stmt.executeQuery());
                 if (l.isEmpty()) {
@@ -690,7 +689,7 @@ public abstract class DbHandler {
                 + CaseResult.TABLE_NAME + " tr ON"
                 + " trm." + CaseResultMetric.CASE_RESULT_ID + " = tr." + CaseResult.CASE_RESULT_ID
                 + " WHERE " + CaseResult.SUITE_RESULT + " = ?;";
-            try (PreparedStatement stmt = this.prepareStatement(sql)) {
+            try (Connection conn = this.getConnection(); PreparedStatement stmt = conn.prepareStatement(sql)) {
                 stmt.setString(1, execId);
                 metrics = dumpResultSetToList(stmt.executeQuery());
             }
@@ -701,7 +700,7 @@ public abstract class DbHandler {
                 + TaskCase.TABLE_NAME + " tc ON"
                 + " tr." + CaseResult.TASK_CASE_ID + " = tc." + TaskCase.TASK_CASE_ID
                 + " WHERE " + CaseResult.SUITE_RESULT + " = ?;";
-            try (PreparedStatement stmt = this.prepareStatement(sql)) {
+            try (Connection conn = this.getConnection(); PreparedStatement stmt = conn.prepareStatement(sql)) {
                 stmt.setString(1, execId);
                 List<Map<String, Object>> l = dumpResultSetToList(stmt.executeQuery());
                 l.forEach(row -> {
@@ -730,7 +729,7 @@ public abstract class DbHandler {
             JSONArray sps = new JSONArray();
             final String sql = "SELECT * FROM " + SuiteProperty.TABLE_NAME
                 + " WHERE " + SuiteProperty.SUITE_RESULT_ID + " = ?;";
-            try (PreparedStatement stmt = this.prepareStatement(sql)) {
+            try (Connection conn = this.getConnection(); PreparedStatement stmt = conn.prepareStatement(sql)) {
                 stmt.setString(1, execId);
                 List<Map<String, Object>> l = dumpResultSetToList(stmt.executeQuery());
                 l.forEach(row -> {
@@ -752,32 +751,32 @@ public abstract class DbHandler {
         JSONObject sr = j.getJSONObject("suite_result");
         String srid = sr.getString(SuiteResult.SUITE_RESULT_ID);
         LOG.debug("srid {}", srid);
-        {
+        try (Connection conn = this.getConnection()) {
             String sql = "SELECT * FROM " + SuiteResult.TABLE_NAME + " WHERE " + SuiteResult.SUITE_RESULT_ID + " = ?;";
-            try (PreparedStatement stmt = this.prepareUpdatableStatement(sql)) {
-                stmt.setString(1, srid);
-                try (ResultSet rs = stmt.executeQuery()) {
-                    ResultSetMetaData rsmd = rs.getMetaData();
-                    if (rs.first()) {
-                        LOG.debug("already imported {}", srid);
-                        return;
-                    }
-                    rs.moveToInsertRow();
-                    for (int col = 1; col <= rsmd.getColumnCount(); col++) {
-                        String cn = rsmd.getColumnLabel(col);
-                        rs.updateObject(cn, sr.get(cn));
-                    }
-                    rs.insertRow();
-                    rs.last();
-                    rs.updateRow();
-                    LOG.debug("sr imported");
-                }
+            PreparedStatement stmt = conn.prepareStatement(sql,
+                ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE);
+            stmt.setString(1, srid);
+            ResultSet rs = stmt.executeQuery();
+            ResultSetMetaData rsmd = rs.getMetaData();
+            if (rs.first()) {
+                LOG.debug("already imported {}", srid);
+                return;
             }
+            rs.moveToInsertRow();
+            for (int col = 1; col <= rsmd.getColumnCount(); col++) {
+                String cn = rsmd.getColumnLabel(col);
+                rs.updateObject(cn, sr.get(cn));
+            }
+            rs.insertRow();
+            rs.last();
+            rs.updateRow();
         }
+        LOG.debug("sr imported");
 
         JSONArray trs = sr.getJSONArray("case_results");
         int len = trs.length();
-        {
+
+        try (Connection conn = this.getConnection()) {
             String sql = String.format("SELECT * FROM %s WHERE %s=? AND %s=? AND %s=? AND %s=? AND %s=?;",
                 TaskCase.TABLE_NAME,
                 TaskCase.SUITE_CLASS,
@@ -786,55 +785,55 @@ public abstract class DbHandler {
                 TaskCase.CASE_DATA_INFO,
                 TaskCase.CASE_DATA
             );
-            try (PreparedStatement stmt = this.prepareUpdatableStatement(sql)) {
-                stmt.setMaxRows(1);
-                for (int i = 0; i < len; i++) {
-                    JSONObject tr = trs.getJSONObject(i);
-                    stmt.setString(1, tr.getString(TaskCase.SUITE_CLASS));
-                    stmt.setString(2, tr.getString(TaskCase.CASE_CLASS));
-                    stmt.setString(3, tr.getString(TaskCase.CASE_METHOD));
-                    stmt.setString(4, tr.getString(TaskCase.CASE_DATA_INFO));
-                    stmt.setString(5, tr.getString(TaskCase.CASE_DATA));
-                    ResultSet rs = stmt.executeQuery();
-                    if (!rs.first()) {
-                        rs.moveToInsertRow();
-                        rs.updateString(TaskCase.SUITE_CLASS, tr.getString(TaskCase.SUITE_CLASS));
-                        rs.updateString(TaskCase.CASE_CLASS, tr.getString(TaskCase.CASE_CLASS));
-                        rs.updateString(TaskCase.CASE_METHOD, tr.getString(TaskCase.CASE_METHOD));
-                        rs.updateString(TaskCase.CASE_DATA_INFO, tr.getString(TaskCase.CASE_DATA_INFO));
-                        rs.updateString(TaskCase.CASE_DATA, tr.getString(TaskCase.CASE_DATA));
-                        rs.insertRow();
-                        rs.last();
-                        rs.updateRow();
-                        rs = stmt.executeQuery();
-                        rs.first();
-                    }
-                    tr.put(TaskCase.TASK_CASE_ID, rs.getLong(TaskCase.TASK_CASE_ID));
+            PreparedStatement stmt
+                = conn.prepareStatement(sql, ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE);
+            stmt.setMaxRows(1);
+            for (int i = 0; i < len; i++) {
+                JSONObject tr = trs.getJSONObject(i);
+                stmt.setString(1, tr.getString(TaskCase.SUITE_CLASS));
+                stmt.setString(2, tr.getString(TaskCase.CASE_CLASS));
+                stmt.setString(3, tr.getString(TaskCase.CASE_METHOD));
+                stmt.setString(4, tr.getString(TaskCase.CASE_DATA_INFO));
+                stmt.setString(5, tr.getString(TaskCase.CASE_DATA));
+                ResultSet rs = stmt.executeQuery();
+                if (!rs.first()) {
+                    rs.moveToInsertRow();
+                    rs.updateString(TaskCase.SUITE_CLASS, tr.getString(TaskCase.SUITE_CLASS));
+                    rs.updateString(TaskCase.CASE_CLASS, tr.getString(TaskCase.CASE_CLASS));
+                    rs.updateString(TaskCase.CASE_METHOD, tr.getString(TaskCase.CASE_METHOD));
+                    rs.updateString(TaskCase.CASE_DATA_INFO, tr.getString(TaskCase.CASE_DATA_INFO));
+                    rs.updateString(TaskCase.CASE_DATA, tr.getString(TaskCase.CASE_DATA));
+                    rs.insertRow();
+                    rs.last();
+                    rs.updateRow();
+                    rs = stmt.executeQuery();
+                    rs.first();
                 }
-                LOG.debug("tcid updated");
+                tr.put(TaskCase.TASK_CASE_ID, rs.getLong(TaskCase.TASK_CASE_ID));
             }
         }
-        {
+        LOG.debug("tcid updated");
+
+        try (Connection conn = this.getConnection()) {
             String sql = "SELECT * FROM " + CaseResult.TABLE_NAME + " WHERE " + CaseResult.SUITE_RESULT + " = ?;";
-            try (PreparedStatement stmt = this.prepareUpdatableStatement(sql)) {
-                stmt.setString(1, srid);
-                try (ResultSet rs = stmt.executeQuery()) {
-                    ResultSetMetaData rsmd = rs.getMetaData();
-                    for (int i = 0; i < len; i++) {
-                        rs.moveToInsertRow();
-                        JSONObject tr = trs.getJSONObject(i);
-                        for (int col = 1; col <= rsmd.getColumnCount(); col++) {
-                            String cn = rsmd.getColumnLabel(col);
-                            rs.updateObject(cn, tr.get(cn));
-                        }
-                        rs.insertRow();
-                        rs.last();
-                        rs.updateRow();
-                    }
-                    LOG.debug("trs imported");
+            PreparedStatement stmt = conn.prepareStatement(sql,
+                ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE);
+            stmt.setString(1, srid);
+            ResultSet rs = stmt.executeQuery();
+            ResultSetMetaData rsmd = rs.getMetaData();
+            for (int i = 0; i < len; i++) {
+                rs.moveToInsertRow();
+                JSONObject tr = trs.getJSONObject(i);
+                for (int col = 1; col <= rsmd.getColumnCount(); col++) {
+                    String cn = rsmd.getColumnLabel(col);
+                    rs.updateObject(cn, tr.get(cn));
                 }
+                rs.insertRow();
+                rs.last();
+                rs.updateRow();
             }
         }
+        LOG.debug("trs imported");
     }
 
     public void saveCaseResultMetrics(String trid, List<CaseResultMetric> resultMetrics) throws SQLException {
@@ -846,7 +845,8 @@ public abstract class DbHandler {
             + CaseResultMetric.METRIC_GROUP + ", "
             + CaseResultMetric.METRIC_NAME + ", "
             + CaseResultMetric.METRIC_VALUE + ") VALUES (?,?,?,?)";
-        try (PreparedStatement stmt = this.prepareStatement(sql)) {
+        try (Connection conn = this.getConnection()) {
+            PreparedStatement stmt = conn.prepareStatement(sql);
             LOG.trace("save metric data for {}", trid);
             for (CaseResultMetric metric : resultMetrics) {
                 stmt.setString(1, trid);
