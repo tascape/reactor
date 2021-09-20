@@ -21,12 +21,10 @@ th.log
 .settings/
 
 # netbeans
-nbproject/private/
-build/
-nbbuild/
 dist/
-nbdist/
 nb-configuration.xml
+nbactions*.xml
+nbactions.xml
 
 # intelliJ
 .idea/
@@ -34,4 +32,3 @@ nb-configuration.xml
 
 # macOS
 .DS_Store
-/nbproject/
