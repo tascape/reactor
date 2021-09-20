@@ -248,12 +248,12 @@ public class SystemConfiguration {
         return this.getIntProperty(SYSPROP_CASE_LOAD_LIMIT, 100);
     }
 
-    public String getHostName() {
+    public String getHostName() throws InterruptedException {
         String hn = this.getProperty(SYSPROP_CASE_STATION);
-        if (StringUtils.isEmpty(hn)) {
+        if (StringUtils.isBlank(hn)) {
             try {
                 hn = Utils.cmd("hostname").get(0);
-            } catch (IOException | InterruptedException ex) {
+            } catch (IOException ex) {
                 LOG.trace("Cannot get host name", ex);
                 hn = "unknow host";
             }
@@ -371,7 +371,7 @@ public class SystemConfiguration {
         return new ArrayList<>();
     }
 
-    public String getJobName() {
+    public String getJobName() throws InterruptedException {
         String value = this.getProperty(pre(SYSENV_JOB_NAME));
         if (StringUtils.isBlank(value)) {
             value = System.getenv().get(SYSENV_JOB_NAME);

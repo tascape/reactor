@@ -76,7 +76,7 @@ public final class H2Handler extends DbHandler {
     }
 
     @Override
-    public boolean queueTaskSuite(TaskSuite suite, String execId) throws SQLException {
+    public boolean queueTaskSuite(TaskSuite suite, String execId) throws SQLException, InterruptedException {
         LOG.debug("Queueing suite result with execution id {} ", execId);
         final String sql = "INSERT INTO " + SuiteResult.TABLE_NAME + " ("
             + SuiteResult.SUITE_RESULT_ID + ", "

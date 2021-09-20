@@ -129,7 +129,7 @@ public abstract class DbHandler {
         }
     }
 
-    public void queueSuiteExecution(TaskSuite suite, String execId) throws SQLException {
+    public void queueSuiteExecution(TaskSuite suite, String execId) throws SQLException, InterruptedException {
         LOG.debug("Queue case suite for execution with execution id {}", execId);
         String lock = this.getDbLock(execId);
         try (Connection conn = this.getConnection()) {
@@ -170,7 +170,7 @@ public abstract class DbHandler {
         }
     }
 
-    public abstract boolean queueTaskSuite(TaskSuite suite, String execId) throws SQLException;
+    public abstract boolean queueTaskSuite(TaskSuite suite, String execId) throws SQLException, InterruptedException;
 
     protected abstract int getCaseId(TaskCase kase) throws SQLException;
 
@@ -253,30 +253,31 @@ public abstract class DbHandler {
         return tcrs;
     }
 
-    public boolean acquireCaseResult(CaseResult tcr) throws SQLException {
+    public boolean acquireCaseResult(CaseResult tcr) throws SQLException, InterruptedException {
         LOG.debug("Try to acquire case {}", tcr.getTaskCase().format());
         final String sql = "SELECT * FROM " + CaseResult.TABLE_NAME + " WHERE "
             + CaseResult.CASE_RESULT_ID + " = ? LIMIT 1;";
 
         try (Connection conn = this.getConnection()) {
-            PreparedStatement stmt = conn.prepareStatement(sql,
-                ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE);
-            stmt.setString(1, tcr.getCaseResultId());
-            ResultSet rs = stmt.executeQuery();
-            if (rs.next()) {
-                String host = rs.getString(CaseResult.CASE_STATION);
-                if (rs.getString(CaseResult.EXECUTION_RESULT).equals(ExecutionResult.QUEUED.result())) {
-                    LOG.debug("Found case {} in DB with QUEUED state", tcr.getTaskCase().format());
+            try (PreparedStatement stmt = conn.prepareStatement(sql, ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE)) {
+                stmt.setString(1, tcr.getCaseResultId());
+                try (ResultSet rs = stmt.executeQuery()) {
+                    if (rs.next()) {
+                        String host = rs.getString(CaseResult.CASE_STATION);
+                        if (rs.getString(CaseResult.EXECUTION_RESULT).equals(ExecutionResult.QUEUED.result())) {
+                            LOG.debug("Found case {} in DB with QUEUED state", tcr.getTaskCase().format());
 //                    if (SYS_CONFIG.getHostName().equals(host)) {
 //                        LOG.debug("This case Failed on current host, and was requeue. Skip...");
 //                        return false;
 //                    }
-                    rs.updateString(CaseResult.EXECUTION_RESULT, ExecutionResult.ACQUIRED.result());
-                    rs.updateString(CaseResult.CASE_STATION, SYS_CONFIG.getHostName());
-                    rs.updateRow();
-                    return true;
-                } else {
-                    LOG.debug("Case {} was acquired by {}", tcr.getTaskCase().format(), host);
+                            rs.updateString(CaseResult.EXECUTION_RESULT, ExecutionResult.ACQUIRED.result());
+                            rs.updateString(CaseResult.CASE_STATION, SYS_CONFIG.getHostName());
+                            rs.updateRow();
+                            return true;
+                        } else {
+                            LOG.debug("Case {} was acquired by {}", tcr.getTaskCase().format(), host);
+                        }
+                    }
                 }
             }
         }
@@ -405,27 +406,29 @@ public abstract class DbHandler {
         LOG.info("Wait {} minutes for execution {} to finish", timeoutMinute, execId);
         String EXEC_WAIT_INTERVAL = "reactor.exec.wait.interval";
         int intervalMillis = SystemConfiguration.getInstance().getIntProperty(EXEC_WAIT_INTERVAL, 10000);
-        final String sql = "SELECT " + CaseResult.EXECUTION_RESULT +", " + CaseResult.LOG_DIR + " FROM "
+        final String sql = "SELECT " + CaseResult.EXECUTION_RESULT + ", " + CaseResult.LOG_DIR + " FROM "
             + CaseResult.TABLE_NAME + " WHERE " + CaseResult.SUITE_RESULT + " = ?;";
         long end = System.currentTimeMillis() + timeoutMinute * 60000;
         while (System.currentTimeMillis() < end) {
             try (PreparedStatement stmt = this.getConnection().prepareStatement(sql)) {
                 stmt.closeOnCompletion();
                 stmt.setString(1, execId);
-                ResultSet rs = stmt.executeQuery();
-                while (rs.next()) {
-                    String result = rs.getString(CaseResult.EXECUTION_RESULT);
-                    if (ExecutionResult.NON_FINISH_STATES.contains(result)) {
-                        LOG.debug("{}: {}", rs.getString(CaseResult.LOG_DIR), result);
-                        rs.refreshRow();
-                        break;
+                try (ResultSet rs = stmt.executeQuery()) {
+                    while (rs.next()) {
+                        String logDir = rs.getString(CaseResult.LOG_DIR);
+                        String result = rs.getString(CaseResult.EXECUTION_RESULT);
+                        LOG.debug("{}: {}", logDir, result);
+                        if (ExecutionResult.NON_FINISH_STATES.contains(result)) {
+                            LOG.warn("{}: {}", logDir, result);
+                            break;
+                        }
                     }
-                }
-                if (rs.isAfterLast()) {
-                    LOG.debug("suite execution is done");
-                    return true;
-                } else {
-                    Utils.sleep(intervalMillis, "wait for suite execution to finish");
+                    if (rs.isAfterLast()) {
+                        LOG.debug("suite execution is done");
+                        return true;
+                    } else {
+                        Utils.sleep(intervalMillis, "wait for suite execution to finish");
+                    }
                 }
             }
         }

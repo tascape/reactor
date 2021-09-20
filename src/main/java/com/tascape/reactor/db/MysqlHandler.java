@@ -84,7 +84,7 @@ public class MysqlHandler extends DbHandler {
     }
 
     @Override
-    public void queueSuiteExecution(TaskSuite suite, String execId) throws SQLException {
+    public void queueSuiteExecution(TaskSuite suite, String execId) throws SQLException, InterruptedException {
         LOG.debug("Queue suite for execution with execution id {}", execId);
         String lock = this.getDbLock(execId);
         try (Connection conn = this.getConnection()) {
@@ -103,7 +103,7 @@ public class MysqlHandler extends DbHandler {
     }
 
     @Override
-    public boolean queueTaskSuite(TaskSuite suite, String execId) throws SQLException {
+    public boolean queueTaskSuite(TaskSuite suite, String execId) throws SQLException, InterruptedException {
         LOG.debug("Queueing suite result with execution id {} ", execId);
         final String sql = "SELECT * FROM " + SuiteResult.TABLE_NAME + " WHERE "
             + SuiteResult.SUITE_RESULT_ID + " = ?";

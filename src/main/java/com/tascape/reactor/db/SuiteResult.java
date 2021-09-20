@@ -119,7 +119,7 @@ public class SuiteResult implements Serializable {
     public SuiteResult() {
     }
 
-    public SuiteResult(TaskSuite taskSuite, String execId) {
+    public SuiteResult(TaskSuite taskSuite, String execId) throws InterruptedException {
         Long time = System.currentTimeMillis();
         this.suiteResultId = execId;
         this.suiteName = taskSuite.getName();

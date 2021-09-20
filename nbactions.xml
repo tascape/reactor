@@ -10,7 +10,7 @@
                 <goal>org.codehaus.mojo:exec-maven-plugin:1.2.1:exec</goal>
             </goals>
             <properties>
-                <exec.args>-Dreactor.debug.method.regex= -Dreactor.exec.thread.count=1 -Dreactor.case.log.level=TRACE -Dreactor.db.type=h2 -Dreactor.case.suite=com.tascape.reactor.suite.JUnit4Suite -classpath %classpath com.tascape.reactor.Reactor</exec.args>
+                <exec.args>-Dreactor.debug.method.regex= -Dreactor.exec.thread.count=1 -Dreactor.case.log.level=TRACE -Dreactor.db.type=mysql -Dreactor.db.host=127.0.0.1 -Dreactor.db.pass=imply123 -Dreactor.case.suite=com.tascape.reactor.suite.JUnit4Suite -classpath %classpath com.tascape.reactor.Reactor</exec.args>
                 <exec.executable>java</exec.executable>
             </properties>
         </action>
@@ -24,7 +24,7 @@
                 <goal>org.codehaus.mojo:exec-maven-plugin:1.2.1:exec</goal>
             </goals>
             <properties>
-                <exec.args>-agentlib:jdwp=transport=dt_socket,server=n,address=${jpda.address} -Dreactor.debug.method.regex= -Dreactor.exec.thread.count=1 -Dreactor.case.log.level=TRACE -Dreactor.db.type=h2 -Dreactor.case.suite=com.tascape.reactor.suite.JUnit4Suite -classpath %classpath com.tascape.reactor.Reactor</exec.args>
+                <exec.args>-agentlib:jdwp=transport=dt_socket,server=n,address=${jpda.address} -Dreactor.debug.method.regex= -Dreactor.exec.thread.count=1 -Dreactor.case.log.level=TRACE -Dreactor.db.type=mysql -Dreactor.db.host=127.0.0.1 -Dreactor.db.pass=imply123 -Dreactor.case.suite=com.tascape.reactor.suite.JUnit4Suite -classpath %classpath com.tascape.reactor.Reactor</exec.args>
                 <exec.executable>java</exec.executable>
                 <jpda.listen>true</jpda.listen>
             </properties>
@@ -39,7 +39,7 @@
                 <goal>org.codehaus.mojo:exec-maven-plugin:1.2.1:exec</goal>
             </goals>
             <properties>
-                <exec.args>-Dreactor.debug.method.regex= -Dreactor.exec.thread.count=1 -Dreactor.case.log.level=TRACE -Dreactor.db.type=h2 -Dreactor.case.suite=com.tascape.reactor.suite.JUnit4Suite -classpath %classpath com.tascape.reactor.Reactor</exec.args>
+                <exec.args>-Dreactor.debug.method.regex= -Dreactor.exec.thread.count=1 -Dreactor.case.log.level=TRACE -Dreactor.db.type=mysql -Dreactor.db.host=127.0.0.1 -Dreactor.db.pass=imply123 -Dreactor.case.suite=com.tascape.reactor.suite.JUnit4Suite -classpath %classpath com.tascape.reactor.Reactor</exec.args>
                 <exec.executable>java</exec.executable>
             </properties>
         </action>
