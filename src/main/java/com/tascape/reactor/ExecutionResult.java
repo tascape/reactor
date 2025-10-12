@@ -45,10 +45,10 @@ public class ExecutionResult {
     public static final ExecutionResult CANCEL = new ExecutionResult("CANCEL");
 
     public static final List<String> NON_FINISH_STATES = Arrays.asList(
-        NA.getName(),
-        QUEUED.getName(),
-        ACQUIRED.getName(),
-        RUNNING.getName()
+            NA.getName(),
+            QUEUED.getName(),
+            ACQUIRED.getName(),
+            RUNNING.getName()
     );
 
     /**

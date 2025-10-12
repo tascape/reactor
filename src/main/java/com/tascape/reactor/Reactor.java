@@ -16,11 +16,8 @@
  */
 package com.tascape.reactor;
 
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.regex.Pattern;
-import org.apache.commons.lang3.SystemUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -29,6 +26,7 @@ import org.slf4j.LoggerFactory;
  * @author linsong wang
  */
 public class Reactor {
+
     private static final Logger LOG = LoggerFactory.getLogger(Reactor.class);
 
     public static void main(String[] args) {

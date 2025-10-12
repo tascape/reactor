@@ -145,11 +145,11 @@ public class SystemConfiguration {
         List<String> keys = new ArrayList<>(System.getProperties().stringPropertyNames());
         Properties sysProps = new Properties();
         keys.stream()
-            .filter((key)
-                -> (key.startsWith(CONSTANT_SYSPROP_PREFIX)) && StringUtils.isNotBlank(System.getProperty(key)))
-            .forEach((key) -> {
-                sysProps.setProperty(key, System.getProperty(key));
-            });
+                .filter((key)
+                        -> (key.startsWith(CONSTANT_SYSPROP_PREFIX)) && StringUtils.isNotBlank(System.getProperty(key)))
+                .forEach((key) -> {
+                    sysProps.setProperty(key, System.getProperty(key));
+                });
         this.properties.putAll(sysProps);
 
         String execId = this.properties.getProperty(SYSPROP_EXECUTION_ID);
@@ -168,7 +168,7 @@ public class SystemConfiguration {
         String v = this.properties.getProperty(name);
         if (StringUtils.isBlank(v)) {
             LOG.debug("System property '{}' is not defined, or blank, default value '{}' will be used", name,
-                defaultValue);
+                    defaultValue);
             return defaultValue;
         }
         return v;
@@ -191,7 +191,7 @@ public class SystemConfiguration {
     public int getIntProperty(String name, int defaultValue) {
         String v = this.getProperty(name);
         if (StringUtils.isBlank(v)) {
-            LOG.debug("System property '{}' is not defined, default value '{}' will be used", name, defaultValue);
+            LOG.trace("System property '{}' is not defined, default value '{}' will be used", name, defaultValue);
             return defaultValue;
         }
         return Integer.parseInt(v);
@@ -289,8 +289,8 @@ public class SystemConfiguration {
         String prop = this.getProperty(SYSPROP_DEBUG_CASE_LIST, "").trim();
         if (prop.isEmpty()) {
             LOG.debug(
-                "No case list is specified. Use -Dreactor.debug.case.list=full-class1.method1,full-class2.method2,"
-                + " or -Dreactor.debug.case.list=@some-file.txt (one case per line in the file)");
+                    "No case list is specified. Use -Dreactor.debug.case.list=full-class1.method1,full-class2.method2,"
+                    + " or -Dreactor.debug.case.list=@some-file.txt (one case per line in the file)");
             return null;
         }
         if (prop.startsWith("@")) {
@@ -337,7 +337,7 @@ public class SystemConfiguration {
 
     public int getDatabasePoolSize() {
         return this.getIntProperty(DbHandler.SYSPROP_DATABASE_POOL_SIZE,
-            this.getIntProperty(SYSPROP_EXECUTION_THREAD_COUNT) + 10);
+                this.getIntProperty(SYSPROP_EXECUTION_THREAD_COUNT) + 10);
     }
 
     public String getProdUnderTask() {
@@ -360,10 +360,10 @@ public class SystemConfiguration {
         if (pf != null) {
             try {
                 return Files.readAllLines(Paths.get(pf)).stream()
-                    .filter(c -> StringUtils.isNotBlank(c))
-                    .map(c -> c.trim())
-                    .distinct()
-                    .collect(Collectors.toList());
+                        .filter(c -> StringUtils.isNotBlank(c))
+                        .map(c -> c.trim())
+                        .distinct()
+                        .collect(Collectors.toList());
             } catch (IOException ex) {
                 LOG.warn("{}", ex.getLocalizedMessage());
             }
@@ -408,10 +408,10 @@ public class SystemConfiguration {
         List<String> keys = new ArrayList<>(this.properties.stringPropertyNames());
         Collections.sort(keys);
         keys.stream()
-            .filter(key -> !key.startsWith(pre("db.")))
-            .forEach((key) -> {
-                LOG.debug(String.format("%50s : %s", key, this.properties.getProperty(key)));
-            });
+                .filter(key -> !key.startsWith(pre("db.")))
+                .forEach((key) -> {
+                    LOG.debug(String.format("%50s : %s", key, this.properties.getProperty(key)));
+                });
     }
 
     public Properties getProperties() {

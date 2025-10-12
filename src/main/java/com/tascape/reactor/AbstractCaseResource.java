@@ -32,6 +32,7 @@ import org.slf4j.LoggerFactory;
  * @author linsong wang
  */
 public abstract class AbstractCaseResource {
+
     private static final Logger LOG = LoggerFactory.getLogger(AbstractCaseResource.class);
 
     public static final SystemConfiguration SYS_CONFIG = SystemConfiguration.getInstance();
@@ -88,7 +89,7 @@ public abstract class AbstractCaseResource {
     public File saveAsTempTextFile(String filePrefix, CharSequence data) throws IOException {
         Path path = this.getLogPath();
         File f = File.createTempFile(SystemConfiguration.CONSTANT_LOG_KEEP_ALIVE_PREFIX + filePrefix, ".txt",
-            path.toFile());
+                path.toFile());
         FileUtils.write(f, data, Charset.defaultCharset());
         LOG.debug("Save data into file {}", f.getAbsolutePath());
         return f;
@@ -110,8 +111,7 @@ public abstract class AbstractCaseResource {
     }
 
     /**
-     * Blocks current thread for specified milliseconds. Shortcut to Thread.sleep.
-     * Throws RuntimeException.
+     * Blocks current thread for specified milliseconds. Shortcut to Thread.sleep. Throws RuntimeException.
      *
      * @param millis milliseconds
      */

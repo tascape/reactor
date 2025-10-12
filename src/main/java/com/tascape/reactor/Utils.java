@@ -27,17 +27,14 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
-import java.lang.reflect.Field;
 import java.nio.file.Paths;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.Date;
 import java.util.List;
-import java.util.Map;
 import java.util.UUID;
 import javax.imageio.ImageIO;
 import org.apache.commons.io.FileUtils;
@@ -51,6 +48,7 @@ import org.slf4j.LoggerFactory;
  * @author linsong wang
  */
 public class Utils {
+
     private static final Logger LOG = LoggerFactory.getLogger(Utils.class);
 
     public static final String PASS = Utils.class + "_PASS";
@@ -110,7 +108,7 @@ public class Utils {
      *
      * @return console output as a list of strings
      *
-     * @throws IOException          for command error
+     * @throws IOException for command error
      * @throws InterruptedException when interrupted
      */
     public static List<String> cmd(String command) throws IOException, InterruptedException {
@@ -124,7 +122,7 @@ public class Utils {
      *
      * @return console output as a list of strings
      *
-     * @throws IOException          for command error
+     * @throws IOException for command error
      * @throws InterruptedException when interrupted
      */
     public static List<String> cmd(String[] command) throws IOException, InterruptedException {
@@ -134,29 +132,29 @@ public class Utils {
     /**
      * Executes command, and waits for the expected phrase in console printout.
      *
-     * @param command    command line
+     * @param command command line
      * @param workindDir working directory
-     * @param timeout    in millisecond
+     * @param timeout in millisecond
      *
      * @return console output as a list of strings
      *
-     * @throws IOException          for command error
+     * @throws IOException for command error
      * @throws InterruptedException when interrupted
      */
     public static List<String> cmdWithWorkingDir(String[] command, String workindDir, final long timeout)
-        throws IOException, InterruptedException {
+            throws IOException, InterruptedException {
         return cmd(command, null, null, timeout, workindDir);
     }
 
     /**
      * Executes command, and waits for the expected phrase in console printout.
      * <p>
-     * @param command  command line
+     * @param command command line
      * @param expected some expected output
      *
      * @return console output as a list of strings
      *
-     * @throws IOException          for command error
+     * @throws IOException for command error
      * @throws InterruptedException when interrupted
      */
     public static List<String> cmd(String[] command, String expected) throws IOException, InterruptedException {
@@ -166,19 +164,19 @@ public class Utils {
     /**
      * Executes command, and waits for the expected pass/fail phrase in console printout within timeout,
      *
-     * @param command    command line
-     * @param pass       skip checking if null
-     * @param fail       skip checking if null
-     * @param timeout    set 0 for not to check the output message, otherwise, waiting for timeout
+     * @param command command line
+     * @param pass skip checking if null
+     * @param fail skip checking if null
+     * @param timeout set 0 for not to check the output message, otherwise, waiting for timeout
      * @param workingDir working directory
      *
      * @return console output as a list of strings
      *
-     * @throws IOException          for command error
+     * @throws IOException for command error
      * @throws InterruptedException when interrupted
      */
     public static List<String> cmd(String[] command, final String pass, final String fail, final long timeout,
-        final String workingDir) throws IOException, InterruptedException {
+            final String workingDir) throws IOException, InterruptedException {
         ProcessBuilder pb = new ProcessBuilder(command);
         if (workingDir != null) {
             pb.directory(new File(workingDir));
@@ -264,7 +262,7 @@ public class Utils {
     }
 
     public static Process cmd(String[] commands, final File file, final File workingDir, final String... ignoreRegex)
-        throws IOException {
+            throws IOException {
         FileUtils.touch(file);
         LOG.debug("Saving console output to {}", file.getAbsolutePath());
 
@@ -272,7 +270,7 @@ public class Utils {
         pb.redirectErrorStream(true);
         pb.directory(workingDir);
         LOG.debug("Running command {}:  {}", workingDir == null ? "" : workingDir.getAbsolutePath(),
-            pb.command().toString().replaceAll(",", ""));
+                pb.command().toString().replaceAll(",", ""));
         final Process p = pb.start();
 
         Thread t = new Thread(Thread.currentThread().getName() + "-" + p.hashCode()) {
@@ -354,7 +352,7 @@ public class Utils {
     }
 
     public static boolean waitForOutputLine(final Process process, String lineExpected, final int timeoutSeconds)
-        throws IOException {
+            throws IOException {
         Thread t = new Thread() {
             @Override
             public void run() {
@@ -449,9 +447,9 @@ public class Utils {
 
     /**
      *
-     * @param path          directory to clean
+     * @param path directory to clean
      * @param keepAliveHour any file/directory having last modified time longer than keepAliveHour will be deleted
-     * @param namePrefix    file name prefix
+     * @param namePrefix file name prefix
      */
     public static void cleanDirectory(final String path, final float keepAliveHour, final String namePrefix) {
         final long intervalMillis = 3600000;
@@ -486,7 +484,7 @@ public class Utils {
         thread.setName(Thread.currentThread().getName() + "-cleaning-" + thread.hashCode());
         thread.setDaemon(true);
         LOG.debug("Starting directory cleaning thread (scanning hourly), all files/directories in {} and older than {} "
-            + "hour(s) and starts with {} will be deleted", dir, keepAliveHour, namePrefix);
+                + "hour(s) and starts with {} will be deleted", dir, keepAliveHour, namePrefix);
         thread.start();
     }
 
@@ -505,7 +503,7 @@ public class Utils {
      * @param png picture file name
      *
      * @throws AWTException UI related exception
-     * @throws IOException  file IO issue
+     * @throws IOException file IO issue
      */
     public static void captureScreen(File png) throws AWTException, IOException {
         Robot robot = new Robot();
