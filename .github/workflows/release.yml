@@ -1,0 +1,88 @@
+name: Manual Maven Central Release
+
+on:
+  workflow_dispatch:
+    inputs:
+      release_type:
+        description: "Version bump type (patch, minor, major)"
+        required: true
+        default: "patch"
+
+permissions:
+  contents: write  # needed to push tags and version bump commits
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    environment: release
+
+    env:
+      CENTRAL_TOKEN_USERNAME: ${{ secrets.CENTRAL_TOKEN_USERNAME }}
+      CENTRAL_TOKEN_PASSWORD: ${{ secrets.CENTRAL_TOKEN_PASSWORD }}
+      GPG_PRIVATE_KEY: ${{ secrets.GPG_PRIVATE_KEY }}
+      GPG_PASSPHRASE: ${{ secrets.GPG_PASSPHRASE }}
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0  # include tags and history
+
+      - name: Set up JDK
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 17
+          server-id: central
+          server-username: CENTRAL_TOKEN_USERNAME
+          server-password: CENTRAL_TOKEN_PASSWORD
+          gpg-private-key: ${{ env.GPG_PRIVATE_KEY }}
+          gpg-passphrase: ${{ env.GPG_PASSPHRASE }}
+
+      - name: Get current version
+        id: version
+        run: |
+          VERSION=$(mvn help:evaluate -Dexpression=project.version -q -DforceStdout)
+          echo "version=$VERSION" >> $GITHUB_OUTPUT
+
+      - name: Prepare release version
+        id: release
+        run: |
+          RELEASE_VERSION="${{ steps.version.outputs.version }}"
+          RELEASE_VERSION="${RELEASE_VERSION%-SNAPSHOT}"
+          mvn versions:set -DnewVersion=$RELEASE_VERSION -B
+          echo "release_version=$RELEASE_VERSION" >> $GITHUB_OUTPUT
+
+      - name: Commit release version
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git commit -am "Release ${{ steps.release.outputs.release_version }}"
+
+      - name: Tag release
+        run: |
+          git tag v${{ steps.release.outputs.release_version }}
+
+      - name: Publish to Maven Central
+        run: mvn clean deploy -B -U
+
+      - name: Determine next version
+        id: bump
+        run: |
+          CURRENT=${{ steps.release.outputs.release_version }}
+          IFS='.' read -r MAJOR MINOR PATCH <<< "$CURRENT"
+          TYPE="${{ github.event.inputs.release_type }}"
+          case "$TYPE" in
+            major) MAJOR=$((MAJOR + 1)); MINOR=0; PATCH=0 ;;
+            minor) MINOR=$((MINOR + 1)); PATCH=0 ;;
+            patch|*) PATCH=$((PATCH + 1)) ;;
+          esac
+          NEXT_VERSION="$MAJOR.$MINOR.$PATCH-SNAPSHOT"
+          mvn versions:set -DnewVersion=$NEXT_VERSION -B
+          echo "next_version=$NEXT_VERSION" >> $GITHUB_OUTPUT
+
+      - name: Commit and push new snapshot version
+        run: |
+          git commit -am "Bump version to ${{ steps.bump.outputs.next_version }}"
+          git push origin HEAD:master
+          git push origin v${{ steps.release.outputs.release_version }}
