@@ -43,6 +43,7 @@ import java.util.stream.Collectors;
  * @author linsong wang
  */
 public class TaskSuite {
+
     private static final Logger LOG = LoggerFactory.getLogger(TaskSuite.class);
 
     private String name;
@@ -170,7 +171,7 @@ public class TaskSuite {
 
                 CaseDataProvider tdp = caseMethod.getAnnotation(CaseDataProvider.class);
                 if (tdp == null) {
-                    LOG.debug("Adding case {}", tc.format());
+                    LOG.trace("Adding case {}", tc.format());
                     tcs.add(tc);
                 } else {
                     LOG.trace("Calling class {}, method {}, with parameter {}", tdp.klass(), tdp.method(),
@@ -189,7 +190,7 @@ public class TaskSuite {
                         t.setCaseData(value);
                         t.setPriority(Math.min(t.getPriority(), data[i].getPriority()));
 
-                        LOG.debug("Adding case {}", t.format());
+                        LOG.trace("Adding case {}", t.format());
                         tcs.add(t);
                     }
                 }

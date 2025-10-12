@@ -42,6 +42,7 @@ import org.slf4j.LoggerFactory;
  * @author linsong wang
  */
 public abstract class AbstractCaseRunner {
+
     private static final Logger LOG = LoggerFactory.getLogger(AbstractCaseRunner.class);
 
     private static final ThreadLocal<CaseResult> CASE_RESULT = new ThreadLocal<>();
@@ -86,8 +87,8 @@ public abstract class AbstractCaseRunner {
                 } else if (newline.contains(" WARN  ")) {
                     newline = "<font color='9F6000'><b>" + newline + "</b></font>";
                 } else if (newline.contains(" ERROR ")
-                    || newline.contains("Failure in case")
-                    || newline.contains("AssertionError")) {
+                        || newline.contains("Failure in case")
+                        || newline.contains("AssertionError")) {
                     newline = "<font color='red'><b>" + newline + "</b></font>";
                 } else {
                     Matcher m = http.matcher(line);
@@ -104,7 +105,7 @@ public abstract class AbstractCaseRunner {
                     if (newline.contains(path)) {
                         if (name.endsWith(".png")) {
                             pw.printf("<a href=\"%s\" target=\"_blank\"><img src=\"%s\" width=\"360px\"/></a>",
-                                name, name);
+                                    name, name);
                         }
                         String a = String.format("<a href=\"%s\" target=\"_blank\">%s</a>", name, name);
                         int len = newline.indexOf("    ");
@@ -149,6 +150,7 @@ public abstract class AbstractCaseRunner {
 
         final String threadName = Thread.currentThread().getName();
         class ThreadFilter extends Filter {
+
             @Override
             public int decide(LoggingEvent event) {
                 if (event.getThreadName().startsWith(threadName)) {

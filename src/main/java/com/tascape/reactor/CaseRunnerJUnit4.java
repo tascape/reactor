@@ -40,6 +40,7 @@ import org.junit.runner.Result;
  * @author linsong wang
  */
 public class CaseRunnerJUnit4 extends AbstractCaseRunner implements Callable<CaseResult> {
+
     private static final Logger LOG = LoggerFactory.getLogger(CaseRunnerJUnit4.class);
 
     public CaseRunnerJUnit4(DbHandler db, CaseResult tcr) {
@@ -106,7 +107,7 @@ public class CaseRunnerJUnit4 extends AbstractCaseRunner implements Callable<Cas
         }
         Environment env = AbstractSuite.getEnvionment(suiteClass);
         if (env == null) {
-            LOG.info("init suite runtime environment");
+            LOG.info("Initialize suite runtime environment");
             AbstractSuite abstractSuite = AbstractSuite.class.cast(Class.forName(suiteClass).newInstance());
             try {
                 abstractSuite.setUp();

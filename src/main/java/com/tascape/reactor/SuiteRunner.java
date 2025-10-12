@@ -49,6 +49,7 @@ import org.slf4j.LoggerFactory;
  * @author linsong wang
  */
 public class SuiteRunner {
+
     private static final Logger LOG = LoggerFactory.getLogger(SuiteRunner.class);
 
     private TaskSuite ts = null;
@@ -106,12 +107,12 @@ public class SuiteRunner {
                 tcrs.forEach(tcr -> {
                     tcr.setSuiteResult(suitResult);
 
-                    LOG.debug("Submit case {}", tcr.getTaskCase().format());
+                    LOG.trace("Submit case {}", tcr.getTaskCase().format());
                     futures.add(completionService.submit(new CaseRunnerJUnit4(db, tcr)));
                 });
-                LOG.debug("Total {} cases submitted", futures.size());
+                LOG.info("Total {} cases submitted", futures.size());
 
-                for (Future<CaseResult> f: futures) {
+                for (Future<CaseResult> f : futures) {
                     try {
                         Future<CaseResult> future = completionService.take();
                         CaseResult tcr = future.get();
@@ -169,6 +170,8 @@ public class SuiteRunner {
         List<SuiteProperty> sps = new ArrayList<>();
         SYS_CONFIG.getProperties().entrySet().stream()
                 .filter(key -> !key.toString().startsWith("reactor.db."))
+                .filter(key -> !key.toString().endsWith("_"))
+                .filter(key -> !key.toString().toLowerCase().contains("password"))
                 .forEach(entry -> {
                     SuiteProperty sp = new SuiteProperty();
                     sp.setSuiteResultId(this.execId);

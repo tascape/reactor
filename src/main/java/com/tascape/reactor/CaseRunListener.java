@@ -37,6 +37,7 @@ import org.slf4j.LoggerFactory;
  * @author linsong wang
  */
 public class CaseRunListener extends RunListener {
+
     private static final Logger LOG = LoggerFactory.getLogger(CaseRunListener.class);
 
     private static final int CASE_RETRY = SystemConfiguration.getInstance().getCaseRetry();
