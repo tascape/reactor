@@ -171,7 +171,7 @@ public class SuiteRunner {
         SYS_CONFIG.getProperties().entrySet().stream()
                 .filter(key -> !key.toString().startsWith("reactor.db."))
                 .filter(key -> !key.toString().endsWith("_"))
-                .filter(key -> !key.toString().toLowerCase().contains("password"))
+                .filter(key -> !key.toString().toLowerCase().contains("pass"))
                 .forEach(entry -> {
                     SuiteProperty sp = new SuiteProperty();
                     sp.setSuiteResultId(this.execId);
