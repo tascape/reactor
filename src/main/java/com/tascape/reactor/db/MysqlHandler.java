@@ -19,8 +19,8 @@ package com.tascape.reactor.db;
 import com.tascape.reactor.ExecutionResult;
 import com.tascape.reactor.TaskSuite;
 import com.tascape.reactor.Utils;
-import com.jolbox.bonecp.BoneCP;
-import com.jolbox.bonecp.BoneCPConfig;
+import com.zaxxer.hikari.HikariConfig;
+import com.zaxxer.hikari.HikariDataSource;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -28,6 +28,7 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.List;
 import java.util.Map;
+import javax.sql.DataSource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -60,27 +61,27 @@ public class MysqlHandler extends DbHandler {
         }
     }
 
-    protected BoneCP connPool;
+    protected DataSource ds;
 
     @Override
     protected void init() throws Exception {
-        BoneCPConfig connPoolConfig = new BoneCPConfig();
-        connPoolConfig.setJdbcUrl(JDBC_URL);
-        connPoolConfig.setUsername(DB_USER);
-        connPoolConfig.setPassword(DB_PASS);
-        connPoolConfig.setMaxConnectionsPerPartition(DB_POOL_SIZE);
-        connPoolConfig.setMaxConnectionAgeInSeconds(600);
-        connPoolConfig.setDefaultAutoCommit(true);
-        connPoolConfig.setIdleConnectionTestPeriodInSeconds(30);
-        connPoolConfig.setConnectionTestStatement("SELECT 1");
-        this.connPool = new BoneCP(connPoolConfig);
-
-        // todo: shutdown pool
+        HikariConfig config = new HikariConfig();
+        config.setJdbcUrl(JDBC_URL);
+        config.setUsername(DB_USER);
+        config.setPassword(DB_PASS);
+        config.setMaximumPoolSize(DB_POOL_SIZE);
+        config.setMinimumIdle(1);
+        config.setAutoCommit(true);
+        config.setConnectionTestQuery("SELECT 1");
+        config.setKeepaliveTime(300000);
+        config.setIdleTimeout(600000);
+        config.setMaxLifetime(1800000);
+        ds = new HikariDataSource(config);
     }
 
     @Override
     protected Connection getConnection() throws SQLException {
-        return connPool.getConnection();
+        return ds.getConnection();
     }
 
     @Override
