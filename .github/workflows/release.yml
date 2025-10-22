@@ -15,91 +15,113 @@
 # limitations under the License.
 #
 
-name: Manual Maven Central Release
+name: Release to Maven Central
 
 on:
   workflow_dispatch:
     inputs:
-      release_type:
-        description: "Version bump type (patch, minor, major)"
-        required: true
-        default: "patch"
-
-permissions:
-  contents: write  # needed to push tags and version bump commits
+      bump:
+        type: choice
+        description: "Next version bump type"
+        options:
+          - patch
+          - minor
+          - major
+        default: patch
 
 jobs:
   release:
+    name: Release from master
     runs-on: ubuntu-latest
     environment: release
-
-    env:
-      CENTRAL_TOKEN_USERNAME: ${{ secrets.CENTRAL_TOKEN_USERNAME }}
-      CENTRAL_TOKEN_PASSWORD: ${{ secrets.CENTRAL_TOKEN_PASSWORD }}
-      GPG_PRIVATE_KEY: ${{ secrets.GPG_PRIVATE_KEY }}
-      GPG_PASSPHRASE: ${{ secrets.GPG_PASSPHRASE }}
+    permissions:
+      contents: write
+      id-token: write
 
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
         with:
-          fetch-depth: 0  # include tags and history
+          fetch-depth: 0
 
       - name: Set up JDK
         uses: actions/setup-java@v4
         with:
           distribution: temurin
           java-version: 17
+          cache: maven
           server-id: central
           server-username: CENTRAL_TOKEN_USERNAME
           server-password: CENTRAL_TOKEN_PASSWORD
-          gpg-private-key: ${{ env.GPG_PRIVATE_KEY }}
-          gpg-passphrase: ${{ env.GPG_PASSPHRASE }}
+          gpg-private-key: ${{ secrets.GPG_PRIVATE_KEY }}
+          gpg-passphrase: GPG_PASSPHRASE
 
       - name: Get current version
-        id: version
+        id: get_version
         run: |
           VERSION=$(mvn help:evaluate -Dexpression=project.version -q -DforceStdout)
+          echo "Current version: $VERSION"
           echo "version=$VERSION" >> $GITHUB_OUTPUT
 
-      - name: Prepare release version
-        id: release
+      - name: Compute release version
+        id: compute_release
         run: |
-          RELEASE_VERSION="${{ steps.version.outputs.version }}"
-          RELEASE_VERSION="${RELEASE_VERSION%-SNAPSHOT}"
-          mvn versions:set -DnewVersion=$RELEASE_VERSION -B
+          VERSION=${{ steps.get_version.outputs.version }}
+          RELEASE_VERSION=${VERSION%-SNAPSHOT}
+          echo "Release version: $RELEASE_VERSION"
           echo "release_version=$RELEASE_VERSION" >> $GITHUB_OUTPUT
 
-      - name: Commit release version
+      - name: Set release version
+        run: |
+          mvn versions:set -DnewVersion=${{ steps.compute_release.outputs.release_version }}
+          mvn versions:commit
+
+      - name: Deploy to Maven Central
+        run: mvn --batch-mode clean deploy -P release -DskipTests
+
+      - name: Commit and tag release
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          git commit -am "Release ${{ steps.release.outputs.release_version }}"
+          git add pom.xml */pom.xml || true
+          git commit -m "Release version ${{ steps.compute_release.outputs.release_version }}" || echo "No changes"
+          git tag v${{ steps.compute_release.outputs.release_version }}
+          git push origin master --tags
 
-      - name: Tag release
+      - name: Bump to next snapshot version
+        id: bump_version
         run: |
-          git tag v${{ steps.release.outputs.release_version }}
+          RELEASE=${{ steps.compute_release.outputs.release_version }}
+          MAJOR=$(echo $RELEASE | cut -d. -f1)
+          MINOR=$(echo $RELEASE | cut -d. -f2)
+          PATCH=$(echo $RELEASE | cut -d. -f3)
 
-      - name: Publish to Maven Central
-        run: mvn clean deploy -B -U
+          BUMP_TYPE=${{ github.event.inputs.bump }}
 
-      - name: Determine next version
-        id: bump
-        run: |
-          CURRENT=${{ steps.release.outputs.release_version }}
-          IFS='.' read -r MAJOR MINOR PATCH <<< "$CURRENT"
-          TYPE="${{ github.event.inputs.release_type }}"
-          case "$TYPE" in
-            major) MAJOR=$((MAJOR + 1)); MINOR=0; PATCH=0 ;;
-            minor) MINOR=$((MINOR + 1)); PATCH=0 ;;
-            patch|*) PATCH=$((PATCH + 1)) ;;
-          esac
-          NEXT_VERSION="$MAJOR.$MINOR.$PATCH-SNAPSHOT"
-          mvn versions:set -DnewVersion=$NEXT_VERSION -B
+          if [ "$BUMP_TYPE" = "major" ]; then
+            MAJOR=$((MAJOR + 1))
+            MINOR=0
+            PATCH=0
+          elif [ "$BUMP_TYPE" = "minor" ]; then
+            MINOR=$((MINOR + 1))
+            PATCH=0
+          else
+            PATCH=$((PATCH + 1))
+          fi
+
+          NEXT_VERSION="${MAJOR}.${MINOR}.${PATCH}-SNAPSHOT"
+          echo "Next development version: $NEXT_VERSION"
           echo "next_version=$NEXT_VERSION" >> $GITHUB_OUTPUT
 
-      - name: Commit and push new snapshot version
+          mvn versions:set -DnewVersion=$NEXT_VERSION
+          mvn versions:commit
+
+      - name: Commit next snapshot version
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          git commit -am "Bump version to ${{ steps.bump.outputs.next_version }}"
-          git push origin HEAD:master
-          git push origin v${{ steps.release.outputs.release_version }}
+          git add pom.xml */pom.xml || true
+          git commit -m "Advance to ${{ steps.bump_version.outputs.next_version }}" || echo "No changes"
+          git push origin master
