@@ -6,7 +6,7 @@
 
     <groupId>com.tascape</groupId>
     <artifactId>reactor</artifactId>
-    <version>1.4.2-SNAPSHOT</version>
+    <version>1.4.4-SNAPSHOT</version>
     <packaging>jar</packaging>
     <name>reactor</name>
 
