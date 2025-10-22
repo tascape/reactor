@@ -56,6 +56,26 @@ jobs:
           gpg-private-key: ${{ secrets.GPG_PRIVATE_KEY }}
           gpg-passphrase: GPG_PASSPHRASE
 
+      - name: Debug GPG import
+        run: |
+          echo "Checking imported secret keys..."
+          gpg --list-secret-keys --keyid-format LONG
+          echo
+          echo "Checking public keys..."
+          gpg --list-keys --keyid-format LONG
+          echo
+          echo "Testing signing with loopback mode..."
+          echo "test" > test.txt
+          gpg --batch --yes --pinentry-mode loopback --passphrase "${{ secrets.GPG_PASSPHRASE }}" -s test.txt || echo "❌ Signing failed"
+
+      - name: Show Maven settings.xml (sanitized)
+        run: |
+          echo "Sanitized Maven settings.xml content:"
+          sed -e 's|<password>.*</password>|<password>***</password>|g' \
+              -e 's|<username>.*</username>|<username>***</username>|g' \
+              ~/.m2/settings.xml
+
+
       - name: Get current version
         id: get_version
         run: |
