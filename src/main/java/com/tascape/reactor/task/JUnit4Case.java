@@ -70,8 +70,8 @@ public class JUnit4Case extends AbstractCase {
         LOG.debug("Sample positive case");
         LOG.trace("Sample positive case");
         Random r = new Random();
-        this.putResultMetric("JUnit4", "positive-1", r.nextInt(100));
-        this.putResultMetric("JUnit4", "positive-2", r.nextInt(200));
+        this.putResultMetric("JUnit4", "positive-1", r.nextInt(100) + "");
+        this.putResultMetric("JUnit4", "positive-2", r.nextInt(200) + "");
         this.doSomethingGood();
     }
 
@@ -86,14 +86,14 @@ public class JUnit4Case extends AbstractCase {
         LOG.info("Sample external id case, set to aaa");
         this.setExternalId("aaa");
         Random r = new Random();
-        this.putResultMetric("JUnit4", "data-point-1", r.nextInt(100));
-        this.putResultMetric("JUnit4", "data-point-2", r.nextInt(100));
-        this.putResultMetric("JUnit4", "data-point-3", r.nextInt(100));
-        this.putResultMetric("JUnit4", "data-point-4", r.nextInt(400));
-        this.putResultMetric("JUnit4", "data-point-5", r.nextInt(100));
-        this.putResultMetric("JUnit4", "data-point-6", r.nextInt(100));
-        this.putResultMetric("JUnit4", "data-point-7", r.nextInt(100));
-        this.putResultMetric("JUnit4", "data-point-8", r.nextInt(800));
+        this.putResultMetric("JUnit4", "data-point-1", r.nextInt(100) + "");
+        this.putResultMetric("JUnit4", "data-point-2", r.nextInt(100) + "");
+        this.putResultMetric("JUnit4", "data-point-3", r.nextInt(100) + "");
+        this.putResultMetric("JUnit4", "data-point-4", r.nextInt(400) + "");
+        this.putResultMetric("JUnit4", "data-point-5", r.nextInt(100) + "");
+        this.putResultMetric("JUnit4", "data-point-6", r.nextInt(100) + "");
+        this.putResultMetric("JUnit4", "data-point-7", r.nextInt(100) + "");
+        this.putResultMetric("JUnit4", "data-point-8", r.nextInt(800) + "");
         this.doSomethingGood();
     }
 
@@ -103,7 +103,7 @@ public class JUnit4Case extends AbstractCase {
         this.doSomethingGood();
         Random r = new Random();
         IntStream.range(0, 10).forEach(i -> {
-            this.putResultMetric("JUnit4", "homepage-load-second", 0.5 + r.nextFloat() * 2);
+            this.putResultMetric("JUnit4", "homepage-load-second", (0.5 + r.nextFloat() * 2) + "");
         });
     }
 
@@ -114,7 +114,7 @@ public class JUnit4Case extends AbstractCase {
         expectedException.expect(IOException.class);
         expectedException.expectMessage("something bad");
         Thread.sleep(3000);
-        this.putResultMetric("JUnit4", "negative", new Random().nextInt(100));
+        this.putResultMetric("JUnit4", "negative", new Random().nextInt(100) + "");
         this.doSomethingBad();
     }
 

@@ -27,7 +27,6 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.nio.charset.Charset;
-import java.nio.file.Files;
 import java.nio.file.Path;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -108,7 +107,7 @@ public abstract class DbHandler {
     public SuiteResult getSuiteResult(String id) throws SQLException {
         LOG.debug("Query for suite result with execution id {}", id);
         final String sql = "SELECT * FROM " + SuiteResult.TABLE_NAME + " WHERE "
-            + SuiteResult.SUITE_RESULT_ID + " = ?";
+                + SuiteResult.SUITE_RESULT_ID + " = ?";
 
         try (Connection conn = this.getConnection()) {
             PreparedStatement stmt = conn.prepareStatement(sql);
@@ -158,9 +157,9 @@ public abstract class DbHandler {
 
     public void addSuiteExecutionProperty(SuiteProperty prop) throws SQLException {
         final String sql = "INSERT INTO " + SuiteProperty.TABLE_NAME + " ("
-            + SuiteProperty.SUITE_RESULT_ID + ", "
-            + SuiteProperty.PROPERTY_NAME + ", "
-            + SuiteProperty.PROPERTY_VALUE + ") VALUES (?,?,?)";
+                + SuiteProperty.SUITE_RESULT_ID + ", "
+                + SuiteProperty.PROPERTY_NAME + ", "
+                + SuiteProperty.PROPERTY_VALUE + ") VALUES (?,?,?)";
         try (Connection conn = this.getConnection()) {
             PreparedStatement stmt = conn.prepareStatement(sql);
             stmt.setString(1, prop.getSuiteResultId());
@@ -184,8 +183,8 @@ public abstract class DbHandler {
         String sql = "SELECT * FROM " + TaskCase.TABLE_NAME + " WHERE ";
         String sql0 = "";
         sql0 = suiteClasses.stream()
-            .map((sc) -> " OR " + TaskCase.SUITE_CLASS + "='" + sc + "'")
-            .reduce(sql0, String::concat);
+                .map((sc) -> " OR " + TaskCase.SUITE_CLASS + "='" + sc + "'")
+                .reduce(sql0, String::concat);
         sql += sql0.substring(4);
         try (Connection conn = this.getConnection()) {
             PreparedStatement stmt = conn.prepareStatement(sql);
@@ -210,11 +209,11 @@ public abstract class DbHandler {
     public List<CaseResult> getQueuedCaseResults(String execId, int limit) throws SQLException {
         LOG.debug("Query database for all queued cases");
         final String sql = "SELECT * FROM " + CaseResult.TABLE_NAME + " tr "
-            + "INNER JOIN " + TaskCase.TABLE_NAME + " tc "
-            + "ON tr.TASK_CASE_ID=tc.TASK_CASE_ID AND " + CaseResult.EXECUTION_RESULT + " = ? "
-            + "WHERE " + CaseResult.SUITE_RESULT + " = ? "
-            + "ORDER BY SUITE_CLASS, CASE_CLASS, CASE_METHOD, CASE_DATA_INFO "
-            + "LIMIT ?;";
+                + "INNER JOIN " + TaskCase.TABLE_NAME + " tc "
+                + "ON tr.TASK_CASE_ID=tc.TASK_CASE_ID AND " + CaseResult.EXECUTION_RESULT + " = ? "
+                + "WHERE " + CaseResult.SUITE_RESULT + " = ? "
+                + "ORDER BY SUITE_CLASS, CASE_CLASS, CASE_METHOD, CASE_DATA_INFO "
+                + "LIMIT ?;";
         List<CaseResult> tcrs = new ArrayList<>();
 
         try (Connection conn = this.getConnection()) {
@@ -256,7 +255,7 @@ public abstract class DbHandler {
     public boolean acquireCaseResult(CaseResult tcr) throws SQLException, InterruptedException {
         LOG.debug("Try to acquire case {}", tcr.getTaskCase().format());
         final String sql = "SELECT * FROM " + CaseResult.TABLE_NAME + " WHERE "
-            + CaseResult.CASE_RESULT_ID + " = ? LIMIT 1;";
+                + CaseResult.CASE_RESULT_ID + " = ? LIMIT 1;";
 
         try (Connection conn = this.getConnection()) {
             try (PreparedStatement stmt = conn.prepareStatement(sql, ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE)) {
@@ -289,10 +288,10 @@ public abstract class DbHandler {
             return;
         }
         final String sql = "SELECT * FROM " + SuiteResult.TABLE_NAME
-            + " WHERE " + SuiteResult.SUITE_RESULT_ID + " = ?;";
+                + " WHERE " + SuiteResult.SUITE_RESULT_ID + " = ?;";
         try (PreparedStatement stmt = this.getConnection().prepareStatement(sql,
-            ResultSet.TYPE_SCROLL_SENSITIVE,
-            ResultSet.CONCUR_UPDATABLE)) {
+                ResultSet.TYPE_SCROLL_SENSITIVE,
+                ResultSet.CONCUR_UPDATABLE)) {
             stmt.setString(1, execId);
             ResultSet rs = stmt.executeQuery();
             if (rs.first()) {
@@ -306,14 +305,14 @@ public abstract class DbHandler {
 
     public void updateCaseExecutionResult(CaseResult tcr) throws SQLException {
         LOG.trace("Update case result {} ({}) to {}", tcr.getCaseResultId(), tcr.getTaskCase().format(),
-            tcr.getResult().result());
+                tcr.getResult().result());
         final String sql = "SELECT tr.* FROM " + CaseResult.TABLE_NAME + " tr INNER JOIN " + TaskCase.TABLE_NAME
-            + " tc WHERE tr.TASK_CASE_ID=tc.TASK_CASE_ID AND "
-            + CaseResult.CASE_RESULT_ID + " = ?;";
+                + " tc WHERE tr.TASK_CASE_ID=tc.TASK_CASE_ID AND "
+                + CaseResult.CASE_RESULT_ID + " = ?;";
 
         try (Connection conn = this.getConnection()) {
             PreparedStatement stmt = conn.prepareStatement(sql,
-                ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE);
+                    ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE);
             stmt.setString(1, tcr.getCaseResultId());
             ResultSet rs = stmt.executeQuery();
             if (rs.first()) {
@@ -349,11 +348,11 @@ public abstract class DbHandler {
 
                 {
                     final String sql1 = "SELECT " + CaseResult.EXECUTION_RESULT + " FROM "
-                        + CaseResult.TABLE_NAME + " WHERE " + CaseResult.SUITE_RESULT
-                        + " = ?;";
+                            + CaseResult.TABLE_NAME + " WHERE " + CaseResult.SUITE_RESULT
+                            + " = ?;";
                     try (PreparedStatement stmt = this.getConnection().prepareStatement(sql1,
-                        ResultSet.TYPE_FORWARD_ONLY,
-                        ResultSet.CONCUR_READ_ONLY)) {
+                            ResultSet.TYPE_FORWARD_ONLY,
+                            ResultSet.CONCUR_READ_ONLY)) {
                         stmt.setString(1, execId);
                         // stmt.setFetchSize(Integer.MIN_VALUE); // mysql only
                         ResultSet rs = stmt.executeQuery();
@@ -378,10 +377,10 @@ public abstract class DbHandler {
                 }
                 {
                     final String sql = "SELECT * FROM " + SuiteResult.TABLE_NAME
-                        + " WHERE " + SuiteResult.SUITE_RESULT_ID + " = ?;";
+                            + " WHERE " + SuiteResult.SUITE_RESULT_ID + " = ?;";
                     try (PreparedStatement stmt = this.getConnection().prepareStatement(sql,
-                        ResultSet.TYPE_SCROLL_SENSITIVE,
-                        ResultSet.CONCUR_UPDATABLE)) {
+                            ResultSet.TYPE_SCROLL_SENSITIVE,
+                            ResultSet.CONCUR_UPDATABLE)) {
                         stmt.setString(1, execId);
                         ResultSet rs = stmt.executeQuery();
                         if (rs.first()) {
@@ -407,7 +406,7 @@ public abstract class DbHandler {
         String EXEC_WAIT_INTERVAL = "reactor.exec.wait.interval";
         int intervalMillis = SystemConfiguration.getInstance().getIntProperty(EXEC_WAIT_INTERVAL, 10000);
         final String sql = "SELECT " + CaseResult.EXECUTION_RESULT + ", " + CaseResult.LOG_DIR + " FROM "
-            + CaseResult.TABLE_NAME + " WHERE " + CaseResult.SUITE_RESULT + " = ?;";
+                + CaseResult.TABLE_NAME + " WHERE " + CaseResult.SUITE_RESULT + " = ?;";
         long end = System.currentTimeMillis() + timeoutMinute * 60000;
         while (System.currentTimeMillis() < end) {
             try (PreparedStatement stmt = this.getConnection().prepareStatement(sql)) {
@@ -452,10 +451,10 @@ public abstract class DbHandler {
                     String iterDataInfo = CaseIterationData.class.getName();
                     Map<String, Boolean> iterationCases = new HashMap<>();
                     String sql = "SELECT tr.*, tc.* FROM "
-                        + CaseResult.TABLE_NAME + " tr JOIN " + TaskCase.TABLE_NAME + " tc"
-                        + " ON tr." + CaseResult.TASK_CASE_ID + " = tc." + TaskCase.TASK_CASE_ID
-                        + " WHERE " + CaseResult.SUITE_RESULT + " = ? ORDER BY tr." + CaseResult.START_TIME
-                        + " DESC;";
+                            + CaseResult.TABLE_NAME + " tr JOIN " + TaskCase.TABLE_NAME + " tc"
+                            + " ON tr." + CaseResult.TASK_CASE_ID + " = tc." + TaskCase.TASK_CASE_ID
+                            + " WHERE " + CaseResult.SUITE_RESULT + " = ? ORDER BY tr." + CaseResult.START_TIME
+                            + " DESC;";
                     try (PreparedStatement stmt = this.getConnection().prepareStatement(sql)) {
                         stmt.setString(1, execId);
                         LOG.debug("{}", stmt);
@@ -465,7 +464,7 @@ public abstract class DbHandler {
                             String result = rs.getString(CaseResult.EXECUTION_RESULT);
                             if (result.equals(ExecutionResult.TBI.getName())) {
                                 LOG.warn("skip TBI case {}.{}",
-                                    rs.getString(TaskCase.CASE_CLASS), rs.getString(TaskCase.CASE_METHOD));
+                                        rs.getString(TaskCase.CASE_CLASS), rs.getString(TaskCase.CASE_METHOD));
                                 continue;
                             }
                             int p = 0, f = 0;
@@ -488,7 +487,7 @@ public abstract class DbHandler {
 
                             if (rs.getString(TaskCase.CASE_DATA_INFO).startsWith(iterDataInfo)) {
                                 String key = rs.getString(TaskCase.SUITE_CLASS) + rs.getString(TaskCase.CASE_CLASS)
-                                    + rs.getString(TaskCase.CASE_METHOD);
+                                        + rs.getString(TaskCase.CASE_METHOD);
                                 LOG.debug("aggregate result of run iterations {}", key);
                                 Boolean r = iterationCases.get(key);
                                 if (r == null) {
@@ -513,9 +512,9 @@ public abstract class DbHandler {
                 }
                 {
                     final String sql = "SELECT * FROM " + SuiteResult.TABLE_NAME
-                        + " WHERE " + SuiteResult.SUITE_RESULT_ID + " = ?;";
+                            + " WHERE " + SuiteResult.SUITE_RESULT_ID + " = ?;";
                     try (PreparedStatement stmt = this.getConnection().prepareStatement(sql,
-                        ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE)) {
+                            ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE)) {
                         stmt.setString(1, execId);
                         ResultSet rs = stmt.executeQuery();
                         if (rs.first()) {
@@ -549,9 +548,9 @@ public abstract class DbHandler {
                 }
 
                 final String sql = "SELECT * FROM " + SuiteResult.TABLE_NAME
-                    + " WHERE " + SuiteResult.SUITE_RESULT_ID + " = ?;";
+                        + " WHERE " + SuiteResult.SUITE_RESULT_ID + " = ?;";
                 try (PreparedStatement stmt = this.getConnection().prepareStatement(sql,
-                    ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE)) {
+                        ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE)) {
                     stmt.setString(1, execId);
                     ResultSet rs = stmt.executeQuery();
                     if (rs.first()) {
@@ -577,15 +576,14 @@ public abstract class DbHandler {
         LOG.debug("Generate JUnit XML result");
 
         final String sql = "SELECT * FROM " + SuiteResult.TABLE_NAME + " WHERE "
-            + SuiteResult.SUITE_RESULT_ID + " = ?;";
+                + SuiteResult.SUITE_RESULT_ID + " = ?;";
         try (PreparedStatement stmt = this.getConnection().prepareStatement(sql,
-            ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE)) {
+                ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE)) {
             stmt.setString(1, execId);
             ResultSet rs = stmt.executeQuery();
             if (rs.first()) {
                 try (
-                    OutputStream os = new FileOutputStream(xml.toFile());
-                    PrintWriter pwh = new PrintWriter(html.toFile())) {
+                        OutputStream os = new FileOutputStream(xml.toFile()); PrintWriter pwh = new PrintWriter(html.toFile())) {
                     XMLStreamWriter xsw = XMLOutputFactory.newInstance().createXMLStreamWriter(os);
                     xsw.writeStartDocument();
                     xsw.writeCharacters("\n");
@@ -596,26 +594,26 @@ public abstract class DbHandler {
                     xsw.writeAttribute("tests", rs.getInt(SuiteResult.NUMBER_OF_CASES) + "");
                     xsw.writeAttribute("failures", rs.getInt(SuiteResult.NUMBER_OF_FAILURE) + "");
                     xsw.writeAttribute("time", (rs.getLong(SuiteResult.STOP_TIME)
-                        - rs.getLong(CaseResult.START_TIME)) / 1000.0 + "");
+                            - rs.getLong(CaseResult.START_TIME)) / 1000.0 + "");
                     xsw.writeAttribute("srid", rs.getString(SuiteResult.SUITE_RESULT_ID));
                     xsw.writeCharacters("\n");
 
                     pwh.println("<html><head><style>");
                     pwh.println("body {font-family: Consolas,Monaco,Lucida Console,Liberation Mono,DejaVu Sans Mono,"
-                        + "Bitstream Vera Sans Mono,Courier New, monospace;}");
+                            + "Bitstream Vera Sans Mono,Courier New, monospace;}");
                     pwh.println("tr:hover {background-color: lightgray;}");
                     pwh.println("td {padding-left: 20px; padding-right: 20px;}");
                     pwh.println("</style></head<body>");
                     pwh.printf("<h2>%s</h2>", rs.getString(SuiteResult.SUITE_NAME));
                     pwh.printf("<h3>%s</h3>", rs.getString(SuiteResult.PROJECT_NAME));
                     pwh.printf("<h4>total cases %d, failures %d</h4>",
-                        rs.getInt(SuiteResult.NUMBER_OF_CASES), rs.getInt(SuiteResult.NUMBER_OF_FAILURE));
+                            rs.getInt(SuiteResult.NUMBER_OF_CASES), rs.getInt(SuiteResult.NUMBER_OF_FAILURE));
                     pwh.println("<table><thead><tr><th>index</th><th>case</th><th>result</th></thead><tbody>");
 
                     final String sql1 = "SELECT * FROM " + CaseResult.TABLE_NAME + " tr JOIN "
-                        + TaskCase.TABLE_NAME + " tc ON "
-                        + "tr." + CaseResult.TASK_CASE_ID + " = tc." + TaskCase.TASK_CASE_ID
-                        + " WHERE " + CaseResult.SUITE_RESULT + " = ?;";
+                            + TaskCase.TABLE_NAME + " tc ON "
+                            + "tr." + CaseResult.TASK_CASE_ID + " = tc." + TaskCase.TASK_CASE_ID
+                            + " WHERE " + CaseResult.SUITE_RESULT + " = ?;";
                     try (PreparedStatement stmt1 = this.getConnection().prepareStatement(sql1)) {
                         stmt1.setString(1, execId);
                         ResultSet rs1 = stmt1.executeQuery();
@@ -625,11 +623,11 @@ public abstract class DbHandler {
                             xsw.writeCharacters("  ");
                             xsw.writeStartElement("testcase");
                             xsw.writeAttribute("name", rs1.getString(TaskCase.CASE_METHOD) + "("
-                                + rs1.getString(TaskCase.CASE_DATA) + ")");
+                                    + rs1.getString(TaskCase.CASE_DATA) + ")");
                             xsw.writeAttribute("classname", rs1.getString(TaskCase.CASE_CLASS));
                             xsw.writeAttribute("result", result);
                             xsw.writeAttribute("time", (rs1.getLong(CaseResult.STOP_TIME)
-                                - rs1.getLong(CaseResult.START_TIME)) / 1000.0 + "");
+                                    - rs1.getLong(CaseResult.START_TIME)) / 1000.0 + "");
                             if (!ExecutionResult.isPass(result)) {
                                 xsw.writeStartElement("failure");
                                 xsw.writeAttribute("type", "failure");
@@ -642,10 +640,10 @@ public abstract class DbHandler {
                             String l = rs1.getString(CaseResult.LOG_DIR);
                             String r = rs1.getString(CaseResult.EXECUTION_RESULT);
                             pwh.printf("<tr><td>%d</td><td>%s</td>"
-                                + "<td><a style='color: %s; font-weight: bold' href='%s/log.html' target='_blank'>%s</a></td></tr>",
-                                ++i,
-                                rs1.getString(TaskCase.CASE_METHOD) + "(" + rs1.getString(TaskCase.CASE_DATA) + ")",
-                                r.equals("PASS") || r.endsWith("/0") ? "green" : "red", l, r);
+                                    + "<td><a style='color: %s; font-weight: bold' href='%s/log.html' target='_blank'>%s</a></td></tr>",
+                                    ++i,
+                                    rs1.getString(TaskCase.CASE_METHOD) + "(" + rs1.getString(TaskCase.CASE_DATA) + ")",
+                                    r.equals("PASS") || r.endsWith("/0") ? "green" : "red", l, r);
                         }
                     }
 
@@ -674,7 +672,7 @@ public abstract class DbHandler {
         JSONObject sr = new JSONObject();
         {
             final String sql = "SELECT * FROM " + SuiteResult.TABLE_NAME + " WHERE "
-                + SuiteResult.SUITE_RESULT_ID + " = ?;";
+                    + SuiteResult.SUITE_RESULT_ID + " = ?;";
             try (Connection conn = this.getConnection(); PreparedStatement stmt = conn.prepareStatement(sql)) {
                 stmt.setString(1, execId);
                 List<Map<String, Object>> l = dumpResultSetToList(stmt.executeQuery());
@@ -691,9 +689,9 @@ public abstract class DbHandler {
         List<Map<String, Object>> metrics;
         {
             final String sql = "SELECT trm.* FROM " + CaseResultMetric.TABLE_NAME + " trm JOIN "
-                + CaseResult.TABLE_NAME + " tr ON"
-                + " trm." + CaseResultMetric.CASE_RESULT_ID + " = tr." + CaseResult.CASE_RESULT_ID
-                + " WHERE " + CaseResult.SUITE_RESULT + " = ?;";
+                    + CaseResult.TABLE_NAME + " tr ON"
+                    + " trm." + CaseResultMetric.CASE_RESULT_ID + " = tr." + CaseResult.CASE_RESULT_ID
+                    + " WHERE " + CaseResult.SUITE_RESULT + " = ?;";
             try (Connection conn = this.getConnection(); PreparedStatement stmt = conn.prepareStatement(sql)) {
                 stmt.setString(1, execId);
                 metrics = dumpResultSetToList(stmt.executeQuery());
@@ -702,9 +700,9 @@ public abstract class DbHandler {
         {
             JSONArray trs = new JSONArray();
             final String sql = "SELECT * FROM " + CaseResult.TABLE_NAME + " tr JOIN "
-                + TaskCase.TABLE_NAME + " tc ON"
-                + " tr." + CaseResult.TASK_CASE_ID + " = tc." + TaskCase.TASK_CASE_ID
-                + " WHERE " + CaseResult.SUITE_RESULT + " = ?;";
+                    + TaskCase.TABLE_NAME + " tc ON"
+                    + " tr." + CaseResult.TASK_CASE_ID + " = tc." + TaskCase.TASK_CASE_ID
+                    + " WHERE " + CaseResult.SUITE_RESULT + " = ?;";
             try (Connection conn = this.getConnection(); PreparedStatement stmt = conn.prepareStatement(sql)) {
                 stmt.setString(1, execId);
                 List<Map<String, Object>> l = dumpResultSetToList(stmt.executeQuery());
@@ -717,14 +715,14 @@ public abstract class DbHandler {
 
                     JSONArray trms = new JSONArray();
                     metrics.stream()
-                        .filter(r -> j.getString(CaseResult.CASE_RESULT_ID).equals(r.get(CaseResult.CASE_RESULT_ID)))
-                        .forEach(r -> {
-                            JSONObject jm = new JSONObject();
-                            r.entrySet().forEach(c -> {
-                                jm.put(c.getKey(), c.getValue());
+                            .filter(r -> j.getString(CaseResult.CASE_RESULT_ID).equals(r.get(CaseResult.CASE_RESULT_ID)))
+                            .forEach(r -> {
+                                JSONObject jm = new JSONObject();
+                                r.entrySet().forEach(c -> {
+                                    jm.put(c.getKey(), c.getValue());
+                                });
+                                trms.put(jm);
                             });
-                            trms.put(jm);
-                        });
                     j.put("case_result_metrics", trms);
                 });
             }
@@ -733,7 +731,7 @@ public abstract class DbHandler {
         {
             JSONArray sps = new JSONArray();
             final String sql = "SELECT * FROM " + SuiteProperty.TABLE_NAME
-                + " WHERE " + SuiteProperty.SUITE_RESULT_ID + " = ?;";
+                    + " WHERE " + SuiteProperty.SUITE_RESULT_ID + " = ?;";
             try (Connection conn = this.getConnection(); PreparedStatement stmt = conn.prepareStatement(sql)) {
                 stmt.setString(1, execId);
                 List<Map<String, Object>> l = dumpResultSetToList(stmt.executeQuery());
@@ -759,7 +757,7 @@ public abstract class DbHandler {
         try (Connection conn = this.getConnection()) {
             String sql = "SELECT * FROM " + SuiteResult.TABLE_NAME + " WHERE " + SuiteResult.SUITE_RESULT_ID + " = ?;";
             PreparedStatement stmt = conn.prepareStatement(sql,
-                ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE);
+                    ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE);
             stmt.setString(1, srid);
             ResultSet rs = stmt.executeQuery();
             ResultSetMetaData rsmd = rs.getMetaData();
@@ -783,15 +781,15 @@ public abstract class DbHandler {
 
         try (Connection conn = this.getConnection()) {
             String sql = String.format("SELECT * FROM %s WHERE %s=? AND %s=? AND %s=? AND %s=? AND %s=?;",
-                TaskCase.TABLE_NAME,
-                TaskCase.SUITE_CLASS,
-                TaskCase.CASE_CLASS,
-                TaskCase.CASE_METHOD,
-                TaskCase.CASE_DATA_INFO,
-                TaskCase.CASE_DATA
+                    TaskCase.TABLE_NAME,
+                    TaskCase.SUITE_CLASS,
+                    TaskCase.CASE_CLASS,
+                    TaskCase.CASE_METHOD,
+                    TaskCase.CASE_DATA_INFO,
+                    TaskCase.CASE_DATA
             );
             PreparedStatement stmt
-                = conn.prepareStatement(sql, ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE);
+                    = conn.prepareStatement(sql, ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE);
             stmt.setMaxRows(1);
             for (int i = 0; i < len; i++) {
                 JSONObject tr = trs.getJSONObject(i);
@@ -822,7 +820,7 @@ public abstract class DbHandler {
         try (Connection conn = this.getConnection()) {
             String sql = "SELECT * FROM " + CaseResult.TABLE_NAME + " WHERE " + CaseResult.SUITE_RESULT + " = ?;";
             PreparedStatement stmt = conn.prepareStatement(sql,
-                ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE);
+                    ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE);
             stmt.setString(1, srid);
             ResultSet rs = stmt.executeQuery();
             ResultSetMetaData rsmd = rs.getMetaData();
@@ -846,10 +844,10 @@ public abstract class DbHandler {
             return;
         }
         final String sql = "INSERT INTO " + CaseResultMetric.TABLE_NAME + " ("
-            + CaseResultMetric.CASE_RESULT_ID + ", "
-            + CaseResultMetric.METRIC_GROUP + ", "
-            + CaseResultMetric.METRIC_NAME + ", "
-            + CaseResultMetric.METRIC_VALUE + ") VALUES (?,?,?,?)";
+                + CaseResultMetric.CASE_RESULT_ID + ", "
+                + CaseResultMetric.METRIC_GROUP + ", "
+                + CaseResultMetric.METRIC_NAME + ", "
+                + CaseResultMetric.METRIC_VALUE + ") VALUES (?,?,?,?)";
         try (Connection conn = this.getConnection()) {
             PreparedStatement stmt = conn.prepareStatement(sql);
             LOG.trace("save metric data for {}", trid);
@@ -857,7 +855,7 @@ public abstract class DbHandler {
                 stmt.setString(1, trid);
                 stmt.setString(2, metric.getMetricGroup());
                 stmt.setString(3, metric.getMetricName());
-                stmt.setDouble(4, metric.getMetricValue());
+                stmt.setString(4, metric.getMetricValue());
                 stmt.executeUpdate();
             }
         }

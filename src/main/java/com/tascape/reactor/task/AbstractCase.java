@@ -233,7 +233,7 @@ public abstract class AbstractCase extends AbstractCaseResource {
         throw new ToBeImplementedException("this is a to-be-implemented case");
     }
 
-    protected void putResultMetric(String group, String name, double value) {
+    protected void putResultMetric(String group, String name, String value) {
         CaseResultMetric metric = new CaseResultMetric();
         metric.setMetricGroup(group);
         metric.setMetricName(name);
