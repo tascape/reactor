@@ -25,6 +25,7 @@ import com.tascape.reactor.db.SuiteResult;
 import com.tascape.reactor.suite.AbstractSuite;
 import java.io.File;
 import java.io.IOException;
+import java.io.PrintWriter;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -165,20 +166,23 @@ public class SuiteRunner {
 
     private void saveExectionProperties(File dir) throws IOException, SQLException {
         File props = new File(dir, "execution.properties");
-        SYS_CONFIG.getProperties().store(FileUtils.openOutputStream(props), Reactor.class.getName());
-
         List<SuiteProperty> sps = new ArrayList<>();
-        SYS_CONFIG.getProperties().entrySet().stream()
-                .filter(key -> !key.toString().startsWith("reactor.db."))
-                .filter(key -> !key.toString().endsWith("_"))
-                .filter(key -> !key.toString().toLowerCase().contains("pass"))
-                .forEach(entry -> {
-                    SuiteProperty sp = new SuiteProperty();
-                    sp.setSuiteResultId(this.execId);
-                    sp.setPropertyName(entry.getKey().toString());
-                    sp.setPropertyValue(entry.getValue().toString());
-                    sps.add(sp);
-                });
+
+        try (var out = FileUtils.openOutputStream(props)) {
+            PrintWriter pw = new PrintWriter(out);
+            SYS_CONFIG.getProperties().entrySet().stream()
+                    .filter(key -> !key.toString().startsWith("reactor.db."))
+                    .filter(key -> !key.toString().endsWith("_"))
+                    .filter(key -> !key.toString().toLowerCase().contains("pass"))
+                    .forEach(entry -> {
+                        SuiteProperty sp = new SuiteProperty();
+                        sp.setSuiteResultId(this.execId);
+                        sp.setPropertyName(entry.getKey().toString());
+                        sp.setPropertyValue(entry.getValue().toString());
+                        sps.add(sp);
+                        pw.append(entry.getKey() + "=" + entry.getValue());
+                    });
+        }
         this.db.setSuiteExecutionProperties(sps);
     }
 

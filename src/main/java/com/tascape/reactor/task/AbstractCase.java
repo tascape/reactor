@@ -238,7 +238,7 @@ public abstract class AbstractCase extends AbstractCaseResource {
         metric.setMetricGroup(group);
         metric.setMetricName(name);
         metric.setMetricValue(value);
-        LOG.info("Case result metric '{}' - '{}' - {}", group, name, value);
+        LOG.info("Case result metric '{}' - '{}' - '{}'", group, name, value);
         this.resultMetrics.add(metric);
     }
 
