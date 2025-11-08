@@ -180,7 +180,7 @@ public class SuiteRunner {
                         sp.setPropertyName(entry.getKey().toString());
                         sp.setPropertyValue(entry.getValue().toString());
                         sps.add(sp);
-                        pw.append(entry.getKey() + "=" + entry.getValue());
+                        pw.println(entry.getKey() + "=" + entry.getValue());
                     });
         }
         this.db.setSuiteExecutionProperties(sps);
