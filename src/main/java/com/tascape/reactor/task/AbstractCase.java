@@ -40,6 +40,7 @@ import org.junit.rules.TestName;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import com.tascape.reactor.data.CaseData;
+import java.util.Objects;
 import org.apache.commons.lang3.StringUtils;
 import org.junit.ToBeImplementedException;
 
@@ -233,12 +234,13 @@ public abstract class AbstractCase extends AbstractCaseResource {
         throw new ToBeImplementedException("this is a to-be-implemented case");
     }
 
-    protected void putResultMetric(String group, String name, double value) {
+    protected void putResultMetric(String group, String name, Object value) {
+        String v = Objects.toString(value);
         CaseResultMetric metric = new CaseResultMetric();
         metric.setMetricGroup(group);
         metric.setMetricName(name);
-        metric.setMetricValue(value);
-        LOG.info("Case result metric '{}' - '{}' - {}", group, name, value);
+        metric.setMetricValue(v);
+        LOG.info("Case result metric '{}' - '{}' - '{}'", group, name, v);
         this.resultMetrics.add(metric);
     }
 

@@ -65,7 +65,7 @@ public class CaseResultMetric implements Serializable {
 
     // @Max(value=?)  @Min(value=?)//if you know range of your decimal fields consider using these annotations to enforce field validation
     @Column(name = "METRIC_VALUE")
-    private Double metricValue;
+    private String metricValue;
 
     @JoinColumn(name = "CASE_RESULT_ID", referencedColumnName = "CASE_RESULT_ID")
     @ManyToOne
@@ -102,11 +102,11 @@ public class CaseResultMetric implements Serializable {
         this.metricName = metricName;
     }
 
-    public Double getMetricValue() {
+    public String getMetricValue() {
         return metricValue;
     }
 
-    public void setMetricValue(Double metricValue) {
+    public void setMetricValue(String metricValue) {
         this.metricValue = metricValue;
     }
 
