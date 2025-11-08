@@ -407,8 +407,8 @@ public class SystemConfiguration {
         LOG.debug("Application properties");
         List<String> keys = new ArrayList<>(this.properties.stringPropertyNames());
         Collections.sort(keys);
-        keys.stream()
-                .filter(key -> !key.startsWith(pre("db.")))
+        keys.stream().filter(key -> !key.toString().endsWith("_"))
+                .filter(key -> !key.toString().toLowerCase().contains("pass"))
                 .forEach((key) -> {
                     LOG.debug(String.format("%50s : %s", key, this.properties.getProperty(key)));
                 });
@@ -422,16 +422,20 @@ public class SystemConfiguration {
         List<String> keys = new ArrayList<>(System.getProperties().stringPropertyNames());
         Collections.sort(keys);
         LOG.debug("Java system properties");
-        for (String key : keys) {
-            LOG.debug(String.format("%50s : %s", key, System.getProperties().getProperty(key)));
-        }
+        keys.stream().filter(key -> !key.toString().endsWith("_"))
+                .filter(key -> !key.toString().toLowerCase().contains("pass"))
+                .forEach(key -> {
+                    LOG.debug(String.format("%50s : %s", key, System.getProperties().getProperty(key)));
+                });
 
         keys = new ArrayList<>(System.getenv().keySet());
         Collections.sort(keys);
         LOG.debug("Java environment properties");
-        for (String key : keys) {
-            LOG.debug(String.format("%50s : %s", key, System.getenv().get(key)));
-        }
+        keys.stream().filter(key -> !key.toString().endsWith("_"))
+                .filter(key -> !key.toString().toLowerCase().contains("pass"))
+                .forEach(key -> {
+                    LOG.debug(String.format("%50s : %s", key, System.getenv().get(key)));
+                });
     }
 
     private Properties loadSystemPropertiesFromPath(Path path) {
