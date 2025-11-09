@@ -40,14 +40,14 @@ public class NativeTests {
 
     @Test
     public void testWaitForOutputLine() throws Exception {
-        Process p = Utils.cmdAsync(new String[]{"ping", "google.com"});
-        boolean result = Utils.waitForOutputLine(p, "icmp_seq=10", 30);
+        Process p = Utils.cmdAsync(new String[]{"tcping", "google.com", "443"});
+        boolean result = Utils.waitForOutputLine(p, "port 443 open", 30);
         assertTrue(result);
     }
 
     @Test
     public void testWaitForOutput() throws Exception {
-        Process p = Utils.cmdAsync(new String[]{"ping", "google.com"});
+        Process p = Utils.cmdAsync(new String[]{"tcping", "google.com", "443"});
         Utils.waitForOutput(p, 11);
     }
 }
