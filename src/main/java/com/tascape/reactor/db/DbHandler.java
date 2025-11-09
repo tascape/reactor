@@ -76,8 +76,8 @@ public abstract class DbHandler {
         String type = SystemConfiguration.getInstance().getDatabaseType();
         DbHandler dbh;
         switch (type) {
-            case "h2":
-                dbh = new H2Handler();
+            case "sqlite":
+                dbh = new SqliteHandler();
                 break;
             case "postgresql":
                 dbh = new PostgresqlHandler();
@@ -86,7 +86,7 @@ public abstract class DbHandler {
                 dbh = new MysqlHandler();
                 break;
             default:
-                dbh = new H2Handler();
+                dbh = new SqliteHandler();
         }
         try {
             dbh.init();

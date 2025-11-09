@@ -24,6 +24,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.sql.Connection;
+import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -31,7 +32,6 @@ import java.sql.Statement;
 import java.util.List;
 import java.util.Map;
 import org.apache.commons.io.FileUtils;
-import org.h2.jdbcx.JdbcConnectionPool;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -39,10 +39,11 @@ import org.slf4j.LoggerFactory;
  *
  * @author linsong wang
  */
-public final class H2Handler extends DbHandler {
-    private static final Logger LOG = LoggerFactory.getLogger(H2Handler.class);
+public final class SqliteHandler extends DbHandler {
 
-    private static final String DB_DRIVER = "org.h2.Driver";
+    private static final Logger LOG = LoggerFactory.getLogger(SqliteHandler.class);
+
+    private static final String DB_DRIVER = "org.sqlite.JDBC";
 
     static {
         try {
@@ -52,19 +53,15 @@ public final class H2Handler extends DbHandler {
         }
     }
 
-    private final String dbPath = SYS_CONFIG.getLogPath() + "/db/" + SystemConfiguration.CONSTANT_LOG_KEEP_ALIVE_PREFIX
-        + System.currentTimeMillis() + "/";
-
-    private JdbcConnectionPool connPool;
+    private final String dbFile = SYS_CONFIG.getLogPath() + "/db/" + SystemConfiguration.CONSTANT_LOG_KEEP_ALIVE_PREFIX
+            + System.currentTimeMillis() + "/" + SYS_CONFIG.getExecId();
 
     @Override
     public void init() throws Exception {
-        File dir = new File(this.dbPath);
-        if (dir.exists()) {
-            FileUtils.cleanDirectory(dir);
+        File f = new File(this.dbFile);
+        if (f.exists()) {
+            FileUtils.delete(f);
         }
-        this.connPool = JdbcConnectionPool.create("jdbc:h2:" + this.dbPath + SYS_CONFIG.getExecId(), "sa", "sa");
-        connPool.setMaxConnections(Integer.MAX_VALUE);
         try (Connection conn = this.getConnection()) {
             try {
                 conn.prepareStatement("SELECT * FROM case_result WHERE 0;").executeQuery();
@@ -79,19 +76,19 @@ public final class H2Handler extends DbHandler {
     public boolean queueTaskSuite(TaskSuite suite, String execId) throws SQLException, InterruptedException {
         LOG.debug("Queueing suite result with execution id {} ", execId);
         final String sql = "INSERT INTO " + SuiteResult.TABLE_NAME + " ("
-            + SuiteResult.SUITE_RESULT_ID + ", "
-            + SuiteResult.SUITE_NAME + ", "
-            + SuiteResult.PROJECT_NAME + ", "
-            + SuiteResult.JOB_NAME + ", "
-            + SuiteResult.JOB_BUILD_NUMBER + ", "
-            + SuiteResult.JOB_BUILD_URL + ", "
-            + SuiteResult.START_TIME + ", "
-            + SuiteResult.STOP_TIME + ", "
-            + SuiteResult.EXECUTION_RESULT + ", "
-            + SuiteResult.NUMBER_OF_CASES + ", "
-            + SuiteResult.NUMBER_OF_FAILURE + ", "
-            + SuiteResult.PRODUCT_UNDER_TASK
-            + ") VALUES (?,?,?,?,?,?,?,?,?,?,?,?);";
+                + SuiteResult.SUITE_RESULT_ID + ", "
+                + SuiteResult.SUITE_NAME + ", "
+                + SuiteResult.PROJECT_NAME + ", "
+                + SuiteResult.JOB_NAME + ", "
+                + SuiteResult.JOB_BUILD_NUMBER + ", "
+                + SuiteResult.JOB_BUILD_URL + ", "
+                + SuiteResult.START_TIME + ", "
+                + SuiteResult.STOP_TIME + ", "
+                + SuiteResult.EXECUTION_RESULT + ", "
+                + SuiteResult.NUMBER_OF_CASES + ", "
+                + SuiteResult.NUMBER_OF_FAILURE + ", "
+                + SuiteResult.PRODUCT_UNDER_TASK
+                + ") VALUES (?,?,?,?,?,?,?,?,?,?,?,?);";
 
         try (Connection conn = this.getConnection()) {
             PreparedStatement stmt = conn.prepareStatement(sql);
@@ -118,17 +115,17 @@ public final class H2Handler extends DbHandler {
     protected void queueCaseResults(String execId, List<TaskCase> cases) throws SQLException {
         LOG.debug("Queue {} case result(s) with execution id {} ", cases.size(), execId);
         final String sql = "INSERT INTO " + CaseResult.TABLE_NAME + " ("
-            + CaseResult.CASE_RESULT_ID + ", "
-            + CaseResult.SUITE_RESULT + ", "
-            + CaseResult.TASK_CASE_ID + ", "
-            + CaseResult.EXECUTION_RESULT + ", "
-            + CaseResult.START_TIME + ", "
-            + CaseResult.STOP_TIME + ", "
-            + CaseResult.CASE_STATION + ", "
-            + CaseResult.CASE_ENV + ", "
-            + CaseResult.LOG_DIR + ", "
-            + CaseResult.RETRY
-            + ") VALUES (?,?,?,?,?,?,?,?,?,?);";
+                + CaseResult.CASE_RESULT_ID + ", "
+                + CaseResult.SUITE_RESULT + ", "
+                + CaseResult.TASK_CASE_ID + ", "
+                + CaseResult.EXECUTION_RESULT + ", "
+                + CaseResult.START_TIME + ", "
+                + CaseResult.STOP_TIME + ", "
+                + CaseResult.CASE_STATION + ", "
+                + CaseResult.CASE_ENV + ", "
+                + CaseResult.LOG_DIR + ", "
+                + CaseResult.RETRY
+                + ") VALUES (?,?,?,?,?,?,?,?,?,?);";
         Map<String, Integer> idMap = this.getCaseIds(cases);
 
         try (Connection conn = this.getConnection()) {
@@ -163,11 +160,11 @@ public final class H2Handler extends DbHandler {
         LOG.debug("Query for id of case {} ", kase.format());
         try (Connection conn = this.getConnection()) {
             final String sql = "SELECT * FROM " + TaskCase.TABLE_NAME + " WHERE "
-                + TaskCase.SUITE_CLASS + " = ? AND "
-                + TaskCase.CASE_CLASS + " = ? AND "
-                + TaskCase.CASE_METHOD + " = ? AND "
-                + TaskCase.CASE_DATA_INFO + " = ? AND "
-                + TaskCase.CASE_DATA + " = ?";
+                    + TaskCase.SUITE_CLASS + " = ? AND "
+                    + TaskCase.CASE_CLASS + " = ? AND "
+                    + TaskCase.CASE_METHOD + " = ? AND "
+                    + TaskCase.CASE_DATA_INFO + " = ? AND "
+                    + TaskCase.CASE_DATA + " = ?";
 
             PreparedStatement stmt = conn.prepareStatement(sql);
             stmt.setString(1, kase.getSuiteClass());
@@ -185,12 +182,12 @@ public final class H2Handler extends DbHandler {
 
         try (Connection conn = this.getConnection()) {
             final String sql = "INSERT INTO " + TaskCase.TABLE_NAME + " ("
-                + TaskCase.SUITE_CLASS + ", "
-                + TaskCase.CASE_CLASS + ", "
-                + TaskCase.CASE_METHOD + ", "
-                + TaskCase.CASE_DATA_INFO + ", "
-                + TaskCase.CASE_DATA
-                + ") VALUES (?,?,?,?,?);";
+                    + TaskCase.SUITE_CLASS + ", "
+                    + TaskCase.CASE_CLASS + ", "
+                    + TaskCase.CASE_METHOD + ", "
+                    + TaskCase.CASE_DATA_INFO + ", "
+                    + TaskCase.CASE_DATA
+                    + ") VALUES (?,?,?,?,?);";
 
             PreparedStatement stmt = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
             stmt.setString(1, kase.getSuiteClass());
@@ -203,12 +200,12 @@ public final class H2Handler extends DbHandler {
 
         try (Connection conn = this.getConnection()) {
             final String sql = "SELECT * FROM " + TaskCase.TABLE_NAME + " WHERE "
-                + TaskCase.SUITE_CLASS + " = ? AND "
-                + TaskCase.CASE_CLASS + " = ? AND "
-                + TaskCase.CASE_METHOD + " = ? AND "
-                + TaskCase.CASE_DATA_INFO + " = ? AND "
-                + TaskCase.CASE_DATA + " = ? ORDER BY " + TaskCase.TASK_CASE_ID
-                + " DESC;";
+                    + TaskCase.SUITE_CLASS + " = ? AND "
+                    + TaskCase.CASE_CLASS + " = ? AND "
+                    + TaskCase.CASE_METHOD + " = ? AND "
+                    + TaskCase.CASE_DATA_INFO + " = ? AND "
+                    + TaskCase.CASE_DATA + " = ? ORDER BY " + TaskCase.TASK_CASE_ID
+                    + " DESC;";
 
             PreparedStatement stmt = conn.prepareStatement(sql);
             stmt.setString(1, kase.getSuiteClass());
@@ -228,7 +225,7 @@ public final class H2Handler extends DbHandler {
 
     @Override
     protected Connection getConnection() throws SQLException {
-        return connPool.getConnection();
+        return DriverManager.getConnection(this.dbFile);
     }
 
     @Override
@@ -245,7 +242,7 @@ public final class H2Handler extends DbHandler {
         try (Connection conn = this.getConnection()) {
             ScriptRunner runner = new ScriptRunner(conn, true, true);
             try (InputStreamReader isr = new InputStreamReader(
-                this.getClass().getClassLoader().getResourceAsStream("db/report-h2.sql"))) {
+                    this.getClass().getClassLoader().getResourceAsStream("db/report-sqlite.sql"))) {
                 runner.runScript(isr);
             }
         }

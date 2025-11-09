@@ -316,7 +316,7 @@ public class SystemConfiguration {
     }
 
     public String getDatabaseType() {
-        return this.getProperty(DbHandler.SYSPROP_DATABASE_TYPE, "h2");
+        return this.getProperty(DbHandler.SYSPROP_DATABASE_TYPE, "sqlite");
     }
 
     public String getDatabaseHost() {
