@@ -63,7 +63,7 @@ public final class H2Handler extends DbHandler {
         if (dir.exists()) {
             FileUtils.cleanDirectory(dir);
         }
-        this.connPool = JdbcConnectionPool.create("jdbc:h2:" + this.dbPath + SYS_CONFIG.getExecId(), "sa", "sa");
+        this.connPool = JdbcConnectionPool.create("jdbc:h2:" + this.dbPath + SYS_CONFIG.getExecId() + ";MODE=MySQL", "sa", "sa");
         connPool.setMaxConnections(Integer.MAX_VALUE);
         try (Connection conn = this.getConnection()) {
             try {

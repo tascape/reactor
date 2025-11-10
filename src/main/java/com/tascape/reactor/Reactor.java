@@ -30,7 +30,7 @@ public class Reactor {
     private static final Logger LOG = LoggerFactory.getLogger(Reactor.class);
 
     public static void main(String[] args) {
-        int exitCode = 0;
+        int numberOfFailures = 0;
         try {
             SystemConfiguration config = SystemConfiguration.getInstance();
             config.listAppProperties();
@@ -50,15 +50,15 @@ public class Reactor {
             }
 
             SuiteRunner sr = new SuiteRunner(ts);
-            exitCode = sr.runCases();
+            numberOfFailures = sr.runCases();
+            if (numberOfFailures != 0) {
+                LOG.error("Reactor finishes with exit code {}", numberOfFailures);
+                System.exit(1);
+            }
+            System.exit(0);
         } catch (Throwable t) {
             LOG.error("Reactor finishes with exception", t);
-            exitCode = -1;
-        } finally {
-            if (exitCode != 0) {
-                LOG.error("Reactor finishes with exit code {}", exitCode);
-            }
-            System.exit(exitCode);
+            System.exit(1);
         }
     }
 }
