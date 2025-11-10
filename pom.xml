@@ -198,9 +198,7 @@
                         <exclude>Jenkinsfile</exclude>
                         <exclude>*.md</exclude>
                         <exclude>**/*.properties</exclude>
-                        <exclude>**/*.sql</exclude>
                         <exclude>*.sh</exclude>
-                        <exclude>*.yml</exclude>
                         <exclude>*.zip</exclude>
                         <exclude>nbactions*</exclude>
                         <exclude>.sdkmanrc</exclude>
