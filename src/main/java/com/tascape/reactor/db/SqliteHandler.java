@@ -17,18 +17,17 @@
 package com.tascape.reactor.db;
 
 import com.tascape.reactor.ExecutionResult;
-import com.tascape.reactor.SystemConfiguration;
 import com.tascape.reactor.TaskSuite;
 import com.tascape.reactor.Utils;
 import java.io.File;
 import java.io.IOException;
-import java.io.InputStreamReader;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import org.apache.commons.io.FileUtils;
@@ -53,12 +52,81 @@ public final class SqliteHandler extends DbHandler {
         }
     }
 
-    private final String dbFile = SYS_CONFIG.getLogPath() + "/db/" + SystemConfiguration.CONSTANT_LOG_KEEP_ALIVE_PREFIX
-            + System.currentTimeMillis() + "/" + SYS_CONFIG.getExecId();
+    private final String dbFile = SYS_CONFIG.getLogPath() + "/db/" + SYS_CONFIG.getExecId() + "/sqlite.db";
+
+    public static final List<String> SQL_DDL = new ArrayList<>() {
+        {
+            add("""
+                CREATE TABLE `suite_result` (
+                  `SUITE_RESULT_ID` TEXT NOT NULL,
+                  `SUITE_NAME` TEXT DEFAULT NULL,
+                  `PROJECT_NAME` TEXT DEFAULT NULL,
+                  `JOB_NAME` TEXT DEFAULT NULL,
+                  `JOB_BUILD_NUMBER` INTEGER DEFAULT NULL,
+                  `JOB_BUILD_URL` TEXT DEFAULT NULL,
+                  `EXECUTION_RESULT` TEXT DEFAULT NULL,
+                  `START_TIME` INTEGER DEFAULT NULL,
+                  `STOP_TIME` INTEGER DEFAULT NULL,
+                  `NUMBER_OF_CASES` INTEGER DEFAULT NULL,
+                  `NUMBER_OF_FAILURE` INTEGER DEFAULT NULL,
+                  `INVISIBLE_ENTRY` INTEGER DEFAULT '0',
+                  `PRODUCT_UNDER_TASK` TEXT DEFAULT NULL
+                )
+                """);
+            add("""
+                CREATE TABLE `suite_property` (
+                  `SUITE_PROPERTY_ID` INTEGER PRIMARY KEY AUTOINCREMENT,
+                  `SUITE_RESULT_ID` TEXT NOT NULL,
+                  `PROPERTY_NAME` TEXT DEFAULT NULL,
+                  `PROPERTY_VALUE` TEXT DEFAULT NULL
+                )
+                """);
+            add("""
+                CREATE TABLE `task_case` (
+                  `TASK_CASE_ID` INTEGER PRIMARY KEY AUTOINCREMENT,
+                  `SUITE_CLASS` TEXT NOT NULL,
+                  `CASE_CLASS` TEXT NOT NULL,
+                  `CASE_METHOD` TEXT NOT NULL,
+                  `CASE_DATA_INFO` TEXT NOT NULL,
+                  `CASE_DATA` TEXT DEFAULT '',
+                  `CASE_ISSUES` TEXT DEFAULT ''
+                )
+                """);
+            add("""
+                CREATE TABLE `case_result` (
+                  `CASE_RESULT_ID` TEXT NOT NULL,
+                  `SUITE_RESULT` TEXT DEFAULT NULL,
+                  `TASK_CASE_ID` INTEGER DEFAULT '0',
+                  `EXECUTION_RESULT` TEXT DEFAULT NULL,
+                  `AUT` TEXT DEFAULT NULL,
+                  `START_TIME` INTEGER DEFAULT NULL,
+                  `STOP_TIME` INTEGER DEFAULT NULL,
+                  `RETRY` INTEGER DEFAULT NULL,
+                  `CASE_STATION` TEXT DEFAULT NULL,
+                  `LOG_DIR` TEXT DEFAULT NULL,
+                  `EXTERNAL_ID` TEXT DEFAULT NULL,
+                  `CASE_ENV` TEXT DEFAULT NULL,
+                  CONSTRAINT `fk_suite_result` FOREIGN KEY (`SUITE_RESULT`) REFERENCES `suite_result` (`SUITE_RESULT_ID`) ON DELETE CASCADE ON UPDATE CASCADE,
+                  CONSTRAINT `fk_task_case` FOREIGN KEY (`TASK_CASE_ID`) REFERENCES `task_case` (`TASK_CASE_ID`) ON UPDATE CASCADE
+                )
+                """);
+            add("""
+                CREATE TABLE `case_result_metric` (
+                  `CASE_RESULT_METRIC_ID` INTEGER PRIMARY KEY AUTOINCREMENT,
+                  `CASE_RESULT_ID` TEXT DEFAULT NULL,
+                  `METRIC_GROUP` TEXT DEFAULT NULL,
+                  `METRIC_NAME` TEXT DEFAULT NULL,
+                  `METRIC_VALUE` TEXT DEFAULT NULL,
+                  CONSTRAINT `fk_case_result` FOREIGN KEY (`CASE_RESULT_ID`) REFERENCES `case_result` (`CASE_RESULT_ID`) ON DELETE CASCADE ON UPDATE CASCADE
+                )
+                """);
+        }
+    };
 
     @Override
     public void init() throws Exception {
         File f = new File(this.dbFile);
+        FileUtils.createParentDirectories(f);
         if (f.exists()) {
             FileUtils.delete(f);
         }
@@ -225,7 +293,9 @@ public final class SqliteHandler extends DbHandler {
 
     @Override
     protected Connection getConnection() throws SQLException {
-        return DriverManager.getConnection(this.dbFile);
+        String jdbc = "jdbc:sqlite:" + this.dbFile;
+        LOG.debug(jdbc);
+        return DriverManager.getConnection(jdbc);
     }
 
     @Override
@@ -240,11 +310,15 @@ public final class SqliteHandler extends DbHandler {
 
     private void initSchema() throws SQLException, IOException {
         try (Connection conn = this.getConnection()) {
-            ScriptRunner runner = new ScriptRunner(conn, true, true);
-            try (InputStreamReader isr = new InputStreamReader(
-                    this.getClass().getClassLoader().getResourceAsStream("db/report-sqlite.sql"))) {
-                runner.runScript(isr);
-            }
+            Statement stmt = conn.createStatement();
+            SQL_DDL.forEach(sql -> {
+                LOG.debug(sql);
+                try {
+                    stmt.executeUpdate(sql);
+                } catch (SQLException ex) {
+                    LOG.error("{}", ex.getMessage());
+                }
+            });
         }
     }
 }

@@ -50,10 +50,10 @@ public class Reactor {
             }
 
             SuiteRunner sr = new SuiteRunner(ts);
-            exitCode = sr.runCases();
+            exitCode = sr.runCases() == 0? 0 : 1;
         } catch (Throwable t) {
             LOG.error("Reactor finishes with exception", t);
-            exitCode = -1;
+            exitCode = 1;
         } finally {
             if (exitCode != 0) {
                 LOG.error("Reactor finishes with exit code {}", exitCode);
