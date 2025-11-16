@@ -36,10 +36,8 @@ import org.slf4j.LoggerFactory;
  *
  * @author linsong wang
  */
-public class MysqlHandler extends DbHandler {
-    private static final Logger LOG = LoggerFactory.getLogger(MysqlHandler.class);
-
-    private static final String DB_DRIVER = "com.mysql.cj.jdbc.Driver";
+public class MariadbHandler extends DbHandler {
+    private static final Logger LOG = LoggerFactory.getLogger(MariadbHandler.class);
 
     protected static final String DB_HOST = SYS_CONFIG.getDatabaseHost();
 
@@ -51,15 +49,7 @@ public class MysqlHandler extends DbHandler {
 
     protected static final int DB_POOL_SIZE = SYS_CONFIG.getDatabasePoolSize();
 
-    private static final String JDBC_URL = "jdbc:mysql://" + DB_HOST + "/" + DB_SCHEMA + "?useSSL=false";
-
-    static {
-        try {
-            Class.forName(DB_DRIVER).newInstance();
-        } catch (ClassNotFoundException | InstantiationException | IllegalAccessException ex) {
-            throw new RuntimeException("Cannot load database driver: " + DB_DRIVER, ex);
-        }
-    }
+    private static final String JDBC_URL = "jdbc:mariadb://" + DB_HOST + "/" + DB_SCHEMA + "?useSSL=false";
 
     protected DataSource ds;
 
@@ -251,7 +241,7 @@ public class MysqlHandler extends DbHandler {
     }
 
     public static void main(String[] args) throws SQLException {
-        MysqlHandler db = new MysqlHandler();
+        MariadbHandler db = new MariadbHandler();
         TaskCase tc = new TaskCase();
         tc.setSuiteClass("a");
         LOG.debug("case id = {}", db.getCaseId(tc));
