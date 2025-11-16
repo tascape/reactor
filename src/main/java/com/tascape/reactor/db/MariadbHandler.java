@@ -49,7 +49,7 @@ public class MariadbHandler extends DbHandler {
 
     protected static final int DB_POOL_SIZE = SYS_CONFIG.getDatabasePoolSize();
 
-    private static final String JDBC_URL = "jdbc:mariadb://" + DB_HOST + "/" + DB_SCHEMA + "?useSSL=false";
+    protected static final String JDBC_URL = "jdbc:mariadb://" + DB_HOST + "/" + DB_SCHEMA + "?useSSL=false";
 
     protected DataSource ds;
 
