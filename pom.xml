@@ -201,10 +201,11 @@
                     <excludes>
                         <exclude>Dockerfile</exclude>
                         <exclude>Jenkinsfile</exclude>
-                        <exclude>*.md</exclude>
+                        <exclude>**/*.md</exclude>
                         <exclude>**/*.properties</exclude>
                         <exclude>*.sh</exclude>
-                        <exclude>*.zip</exclude>
+                        <exclude>**/*.sql</exclude>
+                        <exclude>**/*.zip</exclude>
                         <exclude>nbactions*</exclude>
                         <exclude>.sdkmanrc</exclude>
                     </excludes>
