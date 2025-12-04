@@ -173,7 +173,7 @@ public abstract class AbstractCase extends AbstractCaseResource {
         CaseData td = AbstractCase.this.getCaseData();
         if (td == null) {
             LOG.debug("There is no injected case data, create a new instance of ", clazz);
-            td = clazz.newInstance();
+            td = clazz.getDeclaredConstructor().newInstance();
         }
         LOG.info("Case data {}: {}", td.getValue(), td.getDescription());
         this.setExternalId(td.getExternalId());

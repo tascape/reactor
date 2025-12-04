@@ -57,7 +57,7 @@ public class TaskSuite {
     public TaskSuite(String suiteClass, Pattern caseClassRegex, Pattern caseMethodRegex, List<String> caseList)
             throws Exception {
         LOG.debug("Find cases in target suite {}", suiteClass);
-        AbstractSuite suite = AbstractSuite.class.cast(Class.forName(suiteClass).newInstance());
+        AbstractSuite suite = AbstractSuite.class.cast(Class.forName(suiteClass).getDeclaredConstructor().newInstance());
         this.name = suite.getName();
         this.projectName = suite.getProjectName();
         this.numberOfEnvs = suite.getNumberOfEnvs();

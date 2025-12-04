@@ -54,14 +54,6 @@ public class MySqlCommunication extends EntityCommunication {
 
     private String schemaName;
 
-    static {
-        try {
-            Class.forName("com.mysql.jdbc.Driver").newInstance();
-        } catch (ClassNotFoundException | InstantiationException | IllegalAccessException ex) {
-            throw new RuntimeException("Cannot load database driver", ex);
-        }
-    }
-
     /**
      *
      * @param dbUrl    such as "jdbc:mysql://localhost:3570/reactor");

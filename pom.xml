@@ -21,17 +21,6 @@
     <dependencies>
         <dependency>
             <groupId>com.tascape</groupId>
-            <artifactId>reactor-ui</artifactId>
-            <version>1.2.0</version>
-            <exclusions>
-                <exclusion>
-                    <groupId>org.slf4j</groupId>
-                    <artifactId>slf4j-api</artifactId>
-                </exclusion>
-            </exclusions>
-        </dependency>
-        <dependency>
-            <groupId>com.tascape</groupId>
             <artifactId>reactor-junit4</artifactId>
             <version>4.12.1</version>
         </dependency>
@@ -193,7 +182,7 @@
                 <artifactId>maven-compiler-plugin</artifactId>
                 <version>3.14.1</version>
                 <configuration>
-                    <showDeprecation>false</showDeprecation>
+                    <showDeprecation>true</showDeprecation>
                 </configuration>
             </plugin>
             <plugin>
@@ -233,6 +222,7 @@
             <url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
         </license>
     </licenses>
+
     <developers>
         <developer>
             <name>Linsong Wang</name>
@@ -241,6 +231,7 @@
             <organizationUrl>http://www.tascape.com</organizationUrl>
         </developer>
     </developers>
+
     <scm>
         <connection>scm:git:git@github.com:tascape/reactor.git</connection>
         <developerConnection>scm:git:git@github.com:tascape/reactor.git</developerConnection>

@@ -127,7 +127,7 @@ public class DockerClient extends EntityDriver {
         });
         LOG.debug("[{} {}]", cmdLine.getExecutable(), StringUtils.join(cmdLine.getArguments(), " "));
         List<String> output = new ArrayList<>();
-        ExecuteWatchdog watchdog = new ExecuteWatchdog(ExecuteWatchdog.INFINITE_TIMEOUT);
+        ExecuteWatchdog watchdog = ExecuteWatchdog.builder().setTimeout(ExecuteWatchdog.INFINITE_TIMEOUT_DURATION).get();
         Executor executor = new DefaultExecutor();
         executor.setWatchdog(watchdog);
         PrintWriter writer = new PrintWriter(out);
