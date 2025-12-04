@@ -42,16 +42,6 @@ import org.slf4j.LoggerFactory;
 public final class H2Handler extends DbHandler {
     private static final Logger LOG = LoggerFactory.getLogger(H2Handler.class);
 
-    private static final String DB_DRIVER = "org.h2.Driver";
-
-    static {
-        try {
-            Class.forName(DB_DRIVER);
-        } catch (ClassNotFoundException ex) {
-            throw new RuntimeException("Cannot load database driver: " + DB_DRIVER, ex);
-        }
-    }
-
     private final String dbPath = SYS_CONFIG.getLogPath() + "/db/" + SystemConfiguration.CONSTANT_LOG_KEEP_ALIVE_PREFIX
         + System.currentTimeMillis() + "/";
 

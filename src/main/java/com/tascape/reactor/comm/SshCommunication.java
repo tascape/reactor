@@ -303,7 +303,7 @@ public class SshCommunication extends EntityCommunication implements Closeable {
         ssh.upload(out, "/home/vagrant/ssh.txt", 1000);
 
         ssh.shell("ls -al && sleep 5", 6000);
-        ssh.shell("echo 'test data " + RandomUtils.nextLong() + "' >> /home/vagrant/ssh.txt", 2000);
+        ssh.shell("echo 'test data " + RandomUtils.secureStrong().randomLong() + "' >> /home/vagrant/ssh.txt", 2000);
         try (OutputStream os = FileUtils.openOutputStream(out)) {
             ssh.shell("cat /home/vagrant/ssh.txt", os);
         }

@@ -30,7 +30,6 @@ public class Reactor {
     private static final Logger LOG = LoggerFactory.getLogger(Reactor.class);
 
     public static void main(String[] args) {
-        int numberOfFailures = 0;
         try {
             SystemConfiguration config = SystemConfiguration.getInstance();
             config.listAppProperties();
@@ -50,7 +49,7 @@ public class Reactor {
             }
 
             SuiteRunner sr = new SuiteRunner(ts);
-            numberOfFailures = sr.runCases();
+            int numberOfFailures = sr.runCases();
             if (numberOfFailures != 0) {
                 LOG.error("Reactor finishes with exit code {}", numberOfFailures);
                 System.exit(1);

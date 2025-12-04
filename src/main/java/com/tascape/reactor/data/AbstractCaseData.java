@@ -124,7 +124,7 @@ public abstract class AbstractCaseData implements CaseData {
         if (data == null) {
             Object provider = AbstractCaseData.LOADED_PROVIDERS.get(klass);
             if (provider == null) {
-                provider = klass.newInstance();
+                provider = klass.getDeclaredConstructor().newInstance();
                 AbstractCaseData.LOADED_PROVIDERS.put(klass, provider);
             }
 

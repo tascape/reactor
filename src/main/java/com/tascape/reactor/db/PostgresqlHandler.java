@@ -30,17 +30,7 @@ import org.slf4j.LoggerFactory;
 public class PostgresqlHandler extends MysqlHandler {
     private static final Logger LOG = LoggerFactory.getLogger(PostgresqlHandler.class);
 
-    private static final String DB_DRIVER = "org.postgresql.Driver";
-
     private static final String JDBC_URL = "jdbc:postgresql://" + DB_HOST + "/" + DB_SCHEMA;
-
-    static {
-        try {
-            Class.forName(DB_DRIVER).newInstance();
-        } catch (ClassNotFoundException | InstantiationException | IllegalAccessException ex) {
-            throw new RuntimeException("Cannot load database driver: " + DB_DRIVER, ex);
-        }
-    }
 
     @Override
     protected boolean acquireExecutionLock(Connection conn, String lock) throws SQLException {

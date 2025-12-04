@@ -108,7 +108,7 @@ public class CaseRunnerJUnit4 extends AbstractCaseRunner implements Callable<Cas
         Environment env = AbstractSuite.getEnvionment(suiteClass);
         if (env == null) {
             LOG.info("Initialize suite runtime environment");
-            AbstractSuite abstractSuite = AbstractSuite.class.cast(Class.forName(suiteClass).newInstance());
+            AbstractSuite abstractSuite = AbstractSuite.class.cast(Class.forName(suiteClass).getDeclaredConstructor().newInstance());
             try {
                 abstractSuite.setUp();
             } catch (Throwable t) {
