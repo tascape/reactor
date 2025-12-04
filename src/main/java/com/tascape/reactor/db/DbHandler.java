@@ -85,6 +85,9 @@ public abstract class DbHandler {
             case "mysql":
                 dbh = new MysqlHandler();
                 break;
+            case "mariadb":
+                dbh = new MariadbHandler();
+                break;
             default:
                 dbh = new H2Handler();
         }
